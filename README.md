@@ -50,6 +50,10 @@ python -m venv .venv
 
 The app itself uses only the Python standard library. `pillow` and `pyinstaller` are build-time dependencies.
 
+## Offline Mode
+
+After the app is downloaded and installed, normal LAN-helper features work offline. Optional server downloads and online-only games require internet and are not handled by this app.
+
 ## Build The EXE
 
 Run:
