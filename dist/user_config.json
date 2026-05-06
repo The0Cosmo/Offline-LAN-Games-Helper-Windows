@@ -1,5 +1,9 @@
 {
-  "paths": {},
+  "paths": {
+    "Hearts of Iron IV": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\hoi4.exe",
+    "Stardew Valley": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Stardew Valley\\Stardew Valley.exe",
+    "Valheim": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim\\valheim.exe"
+  },
   "server_paths": {},
   "server_install_dirs": {},
   "steamcmd_path": "",
