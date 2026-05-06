@@ -1,27 +1,34 @@
 # Offline LAN Games Helper - Windows
 
-Offline LAN Games Helper is a safe Windows GUI utility for LAN/offline multiplayer games that you legally own. It helps with host IP discovery, Windows Firewall rules, normal game launching, LAN tutorials, and official dedicated server tools where a real supported server option exists.
+Offline LAN Games Helper is a safe Windows GUI utility for LAN/offline multiplayer games that you legally own. It helps with LAN IP discovery, Windows Firewall rules, normal game launching, game-specific tutorials, exported guides, and official dedicated server tools where a real supported server option exists.
 
-This app is not a server emulator. It does not bypass DRM, Steam, Epic, Paradox Launcher, authentication, ownership checks, anti-cheat, online services, or licenses. It does not create cracks, loaders, Steam emulators, patched executables, hooks, injectors, modified game files, or offline-service emulators.
+This project is not affiliated with Steam, Valve, Paradox, Epic Games, Rockstar, Riot Games, Mojang, Microsoft, Apple, or any game publisher.
+
+## Supported Platform
+
+- Windows 10/11
+- Built app: `dist\Offline LAN Games Helper.exe`
+- Source app: Python + tkinter
 
 ## What The App Does
 
 - Shows the host PC hostname and private LAN IPv4 addresses.
 - Warns when multiple LAN/VPN adapters may confuse IP selection.
-- Lets you copy the selected host IP for friends.
-- Detects installed game executables from common paths and Steam libraries.
-- Saves manually selected game paths in `user_config.json`.
+- Copies the selected host IP.
+- Detects game executables from common paths and Steam libraries.
+- Saves manually selected paths in `user_config.json`.
 - Launches selected games normally.
-- Adds/removes Windows Firewall rules created only by this helper.
-- Shows English LAN tutorials, troubleshooting, ports, and compatibility notes.
-- Exports a Markdown guide for the selected game.
+- Adds/removes only the Windows Firewall rules created by this helper.
+- Shows English tutorials, ports, notes, troubleshooting, and privacy text.
+- Exports Markdown LAN/server guides.
 - Helps with official dedicated server tools only when supported.
 
 ## What The App Cannot Do
 
 - It cannot turn online-only games into LAN games.
 - It cannot emulate matchmaking, account services, Steam, Epic, Paradox, or other online services.
-- It cannot bypass ownership checks or anti-cheat.
+- It cannot bypass DRM, launchers, authentication, game ownership checks, anti-cheat, or licenses.
+- It cannot create cracks, loaders, Steam emulators, patched executables, hooks, injectors, modified game files, or offline-service emulators.
 - It cannot modify original game files.
 - It cannot create a dedicated server for games that only support in-game hosting.
 
@@ -34,16 +41,16 @@ cd "C:\Users\liuqi\Desktop\Windows OfflineLan Helper"
 .\.venv\Scripts\python.exe .\lan_games_helper.py
 ```
 
-If `.venv` does not exist yet, create it first:
+If `.venv` does not exist yet:
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
 ```
 
-The app itself uses only the Python standard library. `pillow` and `pyinstaller` are only needed for icon generation and building the executable.
+The app itself uses only the Python standard library. `pillow` and `pyinstaller` are build-time dependencies.
 
-## Build The Windows EXE
+## Build The EXE
 
 Run:
 
@@ -52,16 +59,15 @@ cd "C:\Users\liuqi\Desktop\Windows OfflineLan Helper"
 .\build_exe.ps1
 ```
 
-The build script:
+The build script uses PyInstaller with:
 
-- creates or uses `.venv`;
-- installs `pyinstaller` and `pillow`;
-- generates `assets\offline_lan_helper.ico` if needed;
-- builds with `--onefile --windowed --noconsole`;
-- checks that the generated `.spec` uses `console=False`;
-- copies `games.json` and `user_config.json` beside the executable.
+```powershell
+pyinstaller --onefile --windowed --noconsole --name "Offline LAN Games Helper" --icon "assets\offline_lan_helper.ico" lan_games_helper.py
+```
 
-The final executable is created here:
+The script also checks that the generated `.spec` contains `console=False`, generates the icon if needed, and copies `games.json`, `user_config.json`, `README.md`, `PRIVACY.md`, and `LICENSE` beside the executable.
+
+Output:
 
 ```text
 C:\Users\liuqi\Desktop\Windows OfflineLan Helper\dist\Offline LAN Games Helper.exe
@@ -69,13 +75,21 @@ C:\Users\liuqi\Desktop\Windows OfflineLan Helper\dist\Offline LAN Games Helper.e
 
 The executable is built as a GUI app and should not open a terminal window.
 
-## Administrator Mode
+## Download From GitHub Releases
+
+When a release is published, download the Windows executable from the repository's GitHub Releases page. Use the release asset named similar to:
+
+```text
+Offline LAN Games Helper.exe
+```
+
+Download only releases published by The0Cosmo or a trusted project maintainer. Do not download repacked copies from unofficial sites.
+
+## Run As Administrator
 
 Administrator rights are required only for Windows Firewall changes.
 
-To run as Administrator:
-
-1. Right-click PowerShell or the built `.exe`.
+1. Right-click the built `.exe` or PowerShell.
 2. Choose `Run as administrator`.
 3. Use `Add Firewall Rules` or `Remove Firewall Rules`.
 
@@ -100,97 +114,47 @@ Offline LAN Helper - GAME_NAME - Ports TCP
 Offline LAN Helper - GAME_NAME - Ports UDP
 ```
 
-`Remove Firewall Rules` removes only rules with those helper-created names. It does not touch unrelated Windows Firewall rules.
+`Remove Firewall Rules` removes only rules with those names. It does not touch unrelated Windows Firewall rules.
 
 ## Server Tools
 
-The `Server Tools` tab is intentionally conservative.
+Server Tools can only:
 
-Supported server support types:
+- open official download pages;
+- use official SteamCMD app IDs if verified and listed;
+- launch official dedicated server executables;
+- let the user select local server files;
+- export instructions.
 
-- `none`: no supported dedicated server; use in-game hosting if available.
-- `in_game_host`: host from inside the game.
-- `official_dedicated`: launch or select an official dedicated server executable already installed.
-- `steamcmd`: install with SteamCMD only if `games.json` contains a verified official app ID and the user selects SteamCMD.
-- `manual_files`: use user-provided local official server files.
-- `official_download_page`: open the official download page in a browser.
+Server Tools cannot create fake servers, emulate online services, bypass authentication, patch game files, or download from unofficial sources.
 
-SteamCMD is used normally. The app does not bundle, emulate, patch, or bypass SteamCMD. If a server requires a purchased game or a logged-in account, follow the official game/server documentation.
-
-Servers are installed under:
+If server support is unavailable, the app shows:
 
 ```text
-servers\GAME_NAME
+No supported dedicated server is available for this game. Host from inside the game if supported.
 ```
 
-Only official SteamCMD app IDs should be added to `games.json`. If an app ID is not verified, leave it blank and use manual files or an official download page instead.
+If a game has no official dedicated server, use in-game hosting.
 
-## Add A Custom Game
+## Add Custom Games
 
-Use `Add Custom Game` to add a game that is not in `games.json`.
+Use `Add Custom Game` only for legitimate games with real offline/LAN or local hosting support. Custom games are saved in `user_config.json`; the app does not edit built-in `games.json`.
 
-You can enter:
+## Privacy
 
-- game name;
-- executable path;
-- optional ports;
-- host tutorial;
-- client tutorial;
-- server support type;
-- optional server executable path;
-- notes.
+Offline LAN Games Helper works locally on your device. It does not collect, sell, share, or upload personal data. It may read local network information such as your LAN IP address and adapter names only to show them inside the app.
 
-Custom games are saved in `user_config.json`. The app never edits the built-in `games.json` when adding a custom game.
+See [PRIVACY.md](PRIVACY.md) for details.
 
-## Export Tutorials
+## License
 
-Use `Export Tutorial` to create a Markdown guide in:
+Copyright (c) 2026 The0Cosmo. All rights reserved.
 
-```text
-exported_guides
-```
-
-The guide includes the selected game, host IP, LAN tutorial, server tools notes, firewall ports, and troubleshooting.
-
-## Editing games.json
-
-Each built-in game entry uses this schema:
-
-```json
-{
-  "name": "Game Name",
-  "platforms": ["Windows"],
-  "lan_status": "Supported / Local server / In-game host",
-  "exe_names": [],
-  "common_paths_windows": [],
-  "common_paths_macos": [],
-  "ports": [],
-  "host_tutorial": [],
-  "client_tutorial": [],
-  "offline_notes": [],
-  "troubleshooting": [],
-  "launch_notes": [],
-  "server_support": "in_game_host",
-  "server_notes": [],
-  "server_files": [],
-  "steamcmd_app_id": "",
-  "server_executable_names": [],
-  "server_common_paths_windows": [],
-  "server_common_paths_macos": [],
-  "server_install_steps": [],
-  "server_launch_command_windows": "",
-  "server_launch_command_macos": "",
-  "server_config_files": [],
-  "server_ports": [],
-  "official_download_url": ""
-}
-```
-
-Only add games that have real offline LAN, local hosting, or official dedicated server support. If support is uncertain, do not add the game.
+This software is for personal, non-commercial use only. See [LICENSE](LICENSE) for the full license terms.
 
 ## Why Online-Only Games Are Excluded
 
-Some games depend on online matchmaking, account services, proprietary lobbies, or anti-cheat services. This helper cannot and will not replace those services.
+Some games depend on online matchmaking, account services, proprietary lobbies, or anti-cheat services. This helper cannot replace those services.
 
 Examples intentionally excluded include VALORANT, osu!, Grand Theft Auto V, Cyberpunk 2077, Paradox Launcher v2, BombSquad, Crab Game, Muck, Human: Fall Flat, The Escapists 2, and launcher-only entries.
 

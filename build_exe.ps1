@@ -73,8 +73,14 @@ if (-not (Test-Path -LiteralPath $Dist)) {
 
 Copy-Item -LiteralPath .\games.json -Destination (Join-Path $Dist 'games.json') -Force
 Copy-Item -LiteralPath .\user_config.json -Destination (Join-Path $Dist 'user_config.json') -Force
+foreach ($File in @('README.md', 'PRIVACY.md', 'LICENSE')) {
+    if (Test-Path -LiteralPath $File) {
+        Copy-Item -LiteralPath $File -Destination (Join-Path $Dist $File) -Force
+    }
+}
 
 Write-Host ''
 Write-Host 'Build complete.'
 Write-Host "Executable: $(Join-Path $Dist 'Offline LAN Games Helper.exe')"
 Write-Host 'Editable data files copied beside the executable: games.json, user_config.json'
+Write-Host 'Documentation copied beside the executable: README.md, PRIVACY.md, LICENSE'
