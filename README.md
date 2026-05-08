@@ -15,13 +15,18 @@ This project is not affiliated with Steam, Valve, Paradox, Epic Games, Rockstar,
 - Shows the host PC hostname and private LAN IPv4 addresses.
 - Warns when multiple LAN/VPN adapters may confuse IP selection.
 - Copies the selected host IP.
+- Tests one user-entered or selected LAN IP with ping and one TCP port.
+- Generates copyable/exportable invite messages for friends.
 - Detects game executables from common paths and Steam libraries.
 - Saves manually selected paths in `user_config.json`.
 - Launches selected games normally.
 - Adds/removes only the Windows Firewall rules created by this helper.
+- Creates timestamped `.zip` backups of user-selected save folders and restores backups only after confirmation.
+- Exports mod file lists for Minecraft Java and other modded games so players can compare setups.
+- Helps diagnose local input conflicts with a Windows-only Input Isolation Helper.
 - Shows English tutorials, ports, notes, troubleshooting, and privacy text.
 - Exports Markdown LAN/server guides.
-- Helps with official dedicated server tools only when supported.
+- Helps with official dedicated server tools only when supported, including status for server processes started by this app.
 
 ## What The App Cannot Do
 
@@ -53,6 +58,8 @@ The app itself uses only the Python standard library. `pillow` and `pyinstaller`
 ## Offline Mode
 
 After the app is downloaded and installed, normal LAN-helper features work offline. Optional server downloads and online-only games require internet and are not handled by this app.
+
+Use the `Offline Mode` toggle to hide or block optional internet/download actions. LAN IP detection, tutorials, path selection, launching installed games, LAN tests, backups, mod-list export, invite export, and guide export still work offline.
 
 ## Build The EXE
 
@@ -140,9 +147,88 @@ No supported dedicated server is available for this game. Host from inside the g
 
 If a game has no official dedicated server, use in-game hosting.
 
+The Server Tools tab also shows whether a dedicated server process started by this app is running or stopped. `Start Server` starts only the selected official server executable/file. `Stop Server` asks for confirmation and only stops a server process that this app started for the selected game. It does not kill unrelated processes.
+
+## LAN Test / Connection Test
+
+Use `LAN Test` to test one IP address that you enter or select. The app can:
+
+- ping the target IP;
+- test one TCP port;
+- use the selected game's default ports from `games.json` when listed.
+
+This is not a scanner. It does not scan the internet, random IP ranges, or LAN ranges.
+
+## Invites
+
+Use `Copy Invite` or `Export Invite` to generate a ready-to-send message with the selected game name, host IP, port, and client join instructions.
+
+## Backups
+
+Use `Backups` to select a world/save folder and create timestamped `.zip` backups in:
+
+```text
+backups\GAME_NAME
+```
+
+Restore requires confirmation. Restoring can overwrite files with matching names, but the helper does not delete original saves.
+
+## Mod List Export
+
+Use `Mods` to select a mods folder and export file names, sizes, and modified dates. Share the exported list with other players so everyone can compare mod setups before joining a modded LAN session.
+
+The app does not download, install, or update mods.
+
+## Input Isolation Helper
+
+The Input Isolation Helper helps users diagnose controller and input conflicts for local multiplayer tools such as Nucleus Co-op, DS4Windows, HidHide, Prism Launcher, and Minecraft Java.
+
+It can show running processes, open local tools, and provide checklists.
+
+It does not inject into games, hook input, block input directly, bypass anti-cheat, or modify game files.
+
+The helper can:
+
+- list running processes with process name, PID, executable path when Windows allows access, and a detected category;
+- copy selected process information;
+- open a selected process file location when the path is available;
+- save local per-process input notes in `user_config.json`;
+- save local per-game/per-process input setup profiles;
+- apply a safe setup flow by opening DS4Windows, HidHide Configuration Client, and Windows Game Controllers;
+- test isolation by opening `joy.cpl` and asking you to confirm what is visible;
+- save a recommended Nucleus Co-op / Minecraft Java profile;
+- open `joy.cpl` so you can see which controllers Windows exposes;
+- open HidHide, DS4Windows, and official documentation pages only when you click those buttons;
+- copy safe HidHide, DS4Windows, and Minecraft Java / Nucleus Co-op checklists.
+
+This app does not apply OS-level input blocking. Real per-process input assignment should be handled by Nucleus Co-op or official/safe external tools such as HidHide and DS4Windows.
+
+### Input Isolation Setup
+
+Use `Input Isolation Setup` for a guided safe setup flow:
+
+1. Select or detect `DS4Windows.exe`.
+2. Detect or select `HidHideClient.exe`.
+3. Click `Apply Safe Input Isolation Setup`.
+4. The app opens DS4Windows, HidHide Configuration Client, and `joy.cpl`.
+5. Follow the checklist shown in the app.
+
+The app does not silently modify HidHide rules. Advanced HidHide CLI support is disabled by default and only provides command previews or read-only CLI help after confirmation. Prefer the HidHide GUI for actual device hiding.
+
 ## Add Custom Games
 
 Use `Add Custom Game` only for legitimate games with real offline/LAN or local hosting support. Custom games are saved in `user_config.json`; the app does not edit built-in `games.json`.
+
+## Support / Donate
+
+Offline LAN Games Helper is free to use.
+
+If the app helped you and you want to support development, you can donate here:
+
+- PayPal: https://paypal.me/REPLACE_WITH_MY_PAYPALME
+- GitHub Sponsors: https://github.com/sponsors/The0Cosmo
+
+Donations are optional and do not unlock extra features.
 
 ## Privacy
 

@@ -30,7 +30,9 @@ import socket
 import subprocess
 import sys
 import threading
+import time
 import webbrowser
+import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
@@ -46,6 +48,55 @@ SAFETY_WARNING = (
     "This app does not emulate servers or bypass online services. "
     "Online-only games are intentionally excluded."
 )
+PAYPAL_DONATION_URL = "https://paypal.me/REPLACE_WITH_MY_PAYPALME"
+GITHUB_SPONSORS_URL = "https://github.com/sponsors/The0Cosmo"
+DONATION_OFFLINE_MESSAGE = "Donation links require an internet connection. You can copy the link and open it later."
+HIDHIDE_OFFICIAL_URL = "https://docs.nefarius.at/projects/HidHide/"
+DS4WINDOWS_OFFICIAL_URL = "https://github.com/Ryochan7/DS4Windows/releases"
+PROCESS_CATEGORIES = {
+    "nucleuscoop.exe": "Local multiplayer tool",
+    "prismlauncher.exe": "Launcher",
+    "javaw.exe": "Minecraft Java / Java game instance",
+    "java.exe": "Minecraft Java / Java game instance",
+    "minecraft.exe": "Minecraft",
+    "ds4windows.exe": "Controller mapper",
+    "hidhideclient.exe": "Controller visibility tool",
+    "steam.exe": "Launcher",
+}
+HIDHIDE_CHECKLIST = """Recommended HidHide setup:
+1. Open DS4Windows.
+2. Set Output Controller to Xbox 360.
+3. Open HidHide Configuration Client.
+4. In Applications, add DS4Windows.exe so DS4Windows can see the real controller.
+5. In Devices, select the real PlayStation controller.
+6. Enable device hiding.
+7. Reconnect the controller.
+8. Open joy.cpl and confirm only the virtual Xbox controller is visible to normal apps.
+9. Start Nucleus Co-op.
+10. Assign the virtual Xbox controller to the correct player."""
+DS4WINDOWS_CHECKLIST = """DS4Windows recommended profile:
+- Output Controller: Xbox 360
+- Hide real controller using HidHide
+- Avoid showing both real PS controller and virtual Xbox controller
+- Disable Steam Input if it creates duplicate input"""
+MINECRAFT_NUCLEUS_CHECKLIST = """For Minecraft Java with Nucleus Co-op, Controlify may read controller input globally across all Minecraft instances. If one controller controls every instance, remove Controlify and use DS4Windows + HidHide, or use keyboard/mouse for one player and controller for another.
+
+Checklist:
+- Remove Controlify if it controls all instances
+- Do not use Controlify and MidnightControls together
+- Use one Minecraft instance per player
+- Use Nucleus Co-op assignment screen
+- Use HidHide to hide real controller
+- Use virtual Xbox controller for the controller player"""
+INPUT_ISOLATION_SAFETY_TEXT = """Input Isolation Helper is guidance-only.
+
+It does not inject code into processes.
+It does not hook keyboard, mouse, or controller input globally.
+It does not block input to processes directly.
+It does not create or install drivers.
+It does not modify game memory or game files.
+It does not bypass anti-cheat, DRM, launchers, authentication, or ownership checks.
+Use it only for legitimate local/offline/LAN multiplayer."""
 PRIVACY_TEXT = """
 Privacy Policy
 
@@ -57,14 +108,29 @@ Data Collection
 Network Information
 - The app may read your hostname, local/private IPv4 addresses, and network adapter names.
 - This information is shown only inside the app so you can set up LAN/offline multiplayer.
+- LAN tests only use IP addresses entered or selected by you. The app does not scan random IP ranges or the internet.
 
 Local Configuration
-- The app may save selected game paths, custom games, selected server paths, and exported guides.
+- The app may save selected game paths, custom games, selected server paths, selected controller tool paths, local input notes, and exported guides.
 - These files stay on your device.
 
 Internet Access
 - Normal LAN helper features should not require internet access.
 - If Server Tools opens official download pages or uses official tools such as SteamCMD, those tools may connect to official services.
+- Official download pages, SteamCMD, update checks if added later, and donation links use the internet only after you click the relevant button.
+- This app has no telemetry, analytics, or background uploads.
+
+Donations
+- The app may include optional donation links such as PayPal.Me or GitHub Sponsors.
+- The app does not process payments, collect payment information, or contact donation services automatically.
+- Donation links open in your default web browser only when you click them.
+
+Input Isolation Helper
+- The Windows version may show local running processes and local controller tool status to help you configure local multiplayer input.
+- This information stays on your device.
+- The app may save local input setup profiles and isolation test results in user_config.json.
+- The app does not upload process lists, controller information, or personal data.
+- The app does not inject into processes, block input directly, or modify games.
 
 No DRM or Account Bypass
 - This app does not bypass DRM, launchers, authentication, game ownership checks, anti-cheat, or online services.
@@ -88,11 +154,21 @@ BUNDLED_GAMES_FILE = RESOURCE_DIR / "games.json"
 CONFIG_FILE = APP_DIR / "user_config.json"
 EXPORT_DIR = APP_DIR / "exported_guides"
 SERVER_ROOT = APP_DIR / "servers"
+BACKUP_ROOT = APP_DIR / "backups"
 DEFAULT_CONFIG = {
     "paths": {},
     "server_paths": {},
     "server_install_dirs": {},
     "steamcmd_path": "",
+    "save_folders": {},
+    "mod_folders": {},
+    "server_log_paths": {},
+    "offline_mode": False,
+    "input_isolation_notes": [],
+    "input_isolation_profiles": {},
+    "ds4windows_path": "",
+    "hidhide_client_path": "",
+    "hidhide_cli_path": "",
     "custom_games": [],
 }
 
@@ -101,6 +177,14 @@ DEFAULT_CONFIG = {
 class AddressInfo:
     adapter: str
     ip: str
+
+
+@dataclass
+class ProcessInfo:
+    name: str
+    pid: int
+    path: str
+    category: str
 
 
 def is_windows() -> bool:
@@ -200,6 +284,43 @@ def safe_filename(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "_", value).strip("_") or "game"
 
 
+def first_port_range(ports: list[dict[str, str]]) -> str:
+    for port in ports:
+        value = str(port.get("range", "")).strip()
+        if value:
+            return value
+    return ""
+
+
+def first_tcp_port_value(port_range: str) -> int | None:
+    match = re.search(r"\d+", port_range)
+    if not match:
+        return None
+    value = int(match.group(0))
+    if 1 <= value <= 65535:
+        return value
+    return None
+
+
+def validate_single_ipv4(value: str) -> str:
+    raw = value.strip()
+    if any(token in raw for token in ["/", ",", "-", " "]):
+        raise ValueError("Enter one IPv4 address only. IP ranges and scans are not supported.")
+    address = ipaddress.ip_address(raw)
+    if address.version != 4:
+        raise ValueError("Enter an IPv4 address.")
+    return str(address)
+
+
+def safe_extract_zip(archive: zipfile.ZipFile, target: Path) -> None:
+    target_root = target.resolve()
+    for member in archive.infolist():
+        destination = (target / member.filename).resolve()
+        if destination != target_root and target_root not in destination.parents:
+            raise ValueError(f"Unsafe path in backup archive: {member.filename}")
+    archive.extractall(target)
+
+
 def expand_path(value: str) -> Path:
     return Path(os.path.expandvars(value)).expanduser()
 
@@ -227,6 +348,42 @@ def parse_ipconfig(output: str) -> list[AddressInfo]:
         if match and is_private_lan_ipv4(match.group(1)):
             addresses.append(AddressInfo(adapter, match.group(1)))
     return addresses
+
+
+def process_category(name: str) -> str:
+    return PROCESS_CATEGORIES.get(name.lower(), "Other")
+
+
+def enumerate_processes() -> list[ProcessInfo]:
+    command = (
+        "Get-CimInstance Win32_Process | "
+        "Select-Object Name,ProcessId,ExecutablePath | "
+        "ConvertTo-Json -Compress -Depth 2"
+    )
+    completed = run_powershell(command, timeout=20)
+    if completed.returncode != 0 or not completed.stdout.strip():
+        return []
+    try:
+        raw = json.loads(completed.stdout)
+    except json.JSONDecodeError:
+        return []
+    rows = raw if isinstance(raw, list) else [raw]
+    processes: list[ProcessInfo] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        name = str(row.get("Name") or "").strip()
+        if not name:
+            continue
+        try:
+            pid = int(row.get("ProcessId") or 0)
+        except (TypeError, ValueError):
+            pid = 0
+        raw_path = row.get("ExecutablePath")
+        path = str(raw_path).strip() if raw_path else "Access denied or unavailable"
+        processes.append(ProcessInfo(name=name, pid=pid, path=path, category=process_category(name)))
+    processes.sort(key=lambda item: (0 if item.category != "Other" else 1, item.name.lower(), item.pid))
+    return processes
 
 
 def get_network_addresses() -> list[AddressInfo]:
@@ -350,10 +507,13 @@ class OfflineLanGamesHelper:
         self.current_server_path: str | None = None
         self.addresses: list[AddressInfo] = []
         self.main_ip = ""
+        self.server_processes: dict[str, subprocess.Popen[Any]] = {}
+        self.process_rows: list[ProcessInfo] = []
 
         self.build_ui()
         self.reload_games()
         self.refresh_network()
+        self.refresh_input_processes()
 
     def build_ui(self) -> None:
         self.root.grid_columnconfigure(0, weight=1, minsize=270)
@@ -365,6 +525,13 @@ class OfflineLanGamesHelper:
         header.grid_columnconfigure(1, weight=1)
         ttk.Label(header, text=APP_TITLE, font=("Segoe UI", 17, "bold")).grid(row=0, column=0, sticky="w")
         ttk.Label(header, text=SAFETY_WARNING, foreground="#9a3412").grid(row=1, column=0, columnspan=2, sticky="w", pady=(4, 0))
+        self.offline_mode_var = tk.BooleanVar(value=bool(self.config.get("offline_mode", False)))
+        ttk.Checkbutton(
+            header,
+            text="Offline Mode: hide or block optional internet/download actions",
+            variable=self.offline_mode_var,
+            command=lambda: self.run_ui_action("Toggle Offline Mode", self.toggle_offline_mode),
+        ).grid(row=2, column=0, columnspan=2, sticky="w", pady=(6, 0))
 
         network = ttk.LabelFrame(header, text="Host Network", padding=8)
         network.grid(row=0, column=1, rowspan=2, sticky="ew", padx=(16, 0))
@@ -379,6 +546,7 @@ class OfflineLanGamesHelper:
         ttk.Label(network, text="Selected IP:").grid(row=1, column=0, sticky="w", pady=(6, 0))
         self.ip_combo = ttk.Combobox(network, state="readonly", width=56)
         self.ip_combo.grid(row=1, column=1, columnspan=2, sticky="ew", pady=(6, 0))
+        self.ip_combo.bind("<<ComboboxSelected>>", lambda _event: self.update_all_tabs())
         ttk.Label(network, textvariable=self.network_warning_var, foreground="#9a3412").grid(row=2, column=0, columnspan=3, sticky="w", pady=(5, 0))
 
         left = ttk.Frame(self.root, padding=(10, 0, 6, 8))
@@ -412,16 +580,26 @@ class OfflineLanGamesHelper:
         self.firewall_text = self.add_text_tab("Firewall / Permissions")
         self.path_text = self.add_text_tab("Game Path")
         self.server_text = self.add_server_tools_tab()
+        self.add_lan_test_tab()
+        self.add_invite_tab()
+        self.add_backup_tab()
+        self.add_mods_tab()
+        self.add_input_isolation_tab()
+        self.add_input_isolation_setup_tab()
         self.troubleshooting_text = self.add_text_tab("Troubleshooting")
+        self.add_support_tab()
         self.privacy_text = self.add_text_tab("Privacy")
         self.server_buttons: dict[str, ttk.Button] = {}
         self.add_server_button("Open Server Folder", self.open_server_folder, 0)
         self.add_server_button("Select Server Executable", self.select_server_executable, 1)
         self.add_server_button("Launch Server", self.launch_server, 2)
-        self.add_server_button("Install with SteamCMD", self.install_with_steamcmd, 3)
-        self.add_server_button("Open Official Download Page", self.open_official_download_page, 4)
-        self.add_server_button("Export Server Guide", self.export_server_guide, 5)
-        self.add_server_button("Select SteamCMD", self.select_steamcmd, 6)
+        self.add_server_button("Start Server", self.start_managed_server, 3)
+        self.add_server_button("Stop Server", self.stop_managed_server, 4)
+        self.add_server_button("Open Server Log", self.open_server_log, 5)
+        self.add_server_button("Install with SteamCMD", self.install_with_steamcmd, 6)
+        self.add_server_button("Open Official Download Page", self.open_official_download_page, 7)
+        self.add_server_button("Export Server Guide", self.export_server_guide, 8)
+        self.add_server_button("Select SteamCMD", self.select_steamcmd, 9)
 
         actions = ttk.LabelFrame(self.root, text="Actions", padding=8)
         actions.grid(row=2, column=0, columnspan=2, sticky="ew", padx=10, pady=(0, 6))
@@ -473,6 +651,319 @@ class OfflineLanGamesHelper:
 
         self.tabs.add(frame, text="Server Tools")
         return text
+
+    def add_lan_test_tab(self) -> None:
+        frame = ttk.Frame(self.tabs, padding=10)
+        frame.grid_columnconfigure(1, weight=1)
+        frame.grid_rowconfigure(5, weight=1)
+        ttk.Label(frame, text="LAN Test / Connection Test", font=("Segoe UI", 12, "bold")).grid(row=0, column=0, columnspan=3, sticky="w")
+        ttk.Label(frame, text="Tests one user-entered or selected IP only. This is not a network scanner.").grid(row=1, column=0, columnspan=3, sticky="w", pady=(2, 10))
+        ttk.Label(frame, text="Target IP").grid(row=2, column=0, sticky="w", pady=4)
+        self.lan_test_ip_var = tk.StringVar()
+        ttk.Entry(frame, textvariable=self.lan_test_ip_var).grid(row=2, column=1, sticky="ew", pady=4)
+        ttk.Button(frame, text="Use Selected Host IP", command=lambda: self.run_ui_action("Use Selected Host IP", self.use_selected_ip_for_test)).grid(row=2, column=2, sticky="ew", padx=(8, 0), pady=4)
+        ttk.Label(frame, text="TCP Port").grid(row=3, column=0, sticky="w", pady=4)
+        self.lan_test_port_var = tk.StringVar()
+        ttk.Entry(frame, textvariable=self.lan_test_port_var).grid(row=3, column=1, sticky="ew", pady=4)
+        ttk.Button(frame, text="Use Game Default Port", command=lambda: self.run_ui_action("Use Game Default Port", self.use_default_port_for_test)).grid(row=3, column=2, sticky="ew", padx=(8, 0), pady=4)
+        controls = ttk.Frame(frame)
+        controls.grid(row=4, column=0, columnspan=3, sticky="ew", pady=(8, 8))
+        ttk.Button(controls, text="Ping IP", command=lambda: self.run_ui_action("Ping IP", self.ping_test)).grid(row=0, column=0, padx=(0, 6))
+        ttk.Button(controls, text="Test TCP Port", command=lambda: self.run_ui_action("Test TCP Port", self.tcp_port_test)).grid(row=0, column=1, padx=(0, 6))
+        self.lan_test_result = tk.Text(frame, wrap=tk.WORD, height=14)
+        self.lan_test_result.grid(row=5, column=0, columnspan=3, sticky="nsew")
+        self.lan_test_result.configure(state=tk.DISABLED)
+        self.tabs.add(frame, text="LAN Test")
+
+    def add_invite_tab(self) -> None:
+        frame = ttk.Frame(self.tabs, padding=10)
+        frame.grid_columnconfigure(0, weight=1)
+        frame.grid_rowconfigure(1, weight=1)
+        ttk.Label(frame, text="Copy Invite Message", font=("Segoe UI", 12, "bold")).grid(row=0, column=0, sticky="w")
+        self.invite_text = tk.Text(frame, wrap=tk.WORD, height=18)
+        self.invite_text.grid(row=1, column=0, sticky="nsew", pady=(8, 8))
+        self.invite_text.configure(state=tk.DISABLED)
+        controls = ttk.Frame(frame)
+        controls.grid(row=2, column=0, sticky="ew")
+        ttk.Button(controls, text="Refresh Invite", command=lambda: self.run_ui_action("Refresh Invite", self.update_invite_tab)).grid(row=0, column=0, padx=(0, 6))
+        ttk.Button(controls, text="Copy Invite", command=lambda: self.run_ui_action("Copy Invite", self.copy_invite)).grid(row=0, column=1, padx=(0, 6))
+        ttk.Button(controls, text="Export Invite", command=lambda: self.run_ui_action("Export Invite", self.export_invite)).grid(row=0, column=2, padx=(0, 6))
+        self.tabs.add(frame, text="Invite")
+
+    def add_backup_tab(self) -> None:
+        frame = ttk.Frame(self.tabs, padding=10)
+        frame.grid_columnconfigure(1, weight=1)
+        frame.grid_rowconfigure(4, weight=1)
+        ttk.Label(frame, text="World / Save Backup", font=("Segoe UI", 12, "bold")).grid(row=0, column=0, columnspan=3, sticky="w")
+        ttk.Label(frame, text="Select a save folder, create timestamped zip backups, and restore only after confirmation.").grid(row=1, column=0, columnspan=3, sticky="w", pady=(2, 10))
+        ttk.Label(frame, text="Save folder").grid(row=2, column=0, sticky="w")
+        self.save_folder_var = tk.StringVar()
+        ttk.Entry(frame, textvariable=self.save_folder_var).grid(row=2, column=1, sticky="ew", padx=(8, 8))
+        ttk.Button(frame, text="Select Save Folder", command=lambda: self.run_ui_action("Select Save Folder", self.select_save_folder)).grid(row=2, column=2, sticky="ew")
+        controls = ttk.Frame(frame)
+        controls.grid(row=3, column=0, columnspan=3, sticky="ew", pady=(10, 8))
+        ttk.Button(controls, text="Create Backup", command=lambda: self.run_ui_action("Create Backup", self.create_save_backup)).grid(row=0, column=0, padx=(0, 6))
+        ttk.Button(controls, text="Restore Backup", command=lambda: self.run_ui_action("Restore Backup", self.restore_save_backup)).grid(row=0, column=1, padx=(0, 6))
+        self.backup_text = tk.Text(frame, wrap=tk.WORD, height=12)
+        self.backup_text.grid(row=4, column=0, columnspan=3, sticky="nsew")
+        self.backup_text.configure(state=tk.DISABLED)
+        self.tabs.add(frame, text="Backups")
+
+    def add_mods_tab(self) -> None:
+        frame = ttk.Frame(self.tabs, padding=10)
+        frame.grid_columnconfigure(1, weight=1)
+        frame.grid_rowconfigure(4, weight=1)
+        ttk.Label(frame, text="Mod List Export", font=("Segoe UI", 12, "bold")).grid(row=0, column=0, columnspan=3, sticky="w")
+        ttk.Label(frame, text="Export mod file names so players can compare matching mod setups. This app does not download mods.").grid(row=1, column=0, columnspan=3, sticky="w", pady=(2, 10))
+        ttk.Label(frame, text="Mods folder").grid(row=2, column=0, sticky="w")
+        self.mod_folder_var = tk.StringVar()
+        ttk.Entry(frame, textvariable=self.mod_folder_var).grid(row=2, column=1, sticky="ew", padx=(8, 8))
+        ttk.Button(frame, text="Select Mods Folder", command=lambda: self.run_ui_action("Select Mods Folder", self.select_mod_folder)).grid(row=2, column=2, sticky="ew")
+        ttk.Button(frame, text="Export Mod List", command=lambda: self.run_ui_action("Export Mod List", self.export_mod_list)).grid(row=3, column=0, sticky="w", pady=(10, 8))
+        self.mods_text = tk.Text(frame, wrap=tk.WORD, height=12)
+        self.mods_text.grid(row=4, column=0, columnspan=3, sticky="nsew")
+        self.mods_text.configure(state=tk.DISABLED)
+        self.tabs.add(frame, text="Mods")
+
+    def add_input_isolation_tab(self) -> None:
+        frame = ttk.Frame(self.tabs, padding=10)
+        frame.grid_columnconfigure(0, weight=1)
+        frame.grid_rowconfigure(1, weight=1)
+        ttk.Label(frame, text="Input Isolation Helper", font=("Segoe UI", 12, "bold")).grid(row=0, column=0, sticky="w")
+        ttk.Label(
+            frame,
+            text="Windows-only local/offline/LAN guidance for Nucleus Co-op, DS4Windows, HidHide, Prism Launcher, and Minecraft Java. No input blocking is applied by this app.",
+            foreground="#9a3412",
+            wraplength=980,
+            justify=tk.LEFT,
+        ).grid(row=0, column=1, sticky="ew", padx=(12, 0))
+
+        notebook = ttk.Notebook(frame)
+        notebook.grid(row=1, column=0, columnspan=2, sticky="nsew", pady=(8, 0))
+        self.input_isolation_tabs = notebook
+
+        processes = ttk.Frame(notebook, padding=8)
+        processes.grid_columnconfigure(0, weight=1)
+        processes.grid_rowconfigure(0, weight=1)
+        columns = ("name", "pid", "path", "category")
+        self.input_process_tree = ttk.Treeview(processes, columns=columns, show="headings", selectmode="browse")
+        for column, heading, width in [
+            ("name", "Process name", 180),
+            ("pid", "PID", 80),
+            ("path", "Executable path", 520),
+            ("category", "Type/category", 190),
+        ]:
+            self.input_process_tree.heading(column, text=heading)
+            self.input_process_tree.column(column, width=width, anchor=tk.W if column != "pid" else tk.CENTER)
+        self.input_process_tree.grid(row=0, column=0, sticky="nsew")
+        process_scroll = ttk.Scrollbar(processes, orient=tk.VERTICAL, command=self.input_process_tree.yview)
+        process_scroll.grid(row=0, column=1, sticky="ns")
+        self.input_process_tree.configure(yscrollcommand=process_scroll.set)
+        self.input_process_tree.bind("<<TreeviewSelect>>", lambda _event: self.load_selected_process_into_notes())
+        process_buttons = ttk.Frame(processes)
+        process_buttons.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(8, 0))
+        for column in range(7):
+            process_buttons.grid_columnconfigure(column, weight=1, uniform="process_buttons")
+        for index, (label, callback) in enumerate(
+            [
+                ("Refresh Processes", self.refresh_input_processes),
+                ("Copy Selected Process Info", self.copy_selected_process_info),
+                ("Open File Location", self.open_selected_process_location),
+                ("Add Process to Notes", self.add_selected_process_to_notes),
+                ("Mark as Game Instance", lambda: self.mark_selected_process_role("Game Instance")),
+                ("Mark as Controller Mapper", lambda: self.mark_selected_process_role("Controller Mapper")),
+                ("Mark as Launcher", lambda: self.mark_selected_process_role("Launcher")),
+            ]
+        ):
+            ttk.Button(process_buttons, text=label, command=lambda text=label, cb=callback: self.run_ui_action(text, cb)).grid(row=0, column=index, sticky="ew", padx=3, pady=3)
+        notebook.add(processes, text="Running Processes")
+
+        notes = ttk.Frame(notebook, padding=8)
+        notes.grid_columnconfigure(1, weight=1)
+        notes.grid_rowconfigure(8, weight=1)
+        self.input_selected_process_var = tk.StringVar(value="Selected process: none")
+        self.input_role_var = tk.StringVar()
+        self.input_keyboard_var = tk.BooleanVar(value=False)
+        self.input_controller_var = tk.BooleanVar(value=False)
+        self.input_ignore_ps_var = tk.BooleanVar(value=False)
+        self.input_virtual_xbox_var = tk.BooleanVar(value=False)
+        ttk.Label(notes, textvariable=self.input_selected_process_var).grid(row=0, column=0, columnspan=3, sticky="w")
+        ttk.Label(notes, text="Role").grid(row=1, column=0, sticky="w", pady=(8, 4))
+        ttk.Entry(notes, textvariable=self.input_role_var).grid(row=1, column=1, columnspan=2, sticky="ew", pady=(8, 4))
+        ttk.Checkbutton(notes, text="Should receive keyboard/mouse", variable=self.input_keyboard_var).grid(row=2, column=1, sticky="w")
+        ttk.Checkbutton(notes, text="Should receive controller", variable=self.input_controller_var).grid(row=3, column=1, sticky="w")
+        ttk.Checkbutton(notes, text="Should ignore real PlayStation controller", variable=self.input_ignore_ps_var).grid(row=4, column=1, sticky="w")
+        ttk.Checkbutton(notes, text="Should use virtual Xbox controller", variable=self.input_virtual_xbox_var).grid(row=5, column=1, sticky="w")
+        ttk.Label(notes, text="Notes").grid(row=6, column=0, sticky="nw", pady=(8, 4))
+        self.input_notes_text = tk.Text(notes, height=5, wrap=tk.WORD)
+        self.input_notes_text.grid(row=6, column=1, columnspan=2, sticky="nsew", pady=(8, 4))
+        note_buttons = ttk.Frame(notes)
+        note_buttons.grid(row=7, column=1, columnspan=2, sticky="ew", pady=(6, 8))
+        ttk.Button(note_buttons, text="Save Process Note", command=lambda: self.run_ui_action("Save Process Note", self.save_input_process_note)).grid(row=0, column=0, padx=(0, 6))
+        ttk.Button(note_buttons, text="Delete Selected Note", command=lambda: self.run_ui_action("Delete Selected Note", self.delete_selected_input_note)).grid(row=0, column=1, padx=(0, 6))
+        ttk.Button(note_buttons, text="Copy All Notes", command=lambda: self.run_ui_action("Copy All Notes", self.copy_all_input_notes)).grid(row=0, column=2, padx=(0, 6))
+        self.input_notes_tree = ttk.Treeview(notes, columns=("process", "pid", "role", "input"), show="headings", selectmode="browse")
+        for column, heading, width in [
+            ("process", "Process", 180),
+            ("pid", "PID", 80),
+            ("role", "Role", 200),
+            ("input", "Input notes", 520),
+        ]:
+            self.input_notes_tree.heading(column, text=heading)
+            self.input_notes_tree.column(column, width=width, anchor=tk.W if column != "pid" else tk.CENTER)
+        self.input_notes_tree.grid(row=8, column=0, columnspan=3, sticky="nsew")
+        self.input_notes_tree.bind("<<TreeviewSelect>>", lambda _event: self.load_selected_input_note())
+        notebook.add(notes, text="Per-Process Notes")
+
+        tools = ttk.Frame(notebook, padding=8)
+        tools.grid_columnconfigure(0, weight=1)
+        tools.grid_rowconfigure(0, weight=1)
+        self.input_tools_text = tk.Text(tools, wrap=tk.WORD)
+        self.input_tools_text.grid(row=0, column=0, sticky="nsew")
+        self.input_tools_text.configure(state=tk.DISABLED)
+        tools_buttons = ttk.Frame(tools)
+        tools_buttons.grid(row=1, column=0, sticky="ew", pady=(8, 0))
+        for column in range(4):
+            tools_buttons.grid_columnconfigure(column, weight=1, uniform="input_tools")
+        buttons = [
+            ("Check HidHide Installed", self.check_hidhide_installed),
+            ("Open HidHide Configuration Client", self.open_hidhide_client),
+            ("Open HidHide Official Page", lambda: self.open_official_input_tool_page(HIDHIDE_OFFICIAL_URL)),
+            ("Copy HidHide Setup Checklist", lambda: self.copy_text_to_clipboard("HidHide setup checklist", HIDHIDE_CHECKLIST)),
+            ("Select DS4Windows.exe", self.select_ds4windows_exe),
+            ("Open DS4Windows", self.open_ds4windows),
+            ("Copy DS4Windows Xbox Output Checklist", lambda: self.copy_text_to_clipboard("DS4Windows checklist", DS4WINDOWS_CHECKLIST)),
+            ("Open DS4Windows Official Page", lambda: self.open_official_input_tool_page(DS4WINDOWS_OFFICIAL_URL)),
+            ("Open Windows Game Controllers", self.open_windows_game_controllers),
+            ("Copy Minecraft / Nucleus Checklist", lambda: self.copy_text_to_clipboard("Minecraft / Nucleus checklist", MINECRAFT_NUCLEUS_CHECKLIST)),
+        ]
+        for index, (label, callback) in enumerate(buttons):
+            row, column = divmod(index, 4)
+            ttk.Button(tools_buttons, text=label, command=lambda text=label, cb=callback: self.run_ui_action(text, cb)).grid(row=row, column=column, sticky="ew", padx=3, pady=3)
+        notebook.add(tools, text="Tools / Checklists")
+
+        advanced = ttk.Frame(notebook, padding=8)
+        advanced.grid_columnconfigure(0, weight=1)
+        self.input_advanced_var = tk.BooleanVar(value=False)
+        ttk.Checkbutton(
+            advanced,
+            text="Show Advanced Mode instructions",
+            variable=self.input_advanced_var,
+            command=self.toggle_input_advanced_text,
+        ).grid(row=0, column=0, sticky="w")
+        self.input_advanced_text = tk.Text(advanced, height=12, wrap=tk.WORD)
+        self.input_advanced_text.insert(
+            "1.0",
+            "Advanced Mode only generates instructions. It does not apply input blocking automatically.\n\n"
+            "Do not use pywinhook, interception drivers, low-level keyboard hooks, mouse hooks, DLL injection, "
+            "or anti-cheat bypass methods. Real per-process input assignment should be handled by Nucleus Co-op "
+            "or official/safe external tools such as HidHide and DS4Windows.",
+        )
+        self.input_advanced_text.configure(state=tk.DISABLED)
+        self.input_advanced_text.grid(row=1, column=0, sticky="nsew", pady=(8, 0))
+        self.input_advanced_text.grid_remove()
+        notebook.add(advanced, text="Advanced")
+
+        self.tabs.add(frame, text="Input Isolation")
+
+    def add_input_isolation_setup_tab(self) -> None:
+        frame = ttk.Frame(self.tabs, padding=10)
+        frame.grid_columnconfigure(0, weight=1)
+        frame.grid_rowconfigure(3, weight=1)
+        ttk.Label(frame, text="Input Isolation Setup", font=("Segoe UI", 12, "bold")).grid(row=0, column=0, sticky="w")
+        ttk.Label(
+            frame,
+            text="Real setup automation is limited to opening safe external tools and saving local profiles. This app does not perform direct per-process input blocking.",
+            foreground="#9a3412",
+            wraplength=980,
+            justify=tk.LEFT,
+        ).grid(row=1, column=0, sticky="ew", pady=(2, 8))
+
+        status = ttk.LabelFrame(frame, text="Tool Status", padding=8)
+        status.grid(row=2, column=0, sticky="ew")
+        status.grid_columnconfigure(1, weight=1)
+        self.ds4_status_var = tk.StringVar(value="DS4Windows.exe: not configured")
+        self.hidhide_status_var = tk.StringVar(value="HidHideClient.exe: not detected")
+        self.hidhide_cli_status_var = tk.StringVar(value="HidHideCLI.exe: not detected")
+        self.isolation_test_status_var = tk.StringVar(value="Last isolation test: not run")
+        ttk.Label(status, textvariable=self.ds4_status_var).grid(row=0, column=0, columnspan=2, sticky="w")
+        ttk.Label(status, textvariable=self.hidhide_status_var).grid(row=1, column=0, columnspan=2, sticky="w")
+        ttk.Label(status, textvariable=self.hidhide_cli_status_var).grid(row=2, column=0, columnspan=2, sticky="w")
+        ttk.Label(status, textvariable=self.isolation_test_status_var).grid(row=3, column=0, columnspan=2, sticky="w")
+        tool_buttons = ttk.Frame(status)
+        tool_buttons.grid(row=0, column=2, rowspan=4, sticky="e", padx=(10, 0))
+        for index, (label, callback) in enumerate(
+            [
+                ("Detect Tools", self.detect_input_setup_tools),
+                ("Select DS4Windows.exe", self.select_ds4windows_exe),
+                ("Select HidHideClient.exe", self.select_hidhide_client_exe),
+                ("Open joy.cpl", self.open_windows_game_controllers),
+            ]
+        ):
+            ttk.Button(tool_buttons, text=label, command=lambda text=label, cb=callback: self.run_ui_action(text, cb)).grid(row=index // 2, column=index % 2, sticky="ew", padx=3, pady=3)
+
+        body = ttk.PanedWindow(frame, orient=tk.HORIZONTAL)
+        body.grid(row=3, column=0, sticky="nsew", pady=(8, 0))
+        guide_frame = ttk.Frame(body, padding=0)
+        guide_frame.grid_columnconfigure(0, weight=1)
+        guide_frame.grid_rowconfigure(0, weight=1)
+        self.input_setup_text = tk.Text(guide_frame, wrap=tk.WORD)
+        self.input_setup_text.grid(row=0, column=0, sticky="nsew")
+        self.input_setup_text.configure(state=tk.DISABLED)
+        body.add(guide_frame, weight=3)
+
+        controls = ttk.Frame(body, padding=(10, 0, 0, 0))
+        controls.grid_columnconfigure(0, weight=1)
+        setup_buttons = [
+            ("Apply Safe Input Isolation Setup", self.apply_safe_input_isolation_setup),
+            ("Test Isolation", self.test_input_isolation),
+            ("Save Nucleus Minecraft Profile", self.save_nucleus_minecraft_profile),
+            ("Copy Generated Setup Steps", self.copy_generated_input_setup_steps),
+            ("Open DS4Windows", self.open_ds4windows),
+            ("Open HidHide Configuration Client", self.open_hidhide_client),
+            ("Open HidHide Official Page", lambda: self.open_official_input_tool_page(HIDHIDE_OFFICIAL_URL)),
+            ("Open DS4Windows Official Page", lambda: self.open_official_input_tool_page(DS4WINDOWS_OFFICIAL_URL)),
+        ]
+        for index, (label, callback) in enumerate(setup_buttons):
+            ttk.Button(controls, text=label, command=lambda text=label, cb=callback: self.run_ui_action(text, cb)).grid(row=index, column=0, sticky="ew", pady=3)
+
+        advanced = ttk.LabelFrame(controls, text="Advanced HidHide CLI", padding=8)
+        advanced.grid(row=len(setup_buttons), column=0, sticky="ew", pady=(12, 0))
+        advanced.grid_columnconfigure(0, weight=1)
+        self.advanced_hidhide_cli_var = tk.BooleanVar(value=False)
+        self.hidhide_cli_controller_var = tk.StringVar()
+        ttk.Checkbutton(
+            advanced,
+            text="Enable Advanced HidHide CLI instructions",
+            variable=self.advanced_hidhide_cli_var,
+            command=lambda: self.run_ui_action("Toggle Advanced HidHide CLI", self.update_input_setup_tab),
+        ).grid(row=0, column=0, sticky="w")
+        ttk.Label(advanced, text="Selected controller instance ID").grid(row=1, column=0, sticky="w", pady=(6, 2))
+        ttk.Entry(advanced, textvariable=self.hidhide_cli_controller_var).grid(row=2, column=0, sticky="ew")
+        ttk.Button(advanced, text="Refresh Controller List", command=lambda: self.run_ui_action("Refresh Controller List", self.refresh_visible_controllers)).grid(row=3, column=0, sticky="ew", pady=(8, 3))
+        ttk.Button(advanced, text="Copy CLI Command Preview", command=lambda: self.run_ui_action("Copy CLI Command Preview", self.copy_hidhide_cli_command_preview)).grid(row=4, column=0, sticky="ew", pady=3)
+        ttk.Button(advanced, text="Run HidHide CLI Help Only", command=lambda: self.run_ui_action("Run HidHide CLI Help Only", self.run_hidhide_cli_help)).grid(row=5, column=0, sticky="ew", pady=3)
+        body.add(controls, weight=1)
+
+        self.tabs.add(frame, text="Input Isolation Setup")
+
+    def add_support_tab(self) -> None:
+        frame = ttk.Frame(self.tabs, padding=10)
+        frame.grid_columnconfigure(0, weight=1)
+        text = (
+            "Offline LAN Games Helper is free to use.\n\n"
+            "If this app helped you and you want to support development, you can donate or sponsor the project.\n\n"
+            "Donations are optional and do not unlock extra features."
+        )
+        ttk.Label(frame, text="Support the Project", font=("Segoe UI", 12, "bold")).grid(row=0, column=0, sticky="w")
+        ttk.Label(frame, text=text, wraplength=760, justify=tk.LEFT).grid(row=1, column=0, sticky="w", pady=(8, 12))
+        controls = ttk.Frame(frame)
+        controls.grid(row=2, column=0, sticky="w")
+        ttk.Button(controls, text="Donate with PayPal", command=lambda: self.run_ui_action("Donate with PayPal", self.open_paypal_donation)).grid(row=0, column=0, padx=(0, 6))
+        ttk.Button(controls, text="Sponsor on GitHub", command=lambda: self.run_ui_action("Sponsor on GitHub", self.open_github_sponsors)).grid(row=0, column=1, padx=(0, 6))
+        ttk.Button(controls, text="Copy Donation Link", command=lambda: self.run_ui_action("Copy Donation Link", self.copy_donation_link)).grid(row=0, column=2, padx=(0, 6))
+        ttk.Label(frame, text=f"PayPal: {PAYPAL_DONATION_URL}\nGitHub Sponsors: {GITHUB_SPONSORS_URL}", foreground="#334155").grid(row=3, column=0, sticky="w", pady=(12, 0))
+        self.tabs.add(frame, text="Support")
 
     def add_action_button(self, parent: ttk.Frame, text: str, callback: Callable[[], None], column: int) -> None:
         ttk.Button(parent, text=text, command=lambda: self.run_ui_action(text, callback)).grid(row=0, column=column, sticky="ew", padx=3, pady=3)
@@ -585,6 +1076,12 @@ class OfflineLanGamesHelper:
         self.update_firewall_tab()
         self.update_path_tab()
         self.update_server_tab()
+        self.update_lan_test_tab()
+        self.update_invite_tab()
+        self.update_backup_tab()
+        self.update_mods_tab()
+        self.update_input_isolation_tab()
+        self.update_input_setup_tab()
         self.update_troubleshooting_tab()
         self.update_privacy_tab()
 
@@ -697,9 +1194,11 @@ class OfflineLanGamesHelper:
             f"Game: {game['name']}",
             f"Server support: {support_text}",
             f"Selected server executable/file: {self.current_server_path or 'not selected'}",
+            f"Server process status: {self.server_status_text(game)}",
             f"SteamCMD path: {self.config.get('steamcmd_path') or 'not selected'}",
             f"SteamCMD app ID: {game.get('steamcmd_app_id') or 'none'}",
             f"Official download page: {game.get('official_download_url') or 'none'}",
+            f"Offline Mode: {'enabled' if self.offline_mode_var.get() else 'disabled'}",
             "",
             "Server notes:",
             self.format_list(game["server_notes"]),
@@ -721,6 +1220,149 @@ class OfflineLanGamesHelper:
         ]
         self.set_text(self.server_text, "\n".join(lines))
         self.update_server_button_states()
+
+    def update_lan_test_tab(self) -> None:
+        if not getattr(self, "lan_test_ip_var", None):
+            return
+        if not self.lan_test_ip_var.get() and self.selected_ip():
+            self.lan_test_ip_var.set(self.selected_ip())
+        if not self.lan_test_port_var.get() and self.current_game:
+            port = first_tcp_port_value(first_port_range(self.current_game.get("ports", [])))
+            if port:
+                self.lan_test_port_var.set(str(port))
+        lines = [
+            "LAN Test / Connection Test",
+            "",
+            "Use this tab to test one IP address entered or selected by you.",
+            "The helper does not scan IP ranges, the internet, or random addresses.",
+            "",
+            "Ping checks whether the host answers ICMP.",
+            "TCP Port checks whether the selected game/server port accepts TCP connections.",
+            "",
+            f"Selected game: {self.current_game['name'] if self.current_game else 'none'}",
+            f"Default ports: {self.format_ports(self.current_game.get('ports', []) if self.current_game else [])}",
+        ]
+        self.set_text(self.lan_test_result, "\n".join(lines))
+
+    def update_invite_tab(self) -> None:
+        if not getattr(self, "invite_text", None):
+            return
+        game = self.current_game
+        if not game:
+            self.set_text(self.invite_text, "No game selected.")
+            return
+        self.set_text(self.invite_text, self.build_invite_message(game))
+
+    def update_backup_tab(self) -> None:
+        if not getattr(self, "backup_text", None):
+            return
+        game = self.current_game
+        folder = self.config.get("save_folders", {}).get(game["name"]) if game else ""
+        self.save_folder_var.set(folder or "")
+        lines = [
+            "World / Save Backup",
+            "",
+            "Backups are timestamped .zip files stored under:",
+            str(BACKUP_ROOT / safe_filename(game["name"])) if game else str(BACKUP_ROOT),
+            "",
+            "Restore extracts a selected backup into the selected save folder only after confirmation.",
+            "The helper does not delete original saves during restore.",
+        ]
+        self.set_text(self.backup_text, "\n".join(lines))
+
+    def update_mods_tab(self) -> None:
+        if not getattr(self, "mods_text", None):
+            return
+        game = self.current_game
+        folder = self.config.get("mod_folders", {}).get(game["name"]) if game else ""
+        self.mod_folder_var.set(folder or "")
+        lines = [
+            "Mod List Export",
+            "",
+            "Select a mods folder to export file names, sizes, and modified dates.",
+            "Players can compare exported lists before joining a modded LAN session.",
+            "This app does not download or install mods.",
+            "",
+            f"Selected game: {game['name'] if game else 'none'}",
+        ]
+        self.set_text(self.mods_text, "\n".join(lines))
+
+    def update_input_isolation_tab(self) -> None:
+        if not getattr(self, "input_tools_text", None):
+            return
+        lines = [
+            "Controller Visibility Checklist",
+            "",
+            "Windows games can see real controllers, virtual controllers, or both. If both are visible, you may get double input or one controller controlling multiple game instances.",
+            "",
+            "This helper does not block input directly. It helps you open safe configuration tools such as HidHide, DS4Windows, joy.cpl, and Nucleus Co-op.",
+            "",
+            INPUT_ISOLATION_SAFETY_TEXT,
+            "",
+            "HidHide Helper",
+            HIDHIDE_CHECKLIST,
+            "",
+            "DS4Windows Helper",
+            DS4WINDOWS_CHECKLIST,
+            "",
+            "Nucleus Co-op / Minecraft Java Helper",
+            MINECRAFT_NUCLEUS_CHECKLIST,
+            "",
+            "joy.cpl Tool",
+            "- Use Open Windows Game Controllers to see which controllers Windows currently exposes.",
+        ]
+        self.set_text(self.input_tools_text, "\n".join(lines))
+        self.refresh_input_notes_tree()
+
+    def update_input_setup_tab(self) -> None:
+        if not getattr(self, "input_setup_text", None):
+            return
+        ds4 = self.find_ds4windows_exe()
+        hidhide = self.find_hidhide_client()
+        cli = self.find_hidhide_cli()
+        self.ds4_status_var.set(f"DS4Windows.exe: {ds4 if ds4 else 'not configured or not found'}")
+        self.hidhide_status_var.set(f"HidHideClient.exe: {hidhide if hidhide else 'not detected'}")
+        self.hidhide_cli_status_var.set(f"HidHideCLI.exe: {cli if cli else 'not detected'}")
+        last_test = self.config.get("input_isolation_profiles", {}).get("last_isolation_test", {})
+        self.isolation_test_status_var.set(f"Last isolation test: {last_test.get('result', 'not run')}" if last_test else "Last isolation test: not run")
+        controller_lines = self.detect_visible_controllers()
+        lines = [
+            "Apply Safe Input Isolation Setup",
+            "",
+            "When clicked, the setup action checks DS4Windows and HidHide paths, opens DS4Windows, opens HidHide Configuration Client, opens Windows Game Controllers, and shows this guided checklist.",
+            "",
+            HIDHIDE_CHECKLIST,
+            "",
+            "Nucleus Minecraft Profile",
+            "Recommended:",
+            "- Player 1: keyboard + mouse",
+            "- Player 2: virtual Xbox controller from DS4Windows",
+            "",
+            "Warning:",
+            "- Remove Controlify if one controller controls all Minecraft instances.",
+            "- Do not use Controlify and MidnightControls together.",
+            "",
+            "Visible controller/device hints from safe Windows APIs:",
+            *(controller_lines or ["- none detected by the safe device query"]),
+            "",
+            "Advanced HidHide CLI",
+            "- Disabled by default.",
+            "- Prefer opening HidHide GUI instead of CLI.",
+            "- This app does not run CLI device-hiding commands automatically.",
+            "- It only previews/copies commands and can run CLI help after confirmation.",
+            "- Never target keyboard or mouse devices.",
+        ]
+        if self.advanced_hidhide_cli_var.get():
+            lines.extend(
+                [
+                    "",
+                    "Advanced Mode enabled:",
+                    "Only use HidHide CLI if you understand HidHide's official syntax and have selected a real game controller device ID.",
+                    f"Selected controller instance ID: {self.hidhide_cli_controller_var.get().strip() or 'none'}",
+                    f"CLI command preview: {self.hidhide_cli_command_preview()}",
+                ]
+            )
+        self.set_text(self.input_setup_text, "\n".join(lines))
 
     def update_troubleshooting_tab(self) -> None:
         game = self.current_game
@@ -753,17 +1395,28 @@ class OfflineLanGamesHelper:
                 button.state(["disabled"])
             return
         support = game["server_support"]
+        offline = self.offline_mode_var.get()
         for button in self.server_buttons.values():
             button.state(["!disabled"])
         if support in {"none", "in_game_host"}:
-            for name in ["Open Server Folder", "Select Server Executable", "Launch Server", "Install with SteamCMD", "Open Official Download Page"]:
+            for name in ["Open Server Folder", "Select Server Executable", "Launch Server", "Start Server", "Stop Server", "Open Server Log", "Install with SteamCMD", "Open Official Download Page"]:
                 self.server_buttons[name].state(["disabled"])
         if not game.get("steamcmd_app_id"):
             self.server_buttons["Install with SteamCMD"].state(["disabled"])
         if not game.get("official_download_url"):
             self.server_buttons["Open Official Download Page"].state(["disabled"])
+        if offline:
+            self.server_buttons["Install with SteamCMD"].state(["disabled"])
+            self.server_buttons["Open Official Download Page"].state(["disabled"])
         self.server_buttons["Export Server Guide"].state(["!disabled"])
         self.server_buttons["Select SteamCMD"].state(["!disabled"])
+
+    def toggle_offline_mode(self) -> None:
+        self.config["offline_mode"] = bool(self.offline_mode_var.get())
+        save_json_file(CONFIG_FILE, self.config)
+        self.update_server_tab()
+        state = "enabled" if self.offline_mode_var.get() else "disabled"
+        self.log(f"Offline Mode {state}. Optional internet/download actions are {'blocked' if self.offline_mode_var.get() else 'available'} when explicitly clicked.")
 
     @staticmethod
     def format_list(items: list[str]) -> str:
@@ -835,6 +1488,241 @@ class OfflineLanGamesHelper:
         messagebox.showinfo(APP_TITLE, f"Copied host IP:\n{value}")
         self.log(f"Copied host IP: {value}")
 
+    def use_selected_ip_for_test(self) -> None:
+        value = self.selected_ip()
+        if not value:
+            messagebox.showwarning(APP_TITLE, "No private LAN IPv4 address was detected.")
+            return
+        self.lan_test_ip_var.set(value)
+        self.log(f"LAN test target IP set to {value}.")
+
+    def use_default_port_for_test(self) -> None:
+        game = self.selected_game_required()
+        if not game:
+            return
+        tcp_ports = [p for p in game.get("ports", []) if str(p.get("protocol", "")).upper() == "TCP"]
+        port = first_tcp_port_value(first_port_range(tcp_ports or game.get("ports", [])))
+        if not port:
+            messagebox.showwarning(APP_TITLE, "No default TCP port is listed for this game.")
+            return
+        self.lan_test_port_var.set(str(port))
+        self.log(f"LAN test TCP port set to {port}.")
+
+    def ping_test(self) -> None:
+        try:
+            target = validate_single_ipv4(self.lan_test_ip_var.get())
+        except ValueError as exc:
+            messagebox.showerror(APP_TITLE, str(exc))
+            return
+        self.set_text(self.lan_test_result, f"Pinging {target}...\n")
+
+        def worker() -> None:
+            try:
+                completed = run_hidden(["ping.exe", "-n", "1", "-w", "1500", target], timeout=5)
+                reachable = completed.returncode == 0
+                output = completed.stdout.strip() or completed.stderr.strip()
+                status = "reachable" if reachable else "not reachable"
+                self.root.after(0, lambda: self.set_text(self.lan_test_result, f"Ping result for {target}: {status}\n\n{output}"))
+                self.root.after(0, lambda: self.log(f"Ping {target}: {status}."))
+            except Exception as exc:
+                self.root.after(0, lambda: messagebox.showerror(APP_TITLE, f"Ping failed:\n{exc}"))
+                self.root.after(0, lambda: self.log(f"Ping failed for {target}: {exc}"))
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def tcp_port_test(self) -> None:
+        try:
+            target = validate_single_ipv4(self.lan_test_ip_var.get())
+        except ValueError as exc:
+            messagebox.showerror(APP_TITLE, str(exc))
+            return
+        try:
+            port = int(self.lan_test_port_var.get().strip())
+            if not 1 <= port <= 65535:
+                raise ValueError
+        except ValueError:
+            messagebox.showerror(APP_TITLE, "Enter a TCP port from 1 to 65535.")
+            return
+        self.set_text(self.lan_test_result, f"Testing TCP {target}:{port}...\n")
+
+        def worker() -> None:
+            try:
+                with socket.create_connection((target, port), timeout=3):
+                    pass
+                self.root.after(0, lambda: self.set_text(self.lan_test_result, f"TCP {target}:{port} is reachable."))
+                self.root.after(0, lambda: self.log(f"TCP {target}:{port} reachable."))
+            except Exception as exc:
+                self.root.after(0, lambda: self.set_text(self.lan_test_result, f"TCP {target}:{port} is not reachable.\n\n{exc}"))
+                self.root.after(0, lambda: self.log(f"TCP {target}:{port} not reachable: {exc}"))
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def build_invite_message(self, game: dict[str, Any]) -> str:
+        ip = self.selected_ip() or "HOST_LAN_IP"
+        port = first_port_range(game.get("ports", [])) or first_port_range(game.get("server_ports", [])) or "varies by game/server"
+        client_steps = "\n".join(f"{index + 1}. {step}" for index, step in enumerate(game.get("client_tutorial", [])))
+        return "\n".join(
+            [
+                f"Offline LAN invite for {game['name']}",
+                "",
+                f"Host IP: {ip}",
+                f"Port(s): {port}",
+                "",
+                "Join steps:",
+                client_steps or "Use the game's LAN/local network join option.",
+                "",
+                "Notes:",
+                "- Join the same LAN or VPN LAN as the host.",
+                "- Use the same game version and matching mods/content.",
+                "- This invite is for legitimate local/offline play only.",
+            ]
+        )
+
+    def copy_invite(self) -> None:
+        game = self.selected_game_required()
+        if not game:
+            return
+        text = self.build_invite_message(game)
+        self.root.clipboard_clear()
+        self.root.clipboard_append(text)
+        messagebox.showinfo(APP_TITLE, "Invite message copied.")
+        self.log(f"Invite copied for {game['name']}.")
+
+    def export_invite(self) -> None:
+        game = self.selected_game_required()
+        if not game:
+            return
+        EXPORT_DIR.mkdir(exist_ok=True)
+        output = EXPORT_DIR / f"{safe_filename(game['name'])}_Invite.md"
+        output.write_text(self.build_invite_message(game), encoding="utf-8")
+        messagebox.showinfo(APP_TITLE, f"Invite exported:\n{output}")
+        self.log(f"Invite exported: {output}")
+
+    def select_save_folder(self) -> None:
+        game = self.selected_game_required()
+        if not game:
+            return
+        folder = filedialog.askdirectory(title=f"Select save/world folder for {game['name']}")
+        if not folder:
+            self.log("Save folder selection canceled.")
+            return
+        self.config.setdefault("save_folders", {})[game["name"]] = folder
+        save_json_file(CONFIG_FILE, self.config)
+        self.save_folder_var.set(folder)
+        self.log(f"Save folder selected for {game['name']}: {folder}")
+
+    def create_save_backup(self) -> None:
+        game = self.selected_game_required()
+        if not game:
+            return
+        folder = Path(self.save_folder_var.get().strip() or self.config.get("save_folders", {}).get(game["name"], ""))
+        if not folder.exists() or not folder.is_dir():
+            messagebox.showerror(APP_TITLE, "Select an existing save folder first.")
+            return
+        destination = BACKUP_ROOT / safe_filename(game["name"])
+        destination.mkdir(parents=True, exist_ok=True)
+        stamp = time.strftime("%Y%m%d_%H%M%S")
+        output = destination / f"{safe_filename(folder.name)}_{stamp}.zip"
+        self.log(f"Creating backup: {output}")
+
+        def worker() -> None:
+            try:
+                with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+                    for path in folder.rglob("*"):
+                        if path.is_file():
+                            archive.write(path, path.relative_to(folder))
+            except Exception as exc:
+                self.root.after(0, lambda: messagebox.showerror(APP_TITLE, f"Backup failed:\n{exc}"))
+                self.root.after(0, lambda: self.log(f"Backup failed: {exc}"))
+                return
+            self.root.after(0, lambda: messagebox.showinfo(APP_TITLE, f"Backup created:\n{output}"))
+            self.root.after(0, lambda: self.log(f"Backup created: {output}"))
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def restore_save_backup(self) -> None:
+        game = self.selected_game_required()
+        if not game:
+            return
+        folder = Path(self.save_folder_var.get().strip() or self.config.get("save_folders", {}).get(game["name"], ""))
+        if not folder.exists() or not folder.is_dir():
+            messagebox.showerror(APP_TITLE, "Select an existing restore target save folder first.")
+            return
+        backup = filedialog.askopenfilename(
+            title=f"Select backup zip for {game['name']}",
+            initialdir=str(BACKUP_ROOT / safe_filename(game["name"])),
+            filetypes=[("Zip backups", "*.zip"), ("All files", "*.*")],
+        )
+        if not backup:
+            self.log("Restore canceled.")
+            return
+        if not messagebox.askyesno(
+            APP_TITLE,
+            "Restore this backup into the selected save folder?\n\n"
+            f"Backup: {backup}\nTarget: {folder}\n\n"
+            "Existing files with the same names may be overwritten. Original saves are not deleted by this helper.",
+        ):
+            self.log("Restore canceled by user.")
+            return
+        def worker() -> None:
+            try:
+                with zipfile.ZipFile(backup, "r") as archive:
+                    safe_extract_zip(archive, folder)
+            except Exception as exc:
+                self.root.after(0, lambda: messagebox.showerror(APP_TITLE, f"Restore failed:\n{exc}"))
+                self.root.after(0, lambda: self.log(f"Restore failed: {exc}"))
+                return
+            self.root.after(0, lambda: messagebox.showinfo(APP_TITLE, f"Backup restored into:\n{folder}"))
+            self.root.after(0, lambda: self.log(f"Backup restored from {backup} into {folder}."))
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def select_mod_folder(self) -> None:
+        game = self.selected_game_required()
+        if not game:
+            return
+        folder = filedialog.askdirectory(title=f"Select mods folder for {game['name']}")
+        if not folder:
+            self.log("Mods folder selection canceled.")
+            return
+        self.config.setdefault("mod_folders", {})[game["name"]] = folder
+        save_json_file(CONFIG_FILE, self.config)
+        self.mod_folder_var.set(folder)
+        self.log(f"Mods folder selected for {game['name']}: {folder}")
+
+    def export_mod_list(self) -> None:
+        game = self.selected_game_required()
+        if not game:
+            return
+        folder = Path(self.mod_folder_var.get().strip() or self.config.get("mod_folders", {}).get(game["name"], ""))
+        if not folder.exists() or not folder.is_dir():
+            messagebox.showerror(APP_TITLE, "Select an existing mods folder first.")
+            return
+        files = sorted([path for path in folder.iterdir() if path.is_file()], key=lambda p: p.name.lower())
+        EXPORT_DIR.mkdir(exist_ok=True)
+        output = EXPORT_DIR / f"{safe_filename(game['name'])}_Mod_List.md"
+        lines = [
+            f"# {game['name']} - Mod List",
+            "",
+            f"Mods folder: {folder}",
+            f"Exported: {time.strftime('%Y-%m-%d %H:%M:%S')}",
+            "",
+            "Compare this list with every player before joining a modded LAN session.",
+            "This helper does not download, install, or update mods.",
+            "",
+            "## Files",
+        ]
+        if files:
+            for path in files:
+                stat = path.stat()
+                modified = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_mtime))
+                lines.append(f"- {path.name} ({stat.st_size} bytes, modified {modified})")
+        else:
+            lines.append("- no files found")
+        output.write_text("\n".join(lines), encoding="utf-8")
+        messagebox.showinfo(APP_TITLE, f"Mod list exported:\n{output}")
+        self.log(f"Mod list exported: {output}")
+
     def launch_game(self) -> None:
         game = self.selected_game_required()
         if not game:
@@ -857,6 +1745,528 @@ class OfflineLanGamesHelper:
             messagebox.showwarning(APP_TITLE, "Select a game first.")
             return None
         return game
+
+    def refresh_input_processes(self) -> None:
+        self.process_rows = enumerate_processes()
+        self.input_process_tree.delete(*self.input_process_tree.get_children())
+        for process in self.process_rows:
+            self.input_process_tree.insert("", tk.END, values=(process.name, process.pid, process.path, process.category))
+        self.log(f"Input Isolation: refreshed {len(self.process_rows)} running processes.")
+
+    def selected_input_process_values(self) -> tuple[str, str, str, str] | None:
+        selection = self.input_process_tree.selection()
+        if not selection:
+            messagebox.showwarning(APP_TITLE, "Select a process first.")
+            return None
+        values = self.input_process_tree.item(selection[0], "values")
+        if len(values) < 4:
+            messagebox.showwarning(APP_TITLE, "Selected process information is incomplete.")
+            return None
+        return str(values[0]), str(values[1]), str(values[2]), str(values[3])
+
+    def load_selected_process_into_notes(self) -> None:
+        selection = self.input_process_tree.selection()
+        if not selection:
+            return
+        values = self.input_process_tree.item(selection[0], "values")
+        if len(values) < 4:
+            return
+        name, pid, path, category = map(str, values[:4])
+        self.input_selected_process_var.set(f"Selected process: {name} PID {pid} ({category})")
+        if not self.input_role_var.get().strip():
+            self.input_role_var.set(category if category != "Other" else "")
+        if name.lower() in {"javaw.exe", "java.exe", "minecraft.exe"}:
+            self.input_keyboard_var.set(True)
+        if name.lower() == "ds4windows.exe":
+            self.input_controller_var.set(True)
+            self.input_virtual_xbox_var.set(True)
+        self.log(f"Input Isolation: selected process {name} PID {pid}.")
+
+    def selected_note_text(self) -> str:
+        return self.input_notes_text.get("1.0", tk.END).strip()
+
+    def input_state_summary(self) -> str:
+        parts = []
+        if self.input_keyboard_var.get():
+            parts.append("Keyboard + Mouse")
+        if self.input_controller_var.get():
+            parts.append("Controller")
+        if self.input_ignore_ps_var.get():
+            parts.append("Ignore real PlayStation controller")
+        if self.input_virtual_xbox_var.get():
+            parts.append("Use virtual Xbox controller")
+        return "; ".join(parts) if parts else "No input target selected"
+
+    def copy_selected_process_info(self) -> None:
+        values = self.selected_input_process_values()
+        if not values:
+            return
+        name, pid, path, category = values
+        text = f"Process: {name}\nPID: {pid}\nPath: {path}\nCategory: {category}"
+        self.copy_text_to_clipboard("selected process info", text)
+
+    def open_selected_process_location(self) -> None:
+        values = self.selected_input_process_values()
+        if not values:
+            return
+        _name, _pid, path, _category = values
+        if not path or path == "Access denied or unavailable" or not Path(path).exists():
+            messagebox.showwarning(APP_TITLE, "Executable path is not available for this process.")
+            return
+        subprocess.Popen(["explorer.exe", "/select,", path], **create_no_window_kwargs())
+        self.log(f"Opened process file location: {path}")
+
+    def add_selected_process_to_notes(self) -> None:
+        values = self.selected_input_process_values()
+        if not values:
+            return
+        self.load_selected_process_into_notes()
+        if not self.input_role_var.get().strip():
+            self.input_role_var.set(values[3] if values[3] != "Other" else "Local multiplayer process")
+        self.save_input_process_note()
+
+    def mark_selected_process_role(self, role: str) -> None:
+        if not self.selected_input_process_values():
+            return
+        self.load_selected_process_into_notes()
+        self.input_role_var.set(role)
+        self.save_input_process_note()
+
+    def save_input_process_note(self) -> None:
+        values = self.selected_input_process_values()
+        if not values:
+            return
+        name, pid, path, category = values
+        note = {
+            "process_name": name,
+            "pid": pid,
+            "path": path,
+            "category": category,
+            "role": self.input_role_var.get().strip() or category,
+            "keyboard_mouse": bool(self.input_keyboard_var.get()),
+            "controller": bool(self.input_controller_var.get()),
+            "ignore_real_playstation": bool(self.input_ignore_ps_var.get()),
+            "virtual_xbox": bool(self.input_virtual_xbox_var.get()),
+            "notes": self.selected_note_text(),
+            "updated": time.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        notes = [item for item in self.config.get("input_isolation_notes", []) if not (str(item.get("process_name")) == name and str(item.get("pid")) == pid)]
+        notes.append(note)
+        self.config["input_isolation_notes"] = notes
+        save_json_file(CONFIG_FILE, self.config)
+        self.refresh_input_notes_tree()
+        self.log(f"Input Isolation note saved for {name} PID {pid}.")
+
+    def refresh_input_notes_tree(self) -> None:
+        if not getattr(self, "input_notes_tree", None):
+            return
+        self.input_notes_tree.delete(*self.input_notes_tree.get_children())
+        for index, note in enumerate(self.config.get("input_isolation_notes", [])):
+            input_bits = []
+            if note.get("keyboard_mouse"):
+                input_bits.append("Keyboard + Mouse")
+            if note.get("controller"):
+                input_bits.append("Controller")
+            if note.get("ignore_real_playstation"):
+                input_bits.append("Ignore real PS")
+            if note.get("virtual_xbox"):
+                input_bits.append("Virtual Xbox")
+            self.input_notes_tree.insert(
+                "",
+                tk.END,
+                iid=str(index),
+                values=(
+                    note.get("process_name", ""),
+                    note.get("pid", ""),
+                    note.get("role", ""),
+                    "; ".join(input_bits) if input_bits else "No input target selected",
+                ),
+            )
+
+    def load_selected_input_note(self) -> None:
+        selection = self.input_notes_tree.selection()
+        if not selection:
+            return
+        try:
+            note = self.config.get("input_isolation_notes", [])[int(selection[0])]
+        except (ValueError, IndexError):
+            return
+        self.input_selected_process_var.set(f"Selected process: {note.get('process_name', '')} PID {note.get('pid', '')} ({note.get('category', '')})")
+        self.input_role_var.set(str(note.get("role", "")))
+        self.input_keyboard_var.set(bool(note.get("keyboard_mouse")))
+        self.input_controller_var.set(bool(note.get("controller")))
+        self.input_ignore_ps_var.set(bool(note.get("ignore_real_playstation")))
+        self.input_virtual_xbox_var.set(bool(note.get("virtual_xbox")))
+        self.input_notes_text.delete("1.0", tk.END)
+        self.input_notes_text.insert("1.0", str(note.get("notes", "")))
+
+    def delete_selected_input_note(self) -> None:
+        selection = self.input_notes_tree.selection()
+        if not selection:
+            messagebox.showwarning(APP_TITLE, "Select a note first.")
+            return
+        if not messagebox.askyesno(APP_TITLE, "Delete the selected local input note?"):
+            return
+        try:
+            index = int(selection[0])
+        except ValueError:
+            return
+        notes = list(self.config.get("input_isolation_notes", []))
+        if 0 <= index < len(notes):
+            removed = notes.pop(index)
+            self.config["input_isolation_notes"] = notes
+            save_json_file(CONFIG_FILE, self.config)
+            self.refresh_input_notes_tree()
+            self.log(f"Deleted input note for {removed.get('process_name', 'process')}.")
+
+    def build_input_notes_export(self) -> str:
+        lines = [
+            "# Input Isolation Notes",
+            "",
+            INPUT_ISOLATION_SAFETY_TEXT,
+            "",
+        ]
+        for note in self.config.get("input_isolation_notes", []):
+            lines.extend(
+                [
+                    f"## {note.get('process_name', '')} PID {note.get('pid', '')}",
+                    "",
+                    f"Path: {note.get('path', '')}",
+                    f"Category: {note.get('category', '')}",
+                    f"Role: {note.get('role', '')}",
+                    f"Input: {self.input_note_summary(note)}",
+                    "",
+                    str(note.get("notes", "")),
+                    "",
+                ]
+            )
+        return "\n".join(lines).strip()
+
+    def input_note_summary(self, note: dict[str, Any]) -> str:
+        parts = []
+        if note.get("keyboard_mouse"):
+            parts.append("Keyboard + Mouse")
+        if note.get("controller"):
+            parts.append("Controller")
+        if note.get("ignore_real_playstation"):
+            parts.append("Ignore real PlayStation controller")
+        if note.get("virtual_xbox"):
+            parts.append("Use virtual Xbox controller")
+        return "; ".join(parts) if parts else "No input target selected"
+
+    def copy_all_input_notes(self) -> None:
+        self.copy_text_to_clipboard("input isolation notes", self.build_input_notes_export())
+
+    def copy_text_to_clipboard(self, label: str, text: str) -> None:
+        self.root.clipboard_clear()
+        self.root.clipboard_append(text)
+        messagebox.showinfo(APP_TITLE, f"Copied {label}.")
+        self.log(f"Copied {label}.")
+
+    def find_ds4windows_exe(self) -> Path | None:
+        configured = self.config.get("ds4windows_path", "")
+        if configured and Path(configured).exists():
+            return Path(configured)
+        for process in self.process_rows:
+            if process.name.lower() == "ds4windows.exe" and process.path != "Access denied or unavailable":
+                path = Path(process.path)
+                if path.exists():
+                    return path
+        return None
+
+    def hidhide_client_candidates(self) -> list[Path]:
+        candidates = [
+            Path(r"C:\Program Files\Nefarius Software Solutions\HidHide\x64\HidHideClient.exe"),
+            Path(r"C:\Program Files\Nefarius Software Solutions\HidHide\HidHideClient.exe"),
+            Path(r"C:\Program Files (x86)\Nefarius Software Solutions\HidHide\x64\HidHideClient.exe"),
+        ]
+        configured = self.config.get("hidhide_client_path", "")
+        if configured:
+            candidates.insert(0, Path(configured))
+        command = (
+            "$paths=@(); "
+            "$keys=@('HKLM:\\SOFTWARE\\Nefarius Software Solutions e.U.\\Nefarius Software Solutions e.U. HidHide',"
+            "'HKCR:\\SOFTWARE\\Nefarius Software Solutions e.U.\\Nefarius Software Solutions e.U. HidHide'); "
+            "foreach($key in $keys){ try { $p=(Get-ItemProperty -Path $key -Name Path -ErrorAction Stop).Path; if($p){$paths += $p} } catch {} }; "
+            "$paths | ConvertTo-Json -Compress"
+        )
+        completed = run_powershell(command, timeout=10)
+        if completed.returncode == 0 and completed.stdout.strip():
+            try:
+                raw = json.loads(completed.stdout)
+                values = raw if isinstance(raw, list) else [raw]
+                for value in values:
+                    if not value:
+                        continue
+                    path = Path(str(value))
+                    candidates.append(path / "HidHideClient.exe" if path.is_dir() or not path.suffix else path)
+            except json.JSONDecodeError:
+                pass
+        return candidates
+
+    def find_hidhide_client(self) -> Path | None:
+        for candidate in self.hidhide_client_candidates():
+            try:
+                if candidate.exists() and candidate.is_file():
+                    return candidate
+            except OSError:
+                continue
+        return None
+
+    def hidhide_cli_candidates(self) -> list[Path]:
+        candidates = []
+        configured = self.config.get("hidhide_cli_path", "")
+        if configured:
+            candidates.append(Path(configured))
+        for client in self.hidhide_client_candidates():
+            candidates.append(client.with_name("HidHideCLI.exe"))
+        candidates.extend(
+            [
+                Path(r"C:\Program Files\Nefarius Software Solutions\HidHide\x64\HidHideCLI.exe"),
+                Path(r"C:\Program Files\Nefarius Software Solutions\HidHide\HidHideCLI.exe"),
+                Path(r"C:\Program Files (x86)\Nefarius Software Solutions\HidHide\x64\HidHideCLI.exe"),
+            ]
+        )
+        return candidates
+
+    def find_hidhide_cli(self) -> Path | None:
+        for candidate in self.hidhide_cli_candidates():
+            try:
+                if candidate.exists() and candidate.is_file():
+                    return candidate
+            except OSError:
+                continue
+        return None
+
+    def check_hidhide_installed(self) -> None:
+        client = self.find_hidhide_client()
+        if client:
+            messagebox.showinfo(APP_TITLE, f"HidHide Configuration Client found:\n{client}")
+            self.log(f"HidHide found: {client}")
+            return
+        messagebox.showwarning(APP_TITLE, "HidHide Configuration Client was not found in common locations. Use the official page button for setup information.")
+        self.log("HidHide not found in common locations.")
+
+    def open_hidhide_client(self) -> None:
+        client = self.find_hidhide_client()
+        if not client:
+            messagebox.showwarning(APP_TITLE, "HidHide Configuration Client was not found. Install HidHide from the official Nefarius page, then try again.")
+            return
+        os.startfile(str(client))  # type: ignore[attr-defined]
+        self.log(f"Opened HidHide Configuration Client: {client}")
+
+    def select_hidhide_client_exe(self) -> None:
+        path = filedialog.askopenfilename(title="Select HidHideClient.exe", filetypes=[("HidHideClient.exe", "HidHideClient.exe"), ("Windows executable", "*.exe"), ("All files", "*.*")])
+        if not path:
+            self.log("HidHideClient selection canceled.")
+            return
+        if Path(path).name.lower() != "hidhideclient.exe":
+            messagebox.showerror(APP_TITLE, "Please select HidHideClient.exe.")
+            return
+        self.config["hidhide_client_path"] = path
+        cli = Path(path).with_name("HidHideCLI.exe")
+        if cli.exists():
+            self.config["hidhide_cli_path"] = str(cli)
+        save_json_file(CONFIG_FILE, self.config)
+        self.update_input_setup_tab()
+        self.log(f"Saved HidHideClient path: {path}")
+
+    def select_ds4windows_exe(self) -> None:
+        path = filedialog.askopenfilename(title="Select DS4Windows.exe", filetypes=[("DS4Windows.exe", "DS4Windows.exe"), ("Windows executable", "*.exe"), ("All files", "*.*")])
+        if not path:
+            self.log("DS4Windows selection canceled.")
+            return
+        if Path(path).name.lower() != "ds4windows.exe":
+            messagebox.showerror(APP_TITLE, "Please select DS4Windows.exe.")
+            return
+        self.config["ds4windows_path"] = path
+        save_json_file(CONFIG_FILE, self.config)
+        self.update_input_setup_tab()
+        self.log(f"Saved DS4Windows path: {path}")
+
+    def open_ds4windows(self) -> None:
+        detected = self.find_ds4windows_exe()
+        if not detected:
+            messagebox.showwarning(APP_TITLE, "Select DS4Windows.exe first.")
+            return
+        self.config["ds4windows_path"] = str(detected)
+        save_json_file(CONFIG_FILE, self.config)
+        os.startfile(str(detected))  # type: ignore[attr-defined]
+        self.log(f"Opened DS4Windows: {detected}")
+
+    def open_windows_game_controllers(self) -> None:
+        subprocess.Popen(["control.exe", "joy.cpl"], **create_no_window_kwargs())
+        self.log("Opened Windows Game Controllers (joy.cpl).")
+
+    def open_official_input_tool_page(self, url: str) -> None:
+        if self.offline_mode_var.get():
+            messagebox.showinfo(APP_TITLE, "Offline Mode is enabled. Optional official tool pages are disabled.")
+            self.log("Official input tool page blocked by Offline Mode.")
+            return
+        webbrowser.open(url)
+        self.log(f"Opened official input tool page: {url}")
+
+    def detect_input_setup_tools(self) -> None:
+        self.refresh_input_processes()
+        ds4 = self.find_ds4windows_exe()
+        hidhide = self.find_hidhide_client()
+        cli = self.find_hidhide_cli()
+        if ds4:
+            self.config["ds4windows_path"] = str(ds4)
+        if hidhide:
+            self.config["hidhide_client_path"] = str(hidhide)
+        if cli:
+            self.config["hidhide_cli_path"] = str(cli)
+        save_json_file(CONFIG_FILE, self.config)
+        self.update_input_setup_tab()
+        self.log("Input setup tool detection completed.")
+
+    def detect_visible_controllers(self) -> list[str]:
+        command = (
+            "Get-CimInstance Win32_PnPEntity | "
+            "Where-Object { $_.Name -match 'controller|gamepad|xbox|dualshock|dualsense|wireless controller' } | "
+            "Select-Object Name,PNPDeviceID,Status | ConvertTo-Json -Compress -Depth 2"
+        )
+        completed = run_powershell(command, timeout=20)
+        if completed.returncode != 0 or not completed.stdout.strip():
+            return []
+        try:
+            raw = json.loads(completed.stdout)
+        except json.JSONDecodeError:
+            return []
+        rows = raw if isinstance(raw, list) else [raw]
+        lines = []
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            name = str(row.get("Name") or "Unknown device")
+            status = str(row.get("Status") or "unknown")
+            device_id = str(row.get("PNPDeviceID") or "")
+            lines.append(f"- {name} [{status}] {device_id}")
+        return lines
+
+    def refresh_visible_controllers(self) -> None:
+        controllers = self.detect_visible_controllers()
+        if controllers:
+            if not self.hidhide_cli_controller_var.get().strip():
+                first = controllers[0].split("] ", 1)[-1].strip()
+                self.hidhide_cli_controller_var.set(first)
+            messagebox.showinfo(APP_TITLE, f"Detected {len(controllers)} controller-like device entries. The setup text has been refreshed.")
+            self.log(f"Detected {len(controllers)} controller-like device entries.")
+        else:
+            messagebox.showinfo(APP_TITLE, "No controller-like devices were detected by the safe Windows device query.")
+            self.log("No controller-like devices detected by safe query.")
+        self.update_input_setup_tab()
+
+    def generated_input_setup_steps(self) -> str:
+        return "\n\n".join(
+            [
+                "Apply Safe Input Isolation Setup",
+                HIDHIDE_CHECKLIST,
+                "Nucleus Minecraft Profile:\n- Player 1: keyboard + mouse\n- Player 2: virtual Xbox controller from DS4Windows\n- Remove Controlify if one controller controls all Minecraft instances.\n- Do not use Controlify and MidnightControls together.",
+                INPUT_ISOLATION_SAFETY_TEXT,
+            ]
+        )
+
+    def apply_safe_input_isolation_setup(self) -> None:
+        ds4 = self.find_ds4windows_exe()
+        if not ds4:
+            messagebox.showwarning(APP_TITLE, "DS4Windows.exe path is not configured. Select DS4Windows.exe first.")
+            return
+        hidhide = self.find_hidhide_client()
+        if not hidhide:
+            messagebox.showwarning(APP_TITLE, "HidHideClient.exe was not found. Install HidHide or select HidHideClient.exe first.")
+            return
+        self.config["ds4windows_path"] = str(ds4)
+        self.config["hidhide_client_path"] = str(hidhide)
+        self.config.setdefault("input_isolation_profiles", {})["safe_setup"] = {
+            "updated": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "ds4windows_path": str(ds4),
+            "hidhide_client_path": str(hidhide),
+            "steps": HIDHIDE_CHECKLIST,
+        }
+        save_json_file(CONFIG_FILE, self.config)
+        os.startfile(str(ds4))  # type: ignore[attr-defined]
+        os.startfile(str(hidhide))  # type: ignore[attr-defined]
+        self.open_windows_game_controllers()
+        self.set_text(self.input_setup_text, self.generated_input_setup_steps())
+        messagebox.showinfo(APP_TITLE, "Opened DS4Windows, HidHide Configuration Client, and Windows Game Controllers. Follow the checklist shown in the setup tab.")
+        self.log("Applied safe input isolation setup by opening approved external tools and showing checklist.")
+
+    def test_input_isolation(self) -> None:
+        self.open_windows_game_controllers()
+        result = "confirmed virtual Xbox only" if messagebox.askyesno(
+            APP_TITLE,
+            "Look at Windows Game Controllers.\n\nIs only the virtual Xbox controller visible to normal apps?",
+        ) else "needs review"
+        self.config.setdefault("input_isolation_profiles", {})["last_isolation_test"] = {
+            "updated": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "result": result,
+        }
+        save_json_file(CONFIG_FILE, self.config)
+        self.update_input_setup_tab()
+        self.log(f"Isolation test saved: {result}.")
+
+    def save_nucleus_minecraft_profile(self) -> None:
+        profile = {
+            "updated": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "game": "Minecraft Java",
+            "tool": "Nucleus Co-op",
+            "player_1": "Keyboard + Mouse",
+            "player_2": "Virtual Xbox controller from DS4Windows",
+            "warnings": [
+                "Remove Controlify if one controller controls all Minecraft instances.",
+                "Do not use Controlify and MidnightControls together.",
+            ],
+            "safety": "Profile is local notes only. This app does not block input or modify games.",
+        }
+        self.config.setdefault("input_isolation_profiles", {})["nucleus_minecraft"] = profile
+        save_json_file(CONFIG_FILE, self.config)
+        self.update_input_setup_tab()
+        messagebox.showinfo(APP_TITLE, "Saved local Nucleus Minecraft input profile.")
+        self.log("Saved Nucleus Minecraft input profile.")
+
+    def copy_generated_input_setup_steps(self) -> None:
+        self.copy_text_to_clipboard("safe input isolation setup steps", self.generated_input_setup_steps())
+
+    def hidhide_cli_command_preview(self) -> str:
+        cli = self.find_hidhide_cli()
+        if not cli:
+            return "HidHideCLI.exe was not found."
+        controller_id = self.hidhide_cli_controller_var.get().strip()
+        if not self.advanced_hidhide_cli_var.get():
+            return f'"{cli}" --help'
+        if not controller_id:
+            return f'"{cli}" --help  # Select a real game controller instance ID before considering any device-specific CLI command.'
+        if any(word in controller_id.lower() for word in ["keyboard", "mouse"]):
+            return "Blocked: keyboard and mouse devices must never be targeted."
+        return f'"{cli}" --help  # Use HidHide GUI for actual hiding. Selected controller reference: {controller_id}'
+
+    def copy_hidhide_cli_command_preview(self) -> None:
+        self.copy_text_to_clipboard("HidHide CLI command preview", self.hidhide_cli_command_preview())
+
+    def run_hidhide_cli_help(self) -> None:
+        cli = self.find_hidhide_cli()
+        if not cli:
+            messagebox.showwarning(APP_TITLE, "HidHideCLI.exe was not found.")
+            return
+        command_text = f'"{cli}" --help'
+        if not messagebox.askyesno(APP_TITLE, f"Run this read-only HidHide CLI help command?\n\n{command_text}\n\nNo device hiding command will be run."):
+            self.log("HidHide CLI help canceled by user.")
+            return
+        completed = run_hidden([str(cli), "--help"], timeout=20)
+        output = (completed.stdout or completed.stderr or "").strip()
+        if not output:
+            fallback = run_hidden([str(cli), "/?"], timeout=20)
+            output = (fallback.stdout or fallback.stderr or "").strip()
+        self.set_text(self.input_setup_text, f"HidHide CLI help output:\n\n{output or 'No output returned.'}")
+        self.log("Ran HidHide CLI help command only.")
+
+    def toggle_input_advanced_text(self) -> None:
+        if self.input_advanced_var.get():
+            self.input_advanced_text.grid()
+        else:
+            self.input_advanced_text.grid_remove()
 
     def ports_by_protocol(self, game: dict[str, Any], key: str = "ports") -> dict[str, list[str]]:
         grouped = {"TCP": [], "UDP": []}
@@ -942,6 +2352,14 @@ class OfflineLanGamesHelper:
         os.startfile(str(folder))  # type: ignore[attr-defined]
         self.log(f"Opened server folder: {folder}")
 
+    def server_status_text(self, game: dict[str, Any]) -> str:
+        process = self.server_processes.get(game["name"])
+        if process and process.poll() is None:
+            return f"running (PID {process.pid}, started by this app)"
+        if process:
+            return f"stopped (last exit code {process.returncode})"
+        return "stopped"
+
     def select_server_executable(self) -> None:
         game = self.selected_game_required()
         if not game:
@@ -971,6 +2389,92 @@ class OfflineLanGamesHelper:
         os.startfile(path)  # type: ignore[attr-defined]
         self.log(f"Launched server file normally: {path}")
 
+    def start_managed_server(self) -> None:
+        game = self.selected_game_required()
+        if not game:
+            return
+        if game["server_support"] in {"none", "in_game_host"}:
+            messagebox.showinfo(APP_TITLE, "No supported dedicated server is available for this game. Host from inside the game if supported.")
+            return
+        existing = self.server_processes.get(game["name"])
+        if existing and existing.poll() is None:
+            messagebox.showinfo(APP_TITLE, f"Server is already running with PID {existing.pid}.")
+            return
+        path = self.current_server_path or self.find_server_path(game)
+        if not path or not Path(path).exists():
+            messagebox.showwarning(APP_TITLE, "Select an official local server executable/file first.")
+            return
+        cwd = str(Path(path).parent)
+        try:
+            if Path(path).suffix.lower() in {".bat", ".cmd"}:
+                args = ["cmd.exe", "/c", path]
+            elif Path(path).suffix.lower() == ".jar":
+                args = ["java.exe", "-jar", path]
+            else:
+                args = [path]
+            process = subprocess.Popen(args, cwd=cwd, **create_no_window_kwargs())
+        except Exception as exc:
+            messagebox.showerror(APP_TITLE, f"Could not start server:\n{exc}")
+            self.log(f"Could not start server: {exc}")
+            return
+        self.server_processes[game["name"]] = process
+        self.update_server_tab()
+        self.log(f"Started server for {game['name']} with PID {process.pid}.")
+
+    def stop_managed_server(self) -> None:
+        game = self.selected_game_required()
+        if not game:
+            return
+        process = self.server_processes.get(game["name"])
+        if not process or process.poll() is not None:
+            messagebox.showinfo(APP_TITLE, "No server process started by this app is currently running for this game.")
+            self.update_server_tab()
+            return
+        if not messagebox.askyesno(APP_TITLE, f"Stop the server process started by this app?\n\nPID: {process.pid}\nGame: {game['name']}"):
+            self.log("Server stop canceled by user.")
+            return
+        try:
+            process.terminate()
+            try:
+                process.wait(timeout=8)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait(timeout=5)
+        except Exception as exc:
+            messagebox.showerror(APP_TITLE, f"Could not stop server:\n{exc}")
+            self.log(f"Could not stop server: {exc}")
+            return
+        self.update_server_tab()
+        self.log(f"Stopped server process for {game['name']}.")
+
+    def open_server_log(self) -> None:
+        game = self.selected_game_required()
+        if not game:
+            return
+        configured = self.config.get("server_log_paths", {}).get(game["name"], "")
+        candidates: list[Path] = []
+        if configured:
+            candidates.append(Path(configured))
+        base_path = self.current_server_path or self.config.get("server_install_dirs", {}).get(game["name"], "")
+        if base_path:
+            folder = Path(base_path).parent if Path(base_path).suffix else Path(base_path)
+            if folder.exists():
+                candidates.extend(sorted(folder.rglob("*.log"), key=lambda p: p.stat().st_mtime, reverse=True)[:5])
+                candidates.extend(sorted(folder.rglob("*.txt"), key=lambda p: p.stat().st_mtime, reverse=True)[:5])
+        for path in candidates:
+            if path.exists() and path.is_file():
+                os.startfile(str(path))  # type: ignore[attr-defined]
+                self.log(f"Opened server log: {path}")
+                return
+        selected = filedialog.askopenfilename(title=f"Select server log for {game['name']}", filetypes=[("Log files", "*.log *.txt"), ("All files", "*.*")])
+        if selected:
+            self.config.setdefault("server_log_paths", {})[game["name"]] = selected
+            save_json_file(CONFIG_FILE, self.config)
+            os.startfile(selected)  # type: ignore[attr-defined]
+            self.log(f"Opened selected server log: {selected}")
+        else:
+            self.log("No server log selected.")
+
     def select_steamcmd(self) -> None:
         path = filedialog.askopenfilename(title="Select steamcmd.exe", filetypes=[("steamcmd.exe", "steamcmd.exe"), ("Windows executable", "*.exe"), ("All files", "*.*")])
         if not path:
@@ -987,6 +2491,10 @@ class OfflineLanGamesHelper:
     def install_with_steamcmd(self) -> None:
         game = self.selected_game_required()
         if not game:
+            return
+        if self.offline_mode_var.get():
+            messagebox.showinfo(APP_TITLE, "Offline Mode is enabled. Optional SteamCMD downloads are disabled.")
+            self.log("SteamCMD install blocked by Offline Mode.")
             return
         app_id = str(game.get("steamcmd_app_id", "")).strip()
         if not app_id:
@@ -1028,12 +2536,38 @@ class OfflineLanGamesHelper:
         game = self.selected_game_required()
         if not game:
             return
+        if self.offline_mode_var.get():
+            messagebox.showinfo(APP_TITLE, "Offline Mode is enabled. Optional official download pages are disabled.")
+            self.log("Official download page blocked by Offline Mode.")
+            return
         url = game.get("official_download_url", "")
         if not url:
             messagebox.showinfo(APP_TITLE, "No official download page is configured for this game.")
             return
         webbrowser.open(url)
         self.log(f"Opened official download page: {url}")
+
+    def open_paypal_donation(self) -> None:
+        if self.offline_mode_var.get():
+            messagebox.showinfo(APP_TITLE, DONATION_OFFLINE_MESSAGE)
+            self.log(DONATION_OFFLINE_MESSAGE)
+            return
+        webbrowser.open(PAYPAL_DONATION_URL)
+        self.log(f"Opened optional donation link: {PAYPAL_DONATION_URL}")
+
+    def open_github_sponsors(self) -> None:
+        if self.offline_mode_var.get():
+            messagebox.showinfo(APP_TITLE, DONATION_OFFLINE_MESSAGE)
+            self.log(DONATION_OFFLINE_MESSAGE)
+            return
+        webbrowser.open(GITHUB_SPONSORS_URL)
+        self.log(f"Opened optional sponsor link: {GITHUB_SPONSORS_URL}")
+
+    def copy_donation_link(self) -> None:
+        self.root.clipboard_clear()
+        self.root.clipboard_append(PAYPAL_DONATION_URL)
+        messagebox.showinfo(APP_TITLE, f"Donation link copied:\n{PAYPAL_DONATION_URL}")
+        self.log("Copied optional donation link.")
 
     def export_tutorial(self) -> None:
         game = self.selected_game_required()
