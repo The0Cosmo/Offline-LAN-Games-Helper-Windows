@@ -1,12 +1,13 @@
 """
-Generate the Offline LAN Games Helper icon.
+Generate the Offline LAN Games Helper kiwi icon.
 
-The icon is intentionally generic: monitor, network nodes, and a small
-gamepad shape. It uses no copyrighted game, launcher, or platform logos.
+The icon is original and logo-free: a green kiwi slice with LAN nodes.
+It uses no copyrighted game, launcher, platform, or store logos.
 """
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 from PIL import Image, ImageDraw
@@ -14,15 +15,12 @@ from PIL import Image, ImageDraw
 
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_DIR = BASE_DIR / "assets"
+KIWI_PNG_PATH = ASSETS_DIR / "kiwi_logo.png"
 PNG_PATH = ASSETS_DIR / "offline_lan_helper.png"
 ICO_PATH = ASSETS_DIR / "offline_lan_helper.ico"
 
 
-def rounded_rectangle(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], radius: int, fill: tuple[int, int, int, int], outline=None, width: int = 1) -> None:
-    draw.rounded_rectangle(box, radius=radius, fill=fill, outline=outline, width=width)
-
-
-def draw_icon(size: int = 256) -> Image.Image:
+def draw_kiwi_icon(size: int = 256) -> Image.Image:
     scale = size / 256
 
     def s(value: int) -> int:
@@ -31,63 +29,55 @@ def draw_icon(size: int = 256) -> Image.Image:
     image = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
 
-    # Background tile.
-    rounded_rectangle(
-        draw,
+    # Rounded app tile.
+    draw.rounded_rectangle(
         (s(14), s(14), s(242), s(242)),
-        s(38),
-        (22, 78, 99, 255),
-        outline=(92, 225, 230, 255),
-        width=s(4),
-    )
-
-    # Subtle inner panel.
-    rounded_rectangle(
-        draw,
-        (s(32), s(38), s(224), s(214)),
-        s(24),
-        (14, 116, 144, 255),
-        outline=(165, 243, 252, 160),
-        width=s(2),
-    )
-
-    # Monitor.
-    rounded_rectangle(
-        draw,
-        (s(62), s(70), s(194), s(145)),
-        s(12),
-        (8, 47, 73, 255),
-        outline=(226, 252, 255, 255),
+        radius=s(44),
+        fill=(235, 250, 226, 255),
+        outline=(76, 145, 43, 255),
         width=s(5),
     )
-    draw.rectangle((s(113), s(146), s(143), s(165)), fill=(226, 252, 255, 255))
-    rounded_rectangle(draw, (s(91), s(164), s(165), s(175)), s(5), (226, 252, 255, 255))
+
+    # Kiwi skin and flesh.
+    draw.ellipse((s(42), s(40), s(214), s(212)), fill=(92, 124, 42, 255))
+    draw.ellipse((s(54), s(52), s(202), s(200)), fill=(106, 190, 54, 255))
+    draw.ellipse((s(80), s(78), s(176), s(174)), fill=(205, 244, 118, 255))
+    draw.ellipse((s(113), s(111), s(143), s(141)), fill=(244, 255, 209, 255))
+
+    # Kiwi seeds.
+    center = (s(128), s(126))
+    seed_color = (25, 42, 20, 255)
+    for angle_index in range(18):
+        angle = (angle_index / 18) * 6.2831853
+        radius_x = s(55)
+        radius_y = s(49)
+        x = int(center[0] + radius_x * math.cos(angle))
+        y = int(center[1] + radius_y * math.sin(angle))
+        draw.ellipse((x - s(3), y - s(4), x + s(3), y + s(4)), fill=seed_color)
 
     # LAN nodes and links.
-    node_color = (187, 247, 208, 255)
-    line_color = (190, 242, 100, 255)
-    center = (s(128), s(112))
-    nodes = [(s(65), s(193)), (s(128), s(199)), (s(191), s(193))]
+    node_color = (240, 253, 244, 255)
+    line_color = (32, 105, 42, 255)
+    nodes = [(s(78), s(192)), (s(128), s(210)), (s(178), s(192))]
     for node in nodes:
-        draw.line((center[0], center[1], node[0], node[1]), fill=line_color, width=s(5))
+        draw.line((center[0], center[1], node[0], node[1]), fill=line_color, width=s(4))
     for node in nodes:
-        draw.ellipse((node[0] - s(13), node[1] - s(13), node[0] + s(13), node[1] + s(13)), fill=node_color, outline=(20, 83, 45, 255), width=s(3))
+        draw.ellipse((node[0] - s(10), node[1] - s(10), node[0] + s(10), node[1] + s(10)), fill=node_color, outline=line_color, width=s(3))
 
-    # Small gamepad shape, generic and logo-free.
-    rounded_rectangle(draw, (s(78), s(96), s(178), s(134)), s(18), (15, 23, 42, 255), outline=(125, 211, 252, 255), width=s(3))
-    draw.rectangle((s(99), s(109), s(121), s(114)), fill=(226, 252, 255, 255))
-    draw.rectangle((s(107), s(101), s(113), s(122)), fill=(226, 252, 255, 255))
-    draw.ellipse((s(143), s(104), s(154), s(115)), fill=(226, 252, 255, 255))
-    draw.ellipse((s(158), s(114), s(169), s(125)), fill=(226, 252, 255, 255))
+    # Simple leaf.
+    draw.ellipse((s(152), s(28), s(208), s(70)), fill=(68, 160, 52, 255), outline=(34, 94, 34, 255), width=s(3))
+    draw.line((s(158), s(64), s(195), s(38)), fill=(34, 94, 34, 255), width=s(3))
 
     return image
 
 
 def main() -> int:
     ASSETS_DIR.mkdir(exist_ok=True)
-    image = draw_icon(256)
+    image = draw_kiwi_icon(256)
+    image.save(KIWI_PNG_PATH)
     image.save(PNG_PATH)
     image.save(ICO_PATH, sizes=[(256, 256), (128, 128), (64, 64), (48, 48), (32, 32), (16, 16)])
+    print(f"Wrote {KIWI_PNG_PATH}")
     print(f"Wrote {PNG_PATH}")
     print(f"Wrote {ICO_PATH}")
     return 0

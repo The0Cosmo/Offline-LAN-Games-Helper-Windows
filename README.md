@@ -2,6 +2,8 @@
 
 Offline LAN Games Helper is a safe Windows GUI utility for LAN/offline multiplayer games that you legally own. It helps with LAN IP discovery, Windows Firewall rules, normal game launching, game-specific tutorials, exported guides, and official dedicated server tools where a real supported server option exists.
 
+The current UI uses a cleaner kiwi-green light theme, readable high-contrast text, larger buttons, scrollable tutorial panels, and an original kiwi LAN logo.
+
 This project is not affiliated with Steam, Valve, Paradox, Epic Games, Rockstar, Riot Games, Mojang, Microsoft, Apple, or any game publisher.
 
 ## Supported Platform
@@ -25,6 +27,7 @@ This project is not affiliated with Steam, Valve, Paradox, Epic Games, Rockstar,
 - Exports mod file lists for Minecraft Java and other modded games so players can compare setups.
 - Helps diagnose local input conflicts with a Windows-only Input Isolation Helper.
 - Shows English tutorials, ports, notes, troubleshooting, and privacy text.
+- Provides English and Italian UI labels from the Settings page.
 - Exports Markdown LAN/server guides.
 - Helps with official dedicated server tools only when supported, including status for server processes started by this app.
 
@@ -60,6 +63,32 @@ The app itself uses only the Python standard library. `pillow` and `pyinstaller`
 After the app is downloaded and installed, normal LAN-helper features work offline. Optional server downloads and online-only games require internet and are not handled by this app.
 
 Use the `Offline Mode` toggle to hide or block optional internet/download actions. LAN IP detection, tutorials, path selection, launching installed games, LAN tests, backups, mod-list export, invite export, and guide export still work offline.
+
+## New UI, Settings, and Language
+
+The app includes a `Settings` tab with:
+
+- language selection: English or Italiano;
+- theme selection: Light, Dark, or System default;
+- default Offline Mode behavior;
+- safety warning visibility;
+- remember last selected game;
+- Windows-only paths for DS4Windows, Nucleus Co-op, and Prism Launcher;
+- default export and backup folders;
+- privacy, support, repository, version, author, and license information.
+
+Settings are saved locally in `user_config.json` and are never uploaded.
+
+## Kiwi Logo
+
+The app icon and About/Settings logo are generated locally by `make_icon.py` as original kiwi-themed artwork:
+
+```text
+assets\kiwi_logo.png
+assets\offline_lan_helper.ico
+```
+
+The icon does not use copyrighted game, launcher, PayPal, Steam, Paradox, Riot, Rockstar, or store logos.
 
 ## Build The EXE
 
@@ -225,7 +254,7 @@ Offline LAN Games Helper is free to use.
 
 If the app helped you and you want to support development, you can donate here:
 
-- PayPal: https://paypal.me/REPLACE_WITH_MY_PAYPALME
+- PayPal: https://paypal.me/The0Cosmo
 - GitHub Sponsors: https://github.com/sponsors/The0Cosmo
 
 Donations are optional and do not unlock extra features.

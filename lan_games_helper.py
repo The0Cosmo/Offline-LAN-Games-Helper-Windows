@@ -43,12 +43,13 @@ from tkinter import filedialog, messagebox, ttk
 
 APP_NAME = "Offline LAN Games Helper"
 APP_TITLE = "Offline LAN Games Helper - Windows"
+APP_VERSION = "1.2.0"
 FIREWALL_PREFIX = "Offline LAN Helper"
 SAFETY_WARNING = (
     "This app does not emulate servers or bypass online services. "
     "Online-only games are intentionally excluded."
 )
-PAYPAL_DONATION_URL = "https://paypal.me/REPLACE_WITH_MY_PAYPALME"
+PAYPAL_DONATION_URL = "https://paypal.me/The0Cosmo"
 GITHUB_SPONSORS_URL = "https://github.com/sponsors/The0Cosmo"
 DONATION_OFFLINE_MESSAGE = "Donation links require an internet connection. You can copy the link and open it later."
 HIDHIDE_OFFICIAL_URL = "https://docs.nefarius.at/projects/HidHide/"
@@ -114,6 +115,10 @@ Local Configuration
 - The app may save selected game paths, custom games, selected server paths, selected controller tool paths, local input notes, and exported guides.
 - These files stay on your device.
 
+Settings and Language
+- The app may save local preferences such as selected language, theme, selected paths, and offline mode.
+- These settings stay on your device and are not uploaded.
+
 Internet Access
 - Normal LAN helper features should not require internet access.
 - If Server Tools opens official download pages or uses official tools such as SteamCMD, those tools may connect to official services.
@@ -155,6 +160,8 @@ CONFIG_FILE = APP_DIR / "user_config.json"
 EXPORT_DIR = APP_DIR / "exported_guides"
 SERVER_ROOT = APP_DIR / "servers"
 BACKUP_ROOT = APP_DIR / "backups"
+KIWI_LOGO_PATH = RESOURCE_DIR / "assets" / "kiwi_logo.png"
+WINDOW_ICON_PATH = RESOURCE_DIR / "assets" / "offline_lan_helper.ico"
 DEFAULT_CONFIG = {
     "paths": {},
     "server_paths": {},
@@ -169,7 +176,174 @@ DEFAULT_CONFIG = {
     "ds4windows_path": "",
     "hidhide_client_path": "",
     "hidhide_cli_path": "",
+    "language": "en",
+    "theme": "light",
+    "show_safety_warnings": True,
+    "remember_last_selected_game": True,
+    "last_selected_game": "",
+    "nucleus_coop_path": "",
+    "prism_launcher_path": "",
+    "default_export_folder": "",
+    "default_backup_folder": "",
     "custom_games": [],
+}
+
+TRANSLATIONS = {
+    "en": {
+        "app_title": "Offline LAN Games Helper - Windows",
+        "settings": "Settings",
+        "language": "Language",
+        "theme": "Theme",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System default",
+        "offline_mode": "Offline Mode: hide or block optional internet/download actions",
+        "safety_warning": SAFETY_WARNING,
+        "search": "Search",
+        "search_placeholder": "Search games",
+        "game_list": "Games",
+        "add_custom_game": "Add Custom Game",
+        "refresh_ip": "Refresh IP",
+        "copy_ip": "Copy Host IP",
+        "detect_path": "Detect Game Path",
+        "manual_select_game": "Manual Select Game",
+        "launch_game": "Launch Game",
+        "add_firewall": "Add Firewall Rules",
+        "remove_firewall": "Remove Firewall Rules",
+        "export_tutorial": "Export Tutorial",
+        "actions": "Actions",
+        "log_status": "Log / Status",
+        "clear_log": "Clear Log",
+        "host_network": "Host Network",
+        "selected_ip": "Selected IP:",
+        "privacy_local": "This app works locally and does not collect or upload personal data.",
+        "support_project": "Support the Project",
+        "donate": "Donate with PayPal",
+        "sponsor": "Sponsor on GitHub",
+        "copy_donation": "Copy Donation Link",
+        "privacy": "Privacy",
+        "open_privacy": "Open Privacy Policy",
+        "about": "About",
+        "author": "Author: The0Cosmo",
+        "license_summary": "Personal, non-commercial use only. See LICENSE for full terms.",
+        "default_behavior": "Default Behavior",
+        "show_safety_warnings": "Show safety warnings",
+        "remember_last_game": "Remember last selected game",
+        "paths": "Paths",
+        "default_export_folder": "Default export folder",
+        "default_backup_folder": "Default backup folder",
+        "select": "Select",
+        "open_github_windows": "Open Windows GitHub Repository",
+        "settings_saved": "Settings saved.",
+        "tutorial": "Tutorial",
+        "network": "Network / IP",
+        "firewall_permissions": "Firewall / Permissions",
+        "game_path": "Game Path",
+        "server_tools": "Server Tools",
+        "lan_test": "LAN Test",
+        "invite": "Invite",
+        "backups": "Backups",
+        "mods": "Mods",
+        "input_isolation": "Input Isolation",
+        "input_isolation_setup": "Input Isolation Setup",
+        "troubleshooting": "Troubleshooting",
+        "support": "Support",
+        "status_ready": "Ready.",
+    },
+    "it": {
+        "app_title": "Offline LAN Games Helper - Windows",
+        "settings": "Impostazioni",
+        "language": "Lingua",
+        "theme": "Tema",
+        "light": "Chiaro",
+        "dark": "Scuro",
+        "system": "Predefinito di sistema",
+        "offline_mode": "Modalita offline: nasconde o blocca azioni internet/download opzionali",
+        "safety_warning": "Questa app non emula server e non aggira servizi online. I giochi solo online sono esclusi.",
+        "search": "Cerca",
+        "search_placeholder": "Cerca giochi",
+        "game_list": "Giochi",
+        "add_custom_game": "Aggiungi gioco personalizzato",
+        "refresh_ip": "Aggiorna IP",
+        "copy_ip": "Copia IP host",
+        "detect_path": "Rileva percorso gioco",
+        "manual_select_game": "Seleziona gioco manualmente",
+        "launch_game": "Avvia gioco",
+        "add_firewall": "Aggiungi regole firewall",
+        "remove_firewall": "Rimuovi regole firewall",
+        "export_tutorial": "Esporta tutorial",
+        "actions": "Azioni",
+        "log_status": "Log / Stato",
+        "clear_log": "Pulisci log",
+        "host_network": "Rete host",
+        "selected_ip": "IP selezionato:",
+        "privacy_local": "Questa app funziona localmente e non raccoglie o carica dati personali.",
+        "support_project": "Supporta il progetto",
+        "donate": "Dona con PayPal",
+        "sponsor": "Sponsorizza su GitHub",
+        "copy_donation": "Copia link donazione",
+        "privacy": "Privacy",
+        "open_privacy": "Apri informativa privacy",
+        "about": "Informazioni",
+        "author": "Autore: The0Cosmo",
+        "license_summary": "Solo uso personale e non commerciale. Vedi LICENSE per i termini completi.",
+        "default_behavior": "Comportamento predefinito",
+        "show_safety_warnings": "Mostra avvisi di sicurezza",
+        "remember_last_game": "Ricorda ultimo gioco selezionato",
+        "paths": "Percorsi",
+        "default_export_folder": "Cartella export predefinita",
+        "default_backup_folder": "Cartella backup predefinita",
+        "select": "Seleziona",
+        "open_github_windows": "Apri repository GitHub Windows",
+        "settings_saved": "Impostazioni salvate.",
+        "tutorial": "Tutorial",
+        "network": "Rete / IP",
+        "firewall_permissions": "Firewall / Permessi",
+        "game_path": "Percorso gioco",
+        "server_tools": "Strumenti server",
+        "lan_test": "Test LAN",
+        "invite": "Invito",
+        "backups": "Backup",
+        "mods": "Mod",
+        "input_isolation": "Isolamento input",
+        "input_isolation_setup": "Configurazione isolamento input",
+        "troubleshooting": "Risoluzione problemi",
+        "support": "Supporto",
+        "status_ready": "Pronto.",
+    },
+}
+
+THEMES = {
+    "light": {
+        "bg": "#f6faf3",
+        "panel": "#ffffff",
+        "panel_alt": "#eef7e8",
+        "text": "#102014",
+        "muted": "#475569",
+        "accent": "#5aa832",
+        "accent_dark": "#2f6f1f",
+        "warning_bg": "#fff7ed",
+        "warning_fg": "#9a3412",
+        "success_bg": "#ecfdf3",
+        "error_bg": "#fef2f2",
+        "border": "#cbd5c0",
+        "button_fg": "#102014",
+    },
+    "dark": {
+        "bg": "#11170f",
+        "panel": "#182116",
+        "panel_alt": "#21301d",
+        "text": "#edf7e8",
+        "muted": "#cbd5c0",
+        "accent": "#8adf62",
+        "accent_dark": "#b8f295",
+        "warning_bg": "#3a250e",
+        "warning_fg": "#fdba74",
+        "success_bg": "#12301c",
+        "error_bg": "#3b1212",
+        "border": "#3f5b35",
+        "button_fg": "#edf7e8",
+    },
 }
 
 
@@ -493,11 +667,16 @@ def join_lines(value: str) -> list[str]:
 class OfflineLanGamesHelper:
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
-        self.root.title(APP_TITLE)
+        self.config = merge_config(load_json_file(CONFIG_FILE, DEFAULT_CONFIG))
+        self.language = self.config.get("language", "en") if self.config.get("language") in TRANSLATIONS else "en"
+        self.theme_name = self.config.get("theme", "light") if self.config.get("theme") in ("light", "dark", "system") else "light"
+        self.colors = THEMES[self.effective_theme_name()]
+        self.root.title(self.tr("app_title"))
         self.root.geometry("1280x820")
         self.root.minsize(1040, 680)
+        self.set_window_icon()
+        self.configure_style()
 
-        self.config = merge_config(load_json_file(CONFIG_FILE, DEFAULT_CONFIG))
         self.builtin_games = [normalize_game(game) for game in load_json_file(GAMES_FILE, [])]
         self.custom_games = [normalize_game(game, custom=True) for game in self.config.get("custom_games", [])]
         self.games: list[dict[str, Any]] = []
@@ -509,11 +688,85 @@ class OfflineLanGamesHelper:
         self.main_ip = ""
         self.server_processes: dict[str, subprocess.Popen[Any]] = {}
         self.process_rows: list[ProcessInfo] = []
+        self.localized_widgets: list[tuple[tk.Widget, str]] = []
+        self.tab_widgets: dict[str, ttk.Frame] = {}
+        self.action_buttons: dict[str, ttk.Button] = {}
+        self.kiwi_photo: tk.PhotoImage | None = None
 
         self.build_ui()
         self.reload_games()
         self.refresh_network()
         self.refresh_input_processes()
+
+    def effective_theme_name(self) -> str:
+        return self.theme_name if self.theme_name in ("light", "dark") else "light"
+
+    def tr(self, key: str) -> str:
+        return TRANSLATIONS.get(self.language, TRANSLATIONS["en"]).get(key, TRANSLATIONS["en"].get(key, key))
+
+    def set_window_icon(self) -> None:
+        try:
+            if WINDOW_ICON_PATH.exists():
+                self.root.iconbitmap(str(WINDOW_ICON_PATH))
+        except tk.TclError:
+            pass
+
+    def configure_style(self) -> None:
+        self.colors = THEMES[self.effective_theme_name()]
+        self.root.configure(bg=self.colors["bg"])
+        self.style = ttk.Style(self.root)
+        try:
+            self.style.theme_use("clam")
+        except tk.TclError:
+            pass
+        base_font = ("Segoe UI", 10)
+        heading_font = ("Segoe UI", 12, "bold")
+        self.root.option_add("*Font", base_font)
+        self.root.option_add("*TCombobox*Listbox.font", base_font)
+        self.style.configure(".", font=base_font, background=self.colors["bg"], foreground=self.colors["text"])
+        self.style.configure("TFrame", background=self.colors["bg"])
+        self.style.configure("Card.TFrame", background=self.colors["panel"], relief="flat")
+        self.style.configure("TLabel", background=self.colors["bg"], foreground=self.colors["text"])
+        self.style.configure("Muted.TLabel", background=self.colors["bg"], foreground=self.colors["muted"])
+        self.style.configure("Warning.TLabel", background=self.colors["warning_bg"], foreground=self.colors["warning_fg"], padding=8)
+        self.style.configure("Success.TLabel", background=self.colors["success_bg"], foreground=self.colors["accent_dark"], padding=8)
+        self.style.configure("TLabelFrame", background=self.colors["bg"], foreground=self.colors["text"], bordercolor=self.colors["border"])
+        self.style.configure("TLabelFrame.Label", background=self.colors["bg"], foreground=self.colors["accent_dark"], font=heading_font)
+        self.style.configure("TButton", padding=(12, 8), background=self.colors["panel_alt"], foreground=self.colors["button_fg"], bordercolor=self.colors["border"])
+        self.style.map("TButton", background=[("active", self.colors["accent"]), ("pressed", self.colors["accent_dark"])], foreground=[("active", "#ffffff"), ("pressed", "#ffffff")])
+        self.style.configure("Accent.TButton", padding=(12, 8), background=self.colors["accent"], foreground="#ffffff")
+        self.style.map("Accent.TButton", background=[("active", self.colors["accent_dark"]), ("pressed", self.colors["accent_dark"])], foreground=[("active", "#ffffff")])
+        self.style.configure("TCheckbutton", background=self.colors["bg"], foreground=self.colors["text"])
+        self.style.configure("TRadiobutton", background=self.colors["bg"], foreground=self.colors["text"])
+        self.style.configure("TNotebook", background=self.colors["bg"], borderwidth=0)
+        self.style.configure("TNotebook.Tab", padding=(12, 7), background=self.colors["panel_alt"], foreground=self.colors["text"])
+        self.style.map("TNotebook.Tab", background=[("selected", self.colors["panel"])], foreground=[("selected", self.colors["accent_dark"])])
+        self.style.configure("Treeview", background=self.colors["panel"], fieldbackground=self.colors["panel"], foreground=self.colors["text"], rowheight=28, bordercolor=self.colors["border"])
+        self.style.configure("Treeview.Heading", background=self.colors["panel_alt"], foreground=self.colors["text"], font=("Segoe UI", 10, "bold"))
+
+    def style_text_widget(self, widget: tk.Text, *, height: int | None = None) -> None:
+        if height is not None:
+            widget.configure(height=height)
+        widget.configure(
+            bg=self.colors["panel"],
+            fg=self.colors["text"],
+            insertbackground=self.colors["text"],
+            selectbackground=self.colors["accent"],
+            selectforeground="#ffffff",
+            relief=tk.SOLID,
+            bd=1,
+            padx=10,
+            pady=8,
+            font=("Segoe UI", 10),
+        )
+
+    def localize_widget(self, widget: tk.Widget, key: str) -> tk.Widget:
+        try:
+            widget.configure(text=self.tr(key))
+        except tk.TclError:
+            pass
+        self.localized_widgets.append((widget, key))
+        return widget
 
     def build_ui(self) -> None:
         self.root.grid_columnconfigure(0, weight=1, minsize=270)
@@ -523,18 +776,32 @@ class OfflineLanGamesHelper:
         header = ttk.Frame(self.root, padding=(10, 8))
         header.grid(row=0, column=0, columnspan=2, sticky="ew")
         header.grid_columnconfigure(1, weight=1)
-        ttk.Label(header, text=APP_TITLE, font=("Segoe UI", 17, "bold")).grid(row=0, column=0, sticky="w")
-        ttk.Label(header, text=SAFETY_WARNING, foreground="#9a3412").grid(row=1, column=0, columnspan=2, sticky="w", pady=(4, 0))
+        title_frame = ttk.Frame(header)
+        title_frame.grid(row=0, column=0, sticky="w")
+        if KIWI_LOGO_PATH.exists():
+            try:
+                self.kiwi_photo = tk.PhotoImage(file=str(KIWI_LOGO_PATH)).subsample(8, 8)
+                ttk.Label(title_frame, image=self.kiwi_photo).grid(row=0, column=0, rowspan=2, sticky="w", padx=(0, 10))
+            except tk.TclError:
+                self.kiwi_photo = None
+        self.title_label = ttk.Label(title_frame, text=self.tr("app_title"), font=("Segoe UI", 18, "bold"))
+        self.title_label.grid(row=0, column=1, sticky="w")
+        ttk.Label(title_frame, text=f"v{APP_VERSION}  |  The0Cosmo", style="Muted.TLabel").grid(row=1, column=1, sticky="w")
+        self.safety_label = ttk.Label(header, text=self.tr("safety_warning"), style="Warning.TLabel", wraplength=760)
+        if bool(self.config.get("show_safety_warnings", True)):
+            self.safety_label.grid(row=1, column=0, sticky="ew", pady=(8, 0))
         self.offline_mode_var = tk.BooleanVar(value=bool(self.config.get("offline_mode", False)))
-        ttk.Checkbutton(
+        self.offline_check = ttk.Checkbutton(
             header,
-            text="Offline Mode: hide or block optional internet/download actions",
+            text=self.tr("offline_mode"),
             variable=self.offline_mode_var,
             command=lambda: self.run_ui_action("Toggle Offline Mode", self.toggle_offline_mode),
-        ).grid(row=2, column=0, columnspan=2, sticky="w", pady=(6, 0))
+        )
+        self.offline_check.grid(row=2, column=0, columnspan=2, sticky="w", pady=(6, 0))
 
-        network = ttk.LabelFrame(header, text="Host Network", padding=8)
-        network.grid(row=0, column=1, rowspan=2, sticky="ew", padx=(16, 0))
+        network = ttk.LabelFrame(header, text=self.tr("host_network"), padding=8)
+        self.host_network_frame = network
+        network.grid(row=0, column=1, rowspan=3, sticky="ew", padx=(16, 0))
         network.grid_columnconfigure(1, weight=1)
         self.hostname_var = tk.StringVar(value="Hostname:")
         self.main_ip_var = tk.StringVar(value="Primary LAN IPv4:")
@@ -543,17 +810,19 @@ class OfflineLanGamesHelper:
         ttk.Label(network, textvariable=self.hostname_var).grid(row=0, column=0, sticky="w", padx=(0, 12))
         ttk.Label(network, textvariable=self.main_ip_var).grid(row=0, column=1, sticky="w", padx=(0, 12))
         ttk.Label(network, textvariable=self.adapter_var).grid(row=0, column=2, sticky="w")
-        ttk.Label(network, text="Selected IP:").grid(row=1, column=0, sticky="w", pady=(6, 0))
+        self.selected_ip_label = ttk.Label(network, text=self.tr("selected_ip"))
+        self.selected_ip_label.grid(row=1, column=0, sticky="w", pady=(6, 0))
         self.ip_combo = ttk.Combobox(network, state="readonly", width=56)
         self.ip_combo.grid(row=1, column=1, columnspan=2, sticky="ew", pady=(6, 0))
         self.ip_combo.bind("<<ComboboxSelected>>", lambda _event: self.update_all_tabs())
-        ttk.Label(network, textvariable=self.network_warning_var, foreground="#9a3412").grid(row=2, column=0, columnspan=3, sticky="w", pady=(5, 0))
+        ttk.Label(network, textvariable=self.network_warning_var, style="Warning.TLabel").grid(row=2, column=0, columnspan=3, sticky="ew", pady=(5, 0))
 
         left = ttk.Frame(self.root, padding=(10, 0, 6, 8))
         left.grid(row=1, column=0, sticky="nsew")
         left.grid_columnconfigure(0, weight=1)
         left.grid_rowconfigure(2, weight=1)
-        ttk.Label(left, text="Search").grid(row=0, column=0, sticky="w")
+        self.search_label = ttk.Label(left, text=self.tr("search"))
+        self.search_label.grid(row=0, column=0, sticky="w")
         self.search_var = tk.StringVar()
         self.search_var.trace_add("write", lambda *_: self.apply_filter())
         ttk.Entry(left, textvariable=self.search_var).grid(row=1, column=0, sticky="ew", pady=(4, 8))
@@ -561,13 +830,27 @@ class OfflineLanGamesHelper:
         list_frame.grid(row=2, column=0, sticky="nsew")
         list_frame.grid_columnconfigure(0, weight=1)
         list_frame.grid_rowconfigure(0, weight=1)
-        self.game_list = tk.Listbox(list_frame, exportselection=False, activestyle="dotbox")
+        self.game_list = tk.Listbox(
+            list_frame,
+            exportselection=False,
+            activestyle="dotbox",
+            bg=self.colors["panel"],
+            fg=self.colors["text"],
+            selectbackground=self.colors["accent"],
+            selectforeground="#ffffff",
+            highlightcolor=self.colors["accent"],
+            highlightbackground=self.colors["border"],
+            relief=tk.SOLID,
+            bd=1,
+            font=("Segoe UI", 11),
+        )
         self.game_list.grid(row=0, column=0, sticky="nsew")
         game_scroll = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.game_list.yview)
         game_scroll.grid(row=0, column=1, sticky="ns")
         self.game_list.configure(yscrollcommand=game_scroll.set)
         self.game_list.bind("<<ListboxSelect>>", self.on_game_selected)
-        ttk.Button(left, text="Add Custom Game", command=lambda: self.run_ui_action("Add Custom Game", self.add_custom_game_dialog)).grid(row=3, column=0, sticky="ew", pady=(8, 0))
+        self.add_custom_button = ttk.Button(left, text=self.tr("add_custom_game"), style="Accent.TButton", command=lambda: self.run_ui_action("Add Custom Game", self.add_custom_game_dialog))
+        self.add_custom_button.grid(row=3, column=0, sticky="ew", pady=(8, 0))
 
         right = ttk.Frame(self.root, padding=(6, 0, 10, 8))
         right.grid(row=1, column=1, sticky="nsew")
@@ -587,6 +870,7 @@ class OfflineLanGamesHelper:
         self.add_input_isolation_tab()
         self.add_input_isolation_setup_tab()
         self.troubleshooting_text = self.add_text_tab("Troubleshooting")
+        self.add_settings_tab()
         self.add_support_tab()
         self.privacy_text = self.add_text_tab("Privacy")
         self.server_buttons: dict[str, ttk.Button] = {}
@@ -601,7 +885,8 @@ class OfflineLanGamesHelper:
         self.add_server_button("Export Server Guide", self.export_server_guide, 8)
         self.add_server_button("Select SteamCMD", self.select_steamcmd, 9)
 
-        actions = ttk.LabelFrame(self.root, text="Actions", padding=8)
+        actions = ttk.LabelFrame(self.root, text=self.tr("actions"), padding=8)
+        self.actions_frame = actions
         actions.grid(row=2, column=0, columnspan=2, sticky="ew", padx=10, pady=(0, 6))
         for column in range(8):
             actions.grid_columnconfigure(column, weight=1, uniform="actions")
@@ -614,13 +899,17 @@ class OfflineLanGamesHelper:
         self.add_action_button(actions, "Remove Firewall Rules", self.remove_firewall_rules, 6)
         self.add_action_button(actions, "Export Tutorial", self.export_tutorial, 7)
 
-        log_frame = ttk.LabelFrame(self.root, text="Log / Status", padding=6)
+        log_frame = ttk.LabelFrame(self.root, text=self.tr("log_status"), padding=6)
+        self.log_frame = log_frame
         log_frame.grid(row=3, column=0, columnspan=2, sticky="ew", padx=10, pady=(0, 10))
         log_frame.grid_columnconfigure(0, weight=1)
         self.log_box = tk.Text(log_frame, height=5, wrap=tk.WORD)
         self.log_box.grid(row=0, column=0, sticky="ew")
+        self.style_text_widget(self.log_box, height=5)
         self.log_box.configure(state=tk.DISABLED)
-        ttk.Button(log_frame, text="Clear Log", command=self.clear_log).grid(row=0, column=1, sticky="ns", padx=(8, 0))
+        self.clear_log_button = ttk.Button(log_frame, text=self.tr("clear_log"), command=self.clear_log)
+        self.clear_log_button.grid(row=0, column=1, sticky="ns", padx=(8, 0))
+        self.apply_language()
 
     def add_text_tab(self, title: str) -> tk.Text:
         frame = ttk.Frame(self.tabs, padding=8)
@@ -630,8 +919,10 @@ class OfflineLanGamesHelper:
         text.grid(row=0, column=0, sticky="nsew")
         scroll = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=text.yview)
         scroll.grid(row=0, column=1, sticky="ns")
+        self.style_text_widget(text)
         text.configure(yscrollcommand=scroll.set, state=tk.DISABLED)
         self.tabs.add(frame, text=title)
+        self.tab_widgets[title] = frame
         return text
 
     def add_server_tools_tab(self) -> tk.Text:
@@ -642,6 +933,7 @@ class OfflineLanGamesHelper:
         text.grid(row=0, column=0, sticky="nsew")
         scroll = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=text.yview)
         scroll.grid(row=0, column=1, sticky="ns")
+        self.style_text_widget(text)
         text.configure(yscrollcommand=scroll.set, state=tk.DISABLED)
 
         self.server_buttons_frame = ttk.Frame(frame, padding=(0, 8, 0, 0))
@@ -650,6 +942,7 @@ class OfflineLanGamesHelper:
             self.server_buttons_frame.grid_columnconfigure(column, weight=1, uniform="server")
 
         self.tabs.add(frame, text="Server Tools")
+        self.tab_widgets["Server Tools"] = frame
         return text
 
     def add_lan_test_tab(self) -> None:
@@ -672,8 +965,10 @@ class OfflineLanGamesHelper:
         ttk.Button(controls, text="Test TCP Port", command=lambda: self.run_ui_action("Test TCP Port", self.tcp_port_test)).grid(row=0, column=1, padx=(0, 6))
         self.lan_test_result = tk.Text(frame, wrap=tk.WORD, height=14)
         self.lan_test_result.grid(row=5, column=0, columnspan=3, sticky="nsew")
+        self.style_text_widget(self.lan_test_result, height=14)
         self.lan_test_result.configure(state=tk.DISABLED)
         self.tabs.add(frame, text="LAN Test")
+        self.tab_widgets["LAN Test"] = frame
 
     def add_invite_tab(self) -> None:
         frame = ttk.Frame(self.tabs, padding=10)
@@ -682,6 +977,7 @@ class OfflineLanGamesHelper:
         ttk.Label(frame, text="Copy Invite Message", font=("Segoe UI", 12, "bold")).grid(row=0, column=0, sticky="w")
         self.invite_text = tk.Text(frame, wrap=tk.WORD, height=18)
         self.invite_text.grid(row=1, column=0, sticky="nsew", pady=(8, 8))
+        self.style_text_widget(self.invite_text, height=18)
         self.invite_text.configure(state=tk.DISABLED)
         controls = ttk.Frame(frame)
         controls.grid(row=2, column=0, sticky="ew")
@@ -689,6 +985,7 @@ class OfflineLanGamesHelper:
         ttk.Button(controls, text="Copy Invite", command=lambda: self.run_ui_action("Copy Invite", self.copy_invite)).grid(row=0, column=1, padx=(0, 6))
         ttk.Button(controls, text="Export Invite", command=lambda: self.run_ui_action("Export Invite", self.export_invite)).grid(row=0, column=2, padx=(0, 6))
         self.tabs.add(frame, text="Invite")
+        self.tab_widgets["Invite"] = frame
 
     def add_backup_tab(self) -> None:
         frame = ttk.Frame(self.tabs, padding=10)
@@ -706,8 +1003,10 @@ class OfflineLanGamesHelper:
         ttk.Button(controls, text="Restore Backup", command=lambda: self.run_ui_action("Restore Backup", self.restore_save_backup)).grid(row=0, column=1, padx=(0, 6))
         self.backup_text = tk.Text(frame, wrap=tk.WORD, height=12)
         self.backup_text.grid(row=4, column=0, columnspan=3, sticky="nsew")
+        self.style_text_widget(self.backup_text, height=12)
         self.backup_text.configure(state=tk.DISABLED)
         self.tabs.add(frame, text="Backups")
+        self.tab_widgets["Backups"] = frame
 
     def add_mods_tab(self) -> None:
         frame = ttk.Frame(self.tabs, padding=10)
@@ -722,8 +1021,10 @@ class OfflineLanGamesHelper:
         ttk.Button(frame, text="Export Mod List", command=lambda: self.run_ui_action("Export Mod List", self.export_mod_list)).grid(row=3, column=0, sticky="w", pady=(10, 8))
         self.mods_text = tk.Text(frame, wrap=tk.WORD, height=12)
         self.mods_text.grid(row=4, column=0, columnspan=3, sticky="nsew")
+        self.style_text_widget(self.mods_text, height=12)
         self.mods_text.configure(state=tk.DISABLED)
         self.tabs.add(frame, text="Mods")
+        self.tab_widgets["Mods"] = frame
 
     def add_input_isolation_tab(self) -> None:
         frame = ttk.Frame(self.tabs, padding=10)
@@ -733,7 +1034,7 @@ class OfflineLanGamesHelper:
         ttk.Label(
             frame,
             text="Windows-only local/offline/LAN guidance for Nucleus Co-op, DS4Windows, HidHide, Prism Launcher, and Minecraft Java. No input blocking is applied by this app.",
-            foreground="#9a3412",
+            style="Warning.TLabel",
             wraplength=980,
             justify=tk.LEFT,
         ).grid(row=0, column=1, sticky="ew", padx=(12, 0))
@@ -797,6 +1098,7 @@ class OfflineLanGamesHelper:
         ttk.Label(notes, text="Notes").grid(row=6, column=0, sticky="nw", pady=(8, 4))
         self.input_notes_text = tk.Text(notes, height=5, wrap=tk.WORD)
         self.input_notes_text.grid(row=6, column=1, columnspan=2, sticky="nsew", pady=(8, 4))
+        self.style_text_widget(self.input_notes_text, height=5)
         note_buttons = ttk.Frame(notes)
         note_buttons.grid(row=7, column=1, columnspan=2, sticky="ew", pady=(6, 8))
         ttk.Button(note_buttons, text="Save Process Note", command=lambda: self.run_ui_action("Save Process Note", self.save_input_process_note)).grid(row=0, column=0, padx=(0, 6))
@@ -820,6 +1122,7 @@ class OfflineLanGamesHelper:
         tools.grid_rowconfigure(0, weight=1)
         self.input_tools_text = tk.Text(tools, wrap=tk.WORD)
         self.input_tools_text.grid(row=0, column=0, sticky="nsew")
+        self.style_text_widget(self.input_tools_text)
         self.input_tools_text.configure(state=tk.DISABLED)
         tools_buttons = ttk.Frame(tools)
         tools_buttons.grid(row=1, column=0, sticky="ew", pady=(8, 0))
@@ -860,11 +1163,13 @@ class OfflineLanGamesHelper:
             "or official/safe external tools such as HidHide and DS4Windows.",
         )
         self.input_advanced_text.configure(state=tk.DISABLED)
+        self.style_text_widget(self.input_advanced_text, height=12)
         self.input_advanced_text.grid(row=1, column=0, sticky="nsew", pady=(8, 0))
         self.input_advanced_text.grid_remove()
         notebook.add(advanced, text="Advanced")
 
         self.tabs.add(frame, text="Input Isolation")
+        self.tab_widgets["Input Isolation"] = frame
 
     def add_input_isolation_setup_tab(self) -> None:
         frame = ttk.Frame(self.tabs, padding=10)
@@ -874,7 +1179,7 @@ class OfflineLanGamesHelper:
         ttk.Label(
             frame,
             text="Real setup automation is limited to opening safe external tools and saving local profiles. This app does not perform direct per-process input blocking.",
-            foreground="#9a3412",
+            style="Warning.TLabel",
             wraplength=980,
             justify=tk.LEFT,
         ).grid(row=1, column=0, sticky="ew", pady=(2, 8))
@@ -909,6 +1214,7 @@ class OfflineLanGamesHelper:
         guide_frame.grid_rowconfigure(0, weight=1)
         self.input_setup_text = tk.Text(guide_frame, wrap=tk.WORD)
         self.input_setup_text.grid(row=0, column=0, sticky="nsew")
+        self.style_text_widget(self.input_setup_text)
         self.input_setup_text.configure(state=tk.DISABLED)
         body.add(guide_frame, weight=3)
 
@@ -946,6 +1252,114 @@ class OfflineLanGamesHelper:
         body.add(controls, weight=1)
 
         self.tabs.add(frame, text="Input Isolation Setup")
+        self.tab_widgets["Input Isolation Setup"] = frame
+
+    def add_settings_tab(self) -> None:
+        frame = ttk.Frame(self.tabs, padding=12)
+        frame.grid_columnconfigure(0, weight=1)
+        frame.grid_columnconfigure(1, weight=1)
+        frame.grid_rowconfigure(4, weight=1)
+
+        header = ttk.Frame(frame)
+        header.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 10))
+        header.grid_columnconfigure(1, weight=1)
+        if KIWI_LOGO_PATH.exists():
+            try:
+                self.settings_logo = tk.PhotoImage(file=str(KIWI_LOGO_PATH)).subsample(6, 6)
+                ttk.Label(header, image=self.settings_logo).grid(row=0, column=0, rowspan=2, sticky="w", padx=(0, 12))
+            except tk.TclError:
+                self.settings_logo = None
+        self.settings_title_label = ttk.Label(header, text=self.tr("settings"), font=("Segoe UI", 16, "bold"))
+        self.settings_title_label.grid(row=0, column=1, sticky="w")
+        self.settings_privacy_label = ttk.Label(header, text=self.tr("privacy_local"), style="Muted.TLabel", wraplength=760)
+        self.settings_privacy_label.grid(row=1, column=1, sticky="w")
+
+        appearance = ttk.LabelFrame(frame, text=self.tr("settings"), padding=10)
+        appearance.grid(row=1, column=0, sticky="nsew", padx=(0, 8), pady=6)
+        appearance.grid_columnconfigure(1, weight=1)
+        self.language_label = ttk.Label(appearance, text=self.tr("language"))
+        self.language_label.grid(row=0, column=0, sticky="w", pady=4)
+        self.language_var = tk.StringVar(value="Italiano" if self.language == "it" else "English")
+        language_combo = ttk.Combobox(appearance, textvariable=self.language_var, values=["English", "Italiano"], state="readonly")
+        language_combo.grid(row=0, column=1, sticky="ew", pady=4)
+        language_combo.bind("<<ComboboxSelected>>", lambda _event: self.change_language())
+
+        self.theme_label = ttk.Label(appearance, text=self.tr("theme"))
+        self.theme_label.grid(row=1, column=0, sticky="w", pady=4)
+        theme_names = {"light": self.tr("light"), "dark": self.tr("dark"), "system": self.tr("system")}
+        self.theme_display_to_key = {value: key for key, value in theme_names.items()}
+        self.theme_var = tk.StringVar(value=theme_names.get(self.theme_name, theme_names["light"]))
+        self.theme_combo = ttk.Combobox(appearance, textvariable=self.theme_var, values=list(theme_names.values()), state="readonly")
+        self.theme_combo.grid(row=1, column=1, sticky="ew", pady=4)
+        self.theme_combo.bind("<<ComboboxSelected>>", lambda _event: self.change_theme())
+
+        defaults = ttk.LabelFrame(frame, text=self.tr("default_behavior"), padding=10)
+        defaults.grid(row=1, column=1, sticky="nsew", padx=(8, 0), pady=6)
+        self.show_safety_var = tk.BooleanVar(value=bool(self.config.get("show_safety_warnings", True)))
+        self.remember_game_var = tk.BooleanVar(value=bool(self.config.get("remember_last_selected_game", True)))
+        self.show_safety_check = ttk.Checkbutton(defaults, text=self.tr("show_safety_warnings"), variable=self.show_safety_var, command=self.save_settings)
+        self.show_safety_check.grid(row=0, column=0, sticky="w", pady=4)
+        self.remember_game_check = ttk.Checkbutton(defaults, text=self.tr("remember_last_game"), variable=self.remember_game_var, command=self.save_settings)
+        self.remember_game_check.grid(row=1, column=0, sticky="w", pady=4)
+
+        paths = ttk.LabelFrame(frame, text=self.tr("paths"), padding=10)
+        paths.grid(row=2, column=0, columnspan=2, sticky="nsew", pady=6)
+        paths.grid_columnconfigure(1, weight=1)
+        self.ds4_settings_var = tk.StringVar(value=self.config.get("ds4windows_path", ""))
+        self.nucleus_settings_var = tk.StringVar(value=self.config.get("nucleus_coop_path", ""))
+        self.prism_settings_var = tk.StringVar(value=self.config.get("prism_launcher_path", ""))
+        self.export_settings_var = tk.StringVar(value=self.config.get("default_export_folder", ""))
+        self.backup_settings_var = tk.StringVar(value=self.config.get("default_backup_folder", ""))
+        path_rows = [
+            ("DS4Windows path", self.ds4_settings_var, lambda: self.select_exe_setting("ds4windows_path", self.ds4_settings_var, "Select DS4Windows.exe")),
+            ("Nucleus Co-op path", self.nucleus_settings_var, lambda: self.select_exe_setting("nucleus_coop_path", self.nucleus_settings_var, "Select NucleusCoop.exe")),
+            ("Prism Launcher path", self.prism_settings_var, lambda: self.select_exe_setting("prism_launcher_path", self.prism_settings_var, "Select PrismLauncher.exe")),
+            (self.tr("default_export_folder"), self.export_settings_var, lambda: self.select_folder_setting("default_export_folder", self.export_settings_var, "Select default export folder")),
+            (self.tr("default_backup_folder"), self.backup_settings_var, lambda: self.select_folder_setting("default_backup_folder", self.backup_settings_var, "Select default backup folder")),
+        ]
+        self.settings_path_labels: list[ttk.Label] = []
+        for row, (label, variable, callback) in enumerate(path_rows):
+            item_label = ttk.Label(paths, text=label)
+            item_label.grid(row=row, column=0, sticky="w", pady=3)
+            self.settings_path_labels.append(item_label)
+            ttk.Entry(paths, textvariable=variable).grid(row=row, column=1, sticky="ew", padx=8, pady=3)
+            ttk.Button(paths, text=self.tr("select"), command=lambda cb=callback: self.run_ui_action("Select settings path", cb)).grid(row=row, column=2, sticky="ew", pady=3)
+
+        support = ttk.LabelFrame(frame, text=self.tr("support_project"), padding=10)
+        support.grid(row=3, column=0, sticky="nsew", padx=(0, 8), pady=6)
+        support.grid_columnconfigure(0, weight=1)
+        ttk.Label(
+            support,
+            text="Donations are optional and do not unlock extra features.",
+            style="Muted.TLabel",
+            wraplength=480,
+        ).grid(row=0, column=0, columnspan=3, sticky="w", pady=(0, 8))
+        self.settings_paypal_button = ttk.Button(support, text=self.tr("donate"), command=lambda: self.run_ui_action("Donate with PayPal", self.open_paypal_donation))
+        self.settings_paypal_button.grid(row=1, column=0, sticky="ew", padx=(0, 5))
+        self.settings_sponsor_button = ttk.Button(support, text=self.tr("sponsor"), command=lambda: self.run_ui_action("Sponsor on GitHub", self.open_github_sponsors))
+        self.settings_sponsor_button.grid(row=1, column=1, sticky="ew", padx=5)
+        self.settings_copy_donation_button = ttk.Button(support, text=self.tr("copy_donation"), command=lambda: self.run_ui_action("Copy Donation Link", self.copy_donation_link))
+        self.settings_copy_donation_button.grid(row=1, column=2, sticky="ew", padx=(5, 0))
+
+        about = ttk.LabelFrame(frame, text=self.tr("about"), padding=10)
+        about.grid(row=3, column=1, sticky="nsew", padx=(8, 0), pady=6)
+        about.grid_columnconfigure(0, weight=1)
+        self.about_label = ttk.Label(
+            about,
+            text=f"{APP_NAME}\nVersion: {APP_VERSION}\n{self.tr('author')}\n{self.tr('license_summary')}",
+            justify=tk.LEFT,
+            wraplength=520,
+        )
+        self.about_label.grid(row=0, column=0, sticky="w")
+        buttons = ttk.Frame(about)
+        buttons.grid(row=1, column=0, sticky="ew", pady=(10, 0))
+        ttk.Button(buttons, text=self.tr("open_privacy"), command=lambda: self.run_ui_action("Open Privacy Policy", self.open_privacy_file)).grid(row=0, column=0, sticky="ew", padx=(0, 6))
+        ttk.Button(buttons, text=self.tr("open_github_windows"), command=lambda: self.run_ui_action("Open GitHub Repository", self.open_windows_repository)).grid(row=0, column=1, sticky="ew")
+
+        self.settings_status_var = tk.StringVar(value=self.tr("status_ready"))
+        ttk.Label(frame, textvariable=self.settings_status_var, style="Success.TLabel").grid(row=4, column=0, columnspan=2, sticky="ew", pady=(8, 0))
+        self.tabs.add(frame, text="Settings")
+        self.tab_widgets["Settings"] = frame
 
     def add_support_tab(self) -> None:
         frame = ttk.Frame(self.tabs, padding=10)
@@ -962,11 +1376,14 @@ class OfflineLanGamesHelper:
         ttk.Button(controls, text="Donate with PayPal", command=lambda: self.run_ui_action("Donate with PayPal", self.open_paypal_donation)).grid(row=0, column=0, padx=(0, 6))
         ttk.Button(controls, text="Sponsor on GitHub", command=lambda: self.run_ui_action("Sponsor on GitHub", self.open_github_sponsors)).grid(row=0, column=1, padx=(0, 6))
         ttk.Button(controls, text="Copy Donation Link", command=lambda: self.run_ui_action("Copy Donation Link", self.copy_donation_link)).grid(row=0, column=2, padx=(0, 6))
-        ttk.Label(frame, text=f"PayPal: {PAYPAL_DONATION_URL}\nGitHub Sponsors: {GITHUB_SPONSORS_URL}", foreground="#334155").grid(row=3, column=0, sticky="w", pady=(12, 0))
+        ttk.Label(frame, text=f"PayPal: {PAYPAL_DONATION_URL}\nGitHub Sponsors: {GITHUB_SPONSORS_URL}", style="Muted.TLabel").grid(row=3, column=0, sticky="w", pady=(12, 0))
         self.tabs.add(frame, text="Support")
+        self.tab_widgets["Support"] = frame
 
     def add_action_button(self, parent: ttk.Frame, text: str, callback: Callable[[], None], column: int) -> None:
-        ttk.Button(parent, text=text, command=lambda: self.run_ui_action(text, callback)).grid(row=0, column=column, sticky="ew", padx=3, pady=3)
+        button = ttk.Button(parent, text=text, command=lambda: self.run_ui_action(text, callback))
+        button.grid(row=0, column=column, sticky="ew", padx=3, pady=3)
+        self.action_buttons[text] = button
 
     def add_server_button(self, text: str, callback: Callable[[], None], index: int) -> None:
         row, column = divmod(index, 6)
@@ -993,6 +1410,179 @@ class OfflineLanGamesHelper:
         self.log_box.delete("1.0", tk.END)
         self.log_box.configure(state=tk.DISABLED)
 
+    def apply_language(self) -> None:
+        self.root.title(self.tr("app_title"))
+        if hasattr(self, "title_label"):
+            self.title_label.configure(text=self.tr("app_title"))
+        if hasattr(self, "safety_label"):
+            self.safety_label.configure(text=self.tr("safety_warning"))
+        if hasattr(self, "offline_check"):
+            self.offline_check.configure(text=self.tr("offline_mode"))
+        if hasattr(self, "search_label"):
+            self.search_label.configure(text=self.tr("search"))
+        if hasattr(self, "add_custom_button"):
+            self.add_custom_button.configure(text=self.tr("add_custom_game"))
+        if hasattr(self, "selected_ip_label"):
+            self.selected_ip_label.configure(text=self.tr("selected_ip"))
+        if hasattr(self, "host_network_frame"):
+            self.host_network_frame.configure(text=self.tr("host_network"))
+        if hasattr(self, "actions_frame"):
+            self.actions_frame.configure(text=self.tr("actions"))
+        if hasattr(self, "log_frame"):
+            self.log_frame.configure(text=self.tr("log_status"))
+        if hasattr(self, "clear_log_button"):
+            self.clear_log_button.configure(text=self.tr("clear_log"))
+
+        button_keys = {
+            "Refresh IP": "refresh_ip",
+            "Copy Host IP": "copy_ip",
+            "Detect Game Path": "detect_path",
+            "Manual Select Game": "manual_select_game",
+            "Launch Game": "launch_game",
+            "Add Firewall Rules": "add_firewall",
+            "Remove Firewall Rules": "remove_firewall",
+            "Export Tutorial": "export_tutorial",
+        }
+        for english, key in button_keys.items():
+            if english in self.action_buttons:
+                self.action_buttons[english].configure(text=self.tr(key))
+
+        tab_keys = {
+            "Tutorial": "tutorial",
+            "Network / IP": "network",
+            "Firewall / Permissions": "firewall_permissions",
+            "Game Path": "game_path",
+            "Server Tools": "server_tools",
+            "LAN Test": "lan_test",
+            "Invite": "invite",
+            "Backups": "backups",
+            "Mods": "mods",
+            "Input Isolation": "input_isolation",
+            "Input Isolation Setup": "input_isolation_setup",
+            "Troubleshooting": "troubleshooting",
+            "Settings": "settings",
+            "Support": "support",
+            "Privacy": "privacy",
+        }
+        for english, key in tab_keys.items():
+            frame = self.tab_widgets.get(english)
+            if frame is not None:
+                self.tabs.tab(frame, text=self.tr(key))
+
+        for widget, key in self.localized_widgets:
+            try:
+                widget.configure(text=self.tr(key))
+            except tk.TclError:
+                pass
+
+        if hasattr(self, "settings_title_label"):
+            self.settings_title_label.configure(text=self.tr("settings"))
+            self.settings_privacy_label.configure(text=self.tr("privacy_local"))
+            self.language_label.configure(text=self.tr("language"))
+            self.theme_label.configure(text=self.tr("theme"))
+            self.show_safety_check.configure(text=self.tr("show_safety_warnings"))
+            self.remember_game_check.configure(text=self.tr("remember_last_game"))
+            self.settings_paypal_button.configure(text=self.tr("donate"))
+            self.settings_sponsor_button.configure(text=self.tr("sponsor"))
+            self.settings_copy_donation_button.configure(text=self.tr("copy_donation"))
+            self.about_label.configure(text=f"{APP_NAME}\nVersion: {APP_VERSION}\n{self.tr('author')}\n{self.tr('license_summary')}")
+            self.settings_status_var.set(self.tr("status_ready"))
+            values = [self.tr("light"), self.tr("dark"), self.tr("system")]
+            self.theme_combo.configure(values=values)
+            theme_label = {"light": self.tr("light"), "dark": self.tr("dark"), "system": self.tr("system")}.get(self.theme_name, self.tr("light"))
+            self.theme_var.set(theme_label)
+            self.theme_display_to_key = {self.tr("light"): "light", self.tr("dark"): "dark", self.tr("system"): "system"}
+
+    def apply_theme_to_widgets(self) -> None:
+        def walk(widget: tk.Widget) -> None:
+            if isinstance(widget, tk.Text):
+                self.style_text_widget(widget)
+            elif isinstance(widget, tk.Listbox):
+                widget.configure(
+                    bg=self.colors["panel"],
+                    fg=self.colors["text"],
+                    selectbackground=self.colors["accent"],
+                    selectforeground="#ffffff",
+                    highlightcolor=self.colors["accent"],
+                    highlightbackground=self.colors["border"],
+                )
+            for child in widget.winfo_children():
+                walk(child)
+
+        walk(self.root)
+
+    def save_settings(self) -> None:
+        self.config["show_safety_warnings"] = bool(getattr(self, "show_safety_var", tk.BooleanVar(value=True)).get())
+        self.config["remember_last_selected_game"] = bool(getattr(self, "remember_game_var", tk.BooleanVar(value=True)).get())
+        if self.current_game and self.config["remember_last_selected_game"]:
+            self.config["last_selected_game"] = self.current_game["name"]
+        save_json_file(CONFIG_FILE, self.config)
+        if hasattr(self, "safety_label"):
+            if self.config["show_safety_warnings"]:
+                self.safety_label.grid(row=1, column=0, sticky="ew", pady=(8, 0))
+            else:
+                self.safety_label.grid_remove()
+        if hasattr(self, "settings_status_var"):
+            self.settings_status_var.set(self.tr("settings_saved"))
+        self.log(self.tr("settings_saved"))
+
+    def change_language(self) -> None:
+        self.language = "it" if getattr(self, "language_var", tk.StringVar(value="English")).get() == "Italiano" else "en"
+        self.config["language"] = self.language
+        save_json_file(CONFIG_FILE, self.config)
+        self.apply_language()
+        self.log(f"Language changed to {'Italian' if self.language == 'it' else 'English'}.")
+
+    def change_theme(self) -> None:
+        display = getattr(self, "theme_var", tk.StringVar(value=self.tr("light"))).get()
+        self.theme_name = getattr(self, "theme_display_to_key", {}).get(display, "light")
+        self.config["theme"] = self.theme_name
+        save_json_file(CONFIG_FILE, self.config)
+        self.configure_style()
+        self.apply_theme_to_widgets()
+        self.apply_language()
+        self.log(f"Theme changed to {self.theme_name}.")
+
+    def select_exe_setting(self, config_key: str, variable: tk.StringVar, title: str) -> None:
+        path = filedialog.askopenfilename(title=title, filetypes=[("Windows executable", "*.exe"), ("All files", "*.*")])
+        if not path:
+            self.log("Settings path selection canceled.")
+            return
+        variable.set(path)
+        self.config[config_key] = path
+        save_json_file(CONFIG_FILE, self.config)
+        self.log(f"Saved {config_key}: {path}")
+
+    def select_folder_setting(self, config_key: str, variable: tk.StringVar, title: str) -> None:
+        path = filedialog.askdirectory(title=title)
+        if not path:
+            self.log("Settings folder selection canceled.")
+            return
+        variable.set(path)
+        self.config[config_key] = path
+        save_json_file(CONFIG_FILE, self.config)
+        self.log(f"Saved {config_key}: {path}")
+
+    def open_privacy_file(self) -> None:
+        privacy_path = APP_DIR / "PRIVACY.md"
+        if privacy_path.exists():
+            os.startfile(str(privacy_path))  # type: ignore[attr-defined]
+            self.log(f"Opened privacy policy: {privacy_path}")
+            return
+        messagebox.showinfo(APP_TITLE, PRIVACY_TEXT)
+
+    def open_windows_repository(self) -> None:
+        webbrowser.open("https://github.com/The0Cosmo/Offline-LAN-Games-Helper-Windows")
+        self.log("Opened Windows GitHub repository.")
+
+    def export_dir_path(self) -> Path:
+        configured = str(self.config.get("default_export_folder", "")).strip()
+        return Path(configured) if configured else EXPORT_DIR
+
+    def backup_root_path(self) -> Path:
+        configured = str(self.config.get("default_backup_folder", "")).strip()
+        return Path(configured) if configured else BACKUP_ROOT
+
     def set_text(self, widget: tk.Text, content: str) -> None:
         widget.configure(state=tk.NORMAL)
         widget.delete("1.0", tk.END)
@@ -1017,9 +1607,11 @@ class OfflineLanGamesHelper:
             self.update_all_tabs()
             return
         index = 0
-        if not select_first and previous:
+        remembered = self.config.get("last_selected_game") if self.config.get("remember_last_selected_game", True) else ""
+        target_name = remembered if select_first and remembered else previous
+        if target_name:
             for i, game in enumerate(self.filtered_games):
-                if game["name"] == previous:
+                if game["name"] == target_name:
                     index = i
                     break
         self.game_list.selection_set(index)
@@ -1036,6 +1628,9 @@ class OfflineLanGamesHelper:
         if not game:
             return
         self.current_game = game
+        if self.config.get("remember_last_selected_game", True):
+            self.config["last_selected_game"] = game["name"]
+            save_json_file(CONFIG_FILE, self.config)
         self.current_path = self.config.get("paths", {}).get(game["name"]) or self.find_game_path(game)
         self.current_server_path = self.config.get("server_paths", {}).get(game["name"]) or self.find_server_path(game)
         self.update_all_tabs()
@@ -1263,7 +1858,7 @@ class OfflineLanGamesHelper:
             "World / Save Backup",
             "",
             "Backups are timestamped .zip files stored under:",
-            str(BACKUP_ROOT / safe_filename(game["name"])) if game else str(BACKUP_ROOT),
+            str(self.backup_root_path() / safe_filename(game["name"])) if game else str(self.backup_root_path()),
             "",
             "Restore extracts a selected backup into the selected save folder only after confirmation.",
             "The helper does not delete original saves during restore.",
@@ -1592,8 +2187,9 @@ class OfflineLanGamesHelper:
         game = self.selected_game_required()
         if not game:
             return
-        EXPORT_DIR.mkdir(exist_ok=True)
-        output = EXPORT_DIR / f"{safe_filename(game['name'])}_Invite.md"
+        export_dir = self.export_dir_path()
+        export_dir.mkdir(parents=True, exist_ok=True)
+        output = export_dir / f"{safe_filename(game['name'])}_Invite.md"
         output.write_text(self.build_invite_message(game), encoding="utf-8")
         messagebox.showinfo(APP_TITLE, f"Invite exported:\n{output}")
         self.log(f"Invite exported: {output}")
@@ -1619,7 +2215,7 @@ class OfflineLanGamesHelper:
         if not folder.exists() or not folder.is_dir():
             messagebox.showerror(APP_TITLE, "Select an existing save folder first.")
             return
-        destination = BACKUP_ROOT / safe_filename(game["name"])
+        destination = self.backup_root_path() / safe_filename(game["name"])
         destination.mkdir(parents=True, exist_ok=True)
         stamp = time.strftime("%Y%m%d_%H%M%S")
         output = destination / f"{safe_filename(folder.name)}_{stamp}.zip"
@@ -1650,7 +2246,7 @@ class OfflineLanGamesHelper:
             return
         backup = filedialog.askopenfilename(
             title=f"Select backup zip for {game['name']}",
-            initialdir=str(BACKUP_ROOT / safe_filename(game["name"])),
+            initialdir=str(self.backup_root_path() / safe_filename(game["name"])),
             filetypes=[("Zip backups", "*.zip"), ("All files", "*.*")],
         )
         if not backup:
@@ -1699,8 +2295,9 @@ class OfflineLanGamesHelper:
             messagebox.showerror(APP_TITLE, "Select an existing mods folder first.")
             return
         files = sorted([path for path in folder.iterdir() if path.is_file()], key=lambda p: p.name.lower())
-        EXPORT_DIR.mkdir(exist_ok=True)
-        output = EXPORT_DIR / f"{safe_filename(game['name'])}_Mod_List.md"
+        export_dir = self.export_dir_path()
+        export_dir.mkdir(parents=True, exist_ok=True)
+        output = export_dir / f"{safe_filename(game['name'])}_Mod_List.md"
         lines = [
             f"# {game['name']} - Mod List",
             "",
@@ -2573,8 +3170,9 @@ class OfflineLanGamesHelper:
         game = self.selected_game_required()
         if not game:
             return
-        EXPORT_DIR.mkdir(exist_ok=True)
-        output = EXPORT_DIR / f"{safe_filename(game['name'])}_LAN_Tutorial.md"
+        export_dir = self.export_dir_path()
+        export_dir.mkdir(parents=True, exist_ok=True)
+        output = export_dir / f"{safe_filename(game['name'])}_LAN_Tutorial.md"
         output.write_text(self.build_export_text(game, include_server=True), encoding="utf-8")
         messagebox.showinfo(APP_TITLE, f"Tutorial exported:\n{output}")
         self.log(f"Tutorial exported: {output}")
@@ -2583,8 +3181,9 @@ class OfflineLanGamesHelper:
         game = self.selected_game_required()
         if not game:
             return
-        EXPORT_DIR.mkdir(exist_ok=True)
-        output = EXPORT_DIR / f"{safe_filename(game['name'])}_Server_Guide.md"
+        export_dir = self.export_dir_path()
+        export_dir.mkdir(parents=True, exist_ok=True)
+        output = export_dir / f"{safe_filename(game['name'])}_Server_Guide.md"
         output.write_text(self.build_server_export_text(game), encoding="utf-8")
         messagebox.showinfo(APP_TITLE, f"Server guide exported:\n{output}")
         self.log(f"Server guide exported: {output}")

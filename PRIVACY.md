@@ -31,6 +31,12 @@ The app may save local settings, such as:
 
 These files stay on your device.
 
+## Settings and Language
+
+The app may save local preferences such as selected language, theme, selected paths, default export/backup folders, and offline mode.
+
+These settings stay on your device and are not uploaded.
+
 ## Internet Access
 
 The app should not require internet access for normal LAN helper features.

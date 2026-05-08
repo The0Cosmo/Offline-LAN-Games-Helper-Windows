@@ -58,6 +58,7 @@ if (-not (Test-Path -LiteralPath $Icon)) {
     --name "Offline LAN Games Helper" `
     --icon "assets\offline_lan_helper.ico" `
     --add-data "games.json;." `
+    --add-data "assets;assets" `
     .\lan_games_helper.py
 
 if (Test-Path -LiteralPath $Spec) {
@@ -73,6 +74,7 @@ if (-not (Test-Path -LiteralPath $Dist)) {
 
 Copy-Item -LiteralPath .\games.json -Destination (Join-Path $Dist 'games.json') -Force
 Copy-Item -LiteralPath .\user_config.json -Destination (Join-Path $Dist 'user_config.json') -Force
+Copy-Item -LiteralPath .\assets -Destination (Join-Path $Dist 'assets') -Recurse -Force
 foreach ($File in @('README.md', 'PRIVACY.md', 'LICENSE')) {
     if (Test-Path -LiteralPath $File) {
         Copy-Item -LiteralPath $File -Destination (Join-Path $Dist $File) -Force
