@@ -116,8 +116,22 @@ Local Configuration
 - These files stay on your device.
 
 Settings and Language
-- The app may save local preferences such as selected language, theme, selected paths, and offline mode.
+- The app may save local preferences such as selected language, theme, UI scale, selected paths, hidden tools, enabled tools, default invite mode, and offline mode.
 - These settings stay on your device and are not uploaded.
+
+Tool Manager
+- The app may save which optional helper tools are hidden or disabled.
+- These preferences stay on your device and are not uploaded.
+
+Invite Export
+- The app may generate invite text using the selected local IP address, port, game name, and optional password entered by you.
+- Invite text is copied or exported only when you click the related button.
+- The app does not upload invite text.
+
+Local Detection and Cache
+- The app may cache local game detection results and UI preferences to improve performance.
+- This data stays on your device and is not uploaded.
+- The app does not scan the entire disk aggressively.
 
 Internet Access
 - Normal LAN helper features should not require internet access.
@@ -162,6 +176,25 @@ SERVER_ROOT = APP_DIR / "servers"
 BACKUP_ROOT = APP_DIR / "backups"
 KIWI_LOGO_PATH = RESOURCE_DIR / "assets" / "kiwi_logo.png"
 WINDOW_ICON_PATH = RESOURCE_DIR / "assets" / "offline_lan_helper.ico"
+
+OPTIONAL_TOOLS = {
+    "firewall_helper": "Firewall Helper",
+    "server_tools": "Server Tools",
+    "controller_tools": "Controller Tools",
+    "hidhide_helper": "HidHide Helper",
+    "ds4windows_helper": "DS4Windows Helper",
+    "nucleus_helper": "Nucleus Co-op Helper",
+    "input_isolation": "Input Isolation Helper",
+    "backup_tools": "Backup Tools",
+    "invite_export": "Invite Export",
+    "custom_games": "Custom Games",
+    "lan_test": "LAN Test",
+    "support": "Support section",
+}
+CORE_PAGES = {"settings", "about", "privacy", "tool_manager"}
+INVITE_MODE_IDS = ["ip_only", "ip_port_only", "short", "full"]
+GAME_FILTER_IDS = ["all", "installed", "favorites", "dedicated_server", "in_game_host"]
+UI_SCALE_VALUES = ["90%", "100%", "110%", "125%", "150%"]
 DEFAULT_CONFIG = {
     "paths": {},
     "server_paths": {},
@@ -186,6 +219,21 @@ DEFAULT_CONFIG = {
     "default_export_folder": "",
     "default_backup_folder": "",
     "custom_games": [],
+    "enabled_tools": {tool_id: True for tool_id in OPTIONAL_TOOLS},
+    "hidden_tools": [],
+    "hide_unused_tools_automatically": False,
+    "favorite_games": [],
+    "hidden_games": [],
+    "manual_installed_games": [],
+    "installed_cache": {},
+    "detection_cache_updated": "",
+    "default_game_filter": "all",
+    "show_hidden_games": False,
+    "default_invite_mode": "short",
+    "include_lan_vpn_note": True,
+    "ui_scale": "100%",
+    "compact_mode": False,
+    "animations": True,
 }
 
 TRANSLATIONS = {
@@ -249,6 +297,62 @@ TRANSLATIONS = {
         "troubleshooting": "Troubleshooting",
         "support": "Support",
         "status_ready": "Ready.",
+        "appearance": "Appearance",
+        "ui_scale": "UI scale",
+        "compact_mode": "Compact mode",
+        "animations": "Animations",
+        "tool_manager": "Tool Manager",
+        "show_tool": "Show Tool",
+        "hide_tool": "Hide Tool",
+        "enable_tool": "Enable Tool",
+        "disable_tool": "Disable Tool",
+        "restore_all_tools": "Restore All Tools",
+        "suggest_unused_tools": "Suggest Unused Tools",
+        "show_all_tools": "Show All Tools",
+        "hide_unused_tools_automatically": "Hide unused tools automatically",
+        "hidden_tools_can_be_restored": "Hidden tools can be restored at any time.",
+        "tool_manager_safety": "This only changes the app interface. It does not uninstall external programs or delete games.",
+        "tool_manager_description": "Tool Manager lets you hide or disable app features you do not use. It does not uninstall external programs or delete games.",
+        "copy_invite": "Copy Invite",
+        "export_invite": "Export Invite",
+        "copy_ip_only": "Copy IP Only",
+        "copy_ip_port_only": "Copy IP:Port Only",
+        "copy_join_address": "Copy Join Address",
+        "invite_mode": "Invite Mode",
+        "ip_only": "IP Only",
+        "ip_port_only": "IP:Port Only",
+        "short_invite": "Short Invite",
+        "full_useful_invite": "Full Useful Invite",
+        "server_password": "Server Password",
+        "lan_vpn_mode": "LAN/VPN Mode",
+        "invite_copied": "Invite copied to clipboard.",
+        "invite_exported": "Invite exported successfully.",
+        "refresh_games": "Refresh Games",
+        "refresh_installed_detection": "Refresh Installed Detection",
+        "loading_games": "Loading games...",
+        "no_games_found": "No games found.",
+        "games_json_error": "games.json could not be loaded.",
+        "no_matching_games_found": "No matching games found.",
+        "show_all_games": "Show All Games",
+        "show_installed_only": "Show Installed Only",
+        "favorites": "Favorites",
+        "dedicated_server": "Dedicated Server",
+        "in_game_host": "In-Game Hosting",
+        "no_installed_detected": "No installed supported games were detected. Showing all supported games.",
+        "clear_search": "Clear",
+        "storage_cleanup": "Storage / Cleanup",
+        "delete_exported_guides": "Delete exported guides",
+        "delete_temp_logs": "Delete temporary logs",
+        "clear_detection_cache": "Clear detection cache",
+        "reset_local_settings": "Reset local settings",
+        "game_list_settings": "Game List",
+        "default_filter": "Default filter",
+        "invite_export_settings": "Invite Export",
+        "include_lan_vpn_note": "Include LAN/VPN note",
+        "show_hidden_games": "Show hidden games",
+        "reset_hidden_games": "Reset hidden games",
+        "refresh_detection": "Refresh detection",
+        "settings_core_note": "Settings, About, Privacy, and Tool Manager are core pages and cannot be hidden.",
     },
     "it": {
         "app_title": "Offline LAN Games Helper - Windows",
@@ -310,39 +414,101 @@ TRANSLATIONS = {
         "troubleshooting": "Risoluzione problemi",
         "support": "Supporto",
         "status_ready": "Pronto.",
+        "appearance": "Aspetto",
+        "ui_scale": "Scala interfaccia",
+        "compact_mode": "Modalita compatta",
+        "animations": "Animazioni",
+        "tool_manager": "Gestore strumenti",
+        "show_tool": "Mostra strumento",
+        "hide_tool": "Nascondi strumento",
+        "enable_tool": "Abilita strumento",
+        "disable_tool": "Disabilita strumento",
+        "restore_all_tools": "Ripristina tutti gli strumenti",
+        "suggest_unused_tools": "Suggerisci strumenti non usati",
+        "show_all_tools": "Mostra tutti gli strumenti",
+        "hide_unused_tools_automatically": "Nascondi automaticamente strumenti non usati",
+        "hidden_tools_can_be_restored": "Gli strumenti nascosti possono essere ripristinati in qualsiasi momento.",
+        "tool_manager_safety": "Questo cambia solo l'interfaccia dell'app. Non disinstalla programmi esterni e non cancella giochi.",
+        "tool_manager_description": "Gestore strumenti permette di nascondere o disabilitare funzioni dell'app non usate. Non disinstalla programmi esterni e non cancella giochi.",
+        "copy_invite": "Copia invito",
+        "export_invite": "Esporta invito",
+        "copy_ip_only": "Copia solo IP",
+        "copy_ip_port_only": "Copia IP:Porta",
+        "copy_join_address": "Copia indirizzo di accesso",
+        "invite_mode": "Modalita invito",
+        "ip_only": "Solo IP",
+        "ip_port_only": "Solo IP:Porta",
+        "short_invite": "Invito breve",
+        "full_useful_invite": "Invito utile completo",
+        "server_password": "Password server",
+        "lan_vpn_mode": "Modalita LAN/VPN",
+        "invite_copied": "Invito copiato negli appunti.",
+        "invite_exported": "Invito esportato correttamente.",
+        "refresh_games": "Aggiorna giochi",
+        "refresh_installed_detection": "Aggiorna rilevamento installati",
+        "loading_games": "Caricamento giochi...",
+        "no_games_found": "Nessun gioco trovato.",
+        "games_json_error": "Impossibile caricare games.json.",
+        "no_matching_games_found": "Nessun gioco corrispondente trovato.",
+        "show_all_games": "Mostra tutti i giochi",
+        "show_installed_only": "Mostra solo installati",
+        "favorites": "Preferiti",
+        "dedicated_server": "Server dedicato",
+        "in_game_host": "Host nel gioco",
+        "no_installed_detected": "Nessun gioco supportato installato rilevato. Mostro tutti i giochi supportati.",
+        "clear_search": "Cancella",
+        "storage_cleanup": "Archiviazione / Pulizia",
+        "delete_exported_guides": "Elimina guide esportate",
+        "delete_temp_logs": "Elimina log temporanei",
+        "clear_detection_cache": "Cancella cache rilevamento",
+        "reset_local_settings": "Reimposta impostazioni locali",
+        "game_list_settings": "Lista giochi",
+        "default_filter": "Filtro predefinito",
+        "invite_export_settings": "Esporta invito",
+        "include_lan_vpn_note": "Includi nota LAN/VPN",
+        "show_hidden_games": "Mostra giochi nascosti",
+        "reset_hidden_games": "Reimposta giochi nascosti",
+        "refresh_detection": "Aggiorna rilevamento",
+        "settings_core_note": "Impostazioni, Informazioni, Privacy e Gestore strumenti sono pagine principali e non possono essere nascoste.",
     },
 }
 
 THEMES = {
     "light": {
-        "bg": "#f6faf3",
-        "panel": "#ffffff",
-        "panel_alt": "#eef7e8",
-        "text": "#102014",
-        "muted": "#475569",
-        "accent": "#5aa832",
-        "accent_dark": "#2f6f1f",
-        "warning_bg": "#fff7ed",
-        "warning_fg": "#9a3412",
-        "success_bg": "#ecfdf3",
-        "error_bg": "#fef2f2",
-        "border": "#cbd5c0",
-        "button_fg": "#102014",
+        "bg": "#F7FAF5",
+        "panel": "#FFFFFF",
+        "panel_alt": "#EEF6EA",
+        "text": "#1F2933",
+        "muted": "#52616B",
+        "accent": "#7CB342",
+        "accent_dark": "#558B2F",
+        "warning": "#F59E0B",
+        "error": "#DC2626",
+        "success": "#16A34A",
+        "warning_bg": "#FFF7E6",
+        "warning_fg": "#92400E",
+        "success_bg": "#ECFDF3",
+        "error_bg": "#FEF2F2",
+        "border": "#DDE5D5",
+        "button_fg": "#1F2933",
     },
     "dark": {
-        "bg": "#11170f",
-        "panel": "#182116",
-        "panel_alt": "#21301d",
-        "text": "#edf7e8",
-        "muted": "#cbd5c0",
-        "accent": "#8adf62",
-        "accent_dark": "#b8f295",
-        "warning_bg": "#3a250e",
-        "warning_fg": "#fdba74",
-        "success_bg": "#12301c",
-        "error_bg": "#3b1212",
-        "border": "#3f5b35",
-        "button_fg": "#edf7e8",
+        "bg": "#111827",
+        "panel": "#1F2937",
+        "panel_alt": "#263244",
+        "text": "#F9FAFB",
+        "muted": "#D1D5DB",
+        "accent": "#A3E635",
+        "accent_dark": "#84CC16",
+        "warning": "#FBBF24",
+        "error": "#F87171",
+        "success": "#4ADE80",
+        "warning_bg": "#3A2A0B",
+        "warning_fg": "#FBBF24",
+        "success_bg": "#12301C",
+        "error_bg": "#3B1212",
+        "border": "#374151",
+        "button_fg": "#F9FAFB",
     },
 }
 
@@ -670,14 +836,26 @@ class OfflineLanGamesHelper:
         self.config = merge_config(load_json_file(CONFIG_FILE, DEFAULT_CONFIG))
         self.language = self.config.get("language", "en") if self.config.get("language") in TRANSLATIONS else "en"
         self.theme_name = self.config.get("theme", "light") if self.config.get("theme") in ("light", "dark", "system") else "light"
+        self.ui_scale = self.config.get("ui_scale", "100%") if self.config.get("ui_scale") in UI_SCALE_VALUES else "100%"
+        self.enabled_tools = dict(self.config.get("enabled_tools", {}))
+        for tool_id in OPTIONAL_TOOLS:
+            self.enabled_tools.setdefault(tool_id, True)
+        self.hidden_tools = set(self.config.get("hidden_tools", []))
+        self.favorite_games = set(self.config.get("favorite_games", []))
+        self.hidden_games = set(self.config.get("hidden_games", []))
+        self.manual_installed_games = set(self.config.get("manual_installed_games", []))
+        self.installed_cache = dict(self.config.get("installed_cache", {}))
+        self.catalog_load_error = ""
+        self.detection_running = False
         self.colors = THEMES[self.effective_theme_name()]
         self.root.title(self.tr("app_title"))
         self.root.geometry("1280x820")
-        self.root.minsize(1040, 680)
+        self.root.minsize(1100, 720)
         self.set_window_icon()
+        self.apply_tk_scaling()
         self.configure_style()
 
-        self.builtin_games = [normalize_game(game) for game in load_json_file(GAMES_FILE, [])]
+        self.builtin_games = self.load_game_catalog()
         self.custom_games = [normalize_game(game, custom=True) for game in self.config.get("custom_games", [])]
         self.games: list[dict[str, Any]] = []
         self.filtered_games: list[dict[str, Any]] = []
@@ -690,6 +868,8 @@ class OfflineLanGamesHelper:
         self.process_rows: list[ProcessInfo] = []
         self.localized_widgets: list[tuple[tk.Widget, str]] = []
         self.tab_widgets: dict[str, ttk.Frame] = {}
+        self.tool_tab_map: dict[str, list[str]] = {}
+        self.tool_button_map: dict[str, list[tk.Widget]] = {}
         self.action_buttons: dict[str, ttk.Button] = {}
         self.kiwi_photo: tk.PhotoImage | None = None
 
@@ -703,6 +883,40 @@ class OfflineLanGamesHelper:
 
     def tr(self, key: str) -> str:
         return TRANSLATIONS.get(self.language, TRANSLATIONS["en"]).get(key, TRANSLATIONS["en"].get(key, key))
+
+    def load_game_catalog(self) -> list[dict[str, Any]]:
+        try:
+            raw_games = load_json_file(GAMES_FILE, [])
+        except Exception as exc:
+            self.catalog_load_error = f"{self.tr('games_json_error')} {exc}"
+            return []
+        if not isinstance(raw_games, list):
+            self.catalog_load_error = self.tr("games_json_error")
+            return []
+        self.catalog_load_error = ""
+        return [normalize_game(game) for game in raw_games if isinstance(game, dict)]
+
+    def ui_scale_multiplier(self) -> float:
+        try:
+            return int(str(self.ui_scale).rstrip("%")) / 100
+        except ValueError:
+            return 1.0
+
+    def scaled_font(self, size: int, weight: str | None = None) -> tuple[Any, ...]:
+        scaled_size = max(8, int(round(size * self.ui_scale_multiplier())))
+        return ("Segoe UI", scaled_size, weight) if weight else ("Segoe UI", scaled_size)
+
+    def apply_tk_scaling(self) -> None:
+        try:
+            self.root.tk.call("tk", "scaling", 1.0 * self.ui_scale_multiplier())
+        except tk.TclError:
+            pass
+
+    def is_tool_enabled(self, tool_id: str) -> bool:
+        return bool(self.enabled_tools.get(tool_id, True))
+
+    def is_tool_visible(self, tool_id: str) -> bool:
+        return self.is_tool_enabled(tool_id) and tool_id not in self.hidden_tools
 
     def set_window_icon(self) -> None:
         try:
@@ -719,8 +933,9 @@ class OfflineLanGamesHelper:
             self.style.theme_use("clam")
         except tk.TclError:
             pass
-        base_font = ("Segoe UI", 10)
-        heading_font = ("Segoe UI", 12, "bold")
+        self.apply_tk_scaling()
+        base_font = self.scaled_font(10)
+        heading_font = self.scaled_font(12, "bold")
         self.root.option_add("*Font", base_font)
         self.root.option_add("*TCombobox*Listbox.font", base_font)
         self.style.configure(".", font=base_font, background=self.colors["bg"], foreground=self.colors["text"])
@@ -729,7 +944,8 @@ class OfflineLanGamesHelper:
         self.style.configure("TLabel", background=self.colors["bg"], foreground=self.colors["text"])
         self.style.configure("Muted.TLabel", background=self.colors["bg"], foreground=self.colors["muted"])
         self.style.configure("Warning.TLabel", background=self.colors["warning_bg"], foreground=self.colors["warning_fg"], padding=8)
-        self.style.configure("Success.TLabel", background=self.colors["success_bg"], foreground=self.colors["accent_dark"], padding=8)
+        self.style.configure("Success.TLabel", background=self.colors["success_bg"], foreground=self.colors["success"], padding=8)
+        self.style.configure("Error.TLabel", background=self.colors["error_bg"], foreground=self.colors["error"], padding=8)
         self.style.configure("TLabelFrame", background=self.colors["bg"], foreground=self.colors["text"], bordercolor=self.colors["border"])
         self.style.configure("TLabelFrame.Label", background=self.colors["bg"], foreground=self.colors["accent_dark"], font=heading_font)
         self.style.configure("TButton", padding=(12, 8), background=self.colors["panel_alt"], foreground=self.colors["button_fg"], bordercolor=self.colors["border"])
@@ -741,8 +957,8 @@ class OfflineLanGamesHelper:
         self.style.configure("TNotebook", background=self.colors["bg"], borderwidth=0)
         self.style.configure("TNotebook.Tab", padding=(12, 7), background=self.colors["panel_alt"], foreground=self.colors["text"])
         self.style.map("TNotebook.Tab", background=[("selected", self.colors["panel"])], foreground=[("selected", self.colors["accent_dark"])])
-        self.style.configure("Treeview", background=self.colors["panel"], fieldbackground=self.colors["panel"], foreground=self.colors["text"], rowheight=28, bordercolor=self.colors["border"])
-        self.style.configure("Treeview.Heading", background=self.colors["panel_alt"], foreground=self.colors["text"], font=("Segoe UI", 10, "bold"))
+        self.style.configure("Treeview", background=self.colors["panel"], fieldbackground=self.colors["panel"], foreground=self.colors["text"], rowheight=max(28, int(28 * self.ui_scale_multiplier())), bordercolor=self.colors["border"])
+        self.style.configure("Treeview.Heading", background=self.colors["panel_alt"], foreground=self.colors["text"], font=self.scaled_font(10, "bold"))
 
     def style_text_widget(self, widget: tk.Text, *, height: int | None = None) -> None:
         if height is not None:
@@ -757,7 +973,7 @@ class OfflineLanGamesHelper:
             bd=1,
             padx=10,
             pady=8,
-            font=("Segoe UI", 10),
+            font=self.scaled_font(10),
         )
 
     def localize_widget(self, widget: tk.Widget, key: str) -> tk.Widget:
@@ -784,9 +1000,11 @@ class OfflineLanGamesHelper:
                 ttk.Label(title_frame, image=self.kiwi_photo).grid(row=0, column=0, rowspan=2, sticky="w", padx=(0, 10))
             except tk.TclError:
                 self.kiwi_photo = None
-        self.title_label = ttk.Label(title_frame, text=self.tr("app_title"), font=("Segoe UI", 18, "bold"))
+        self.title_label = ttk.Label(title_frame, text=self.tr("app_title"), font=self.scaled_font(18, "bold"))
         self.title_label.grid(row=0, column=1, sticky="w")
         ttk.Label(title_frame, text=f"v{APP_VERSION}  |  The0Cosmo", style="Muted.TLabel").grid(row=1, column=1, sticky="w")
+        self.settings_header_button = ttk.Button(title_frame, text=self.tr("settings"), command=lambda: self.run_ui_action("Open Settings", self.show_settings))
+        self.settings_header_button.grid(row=0, column=2, rowspan=2, sticky="ns", padx=(14, 0))
         self.safety_label = ttk.Label(header, text=self.tr("safety_warning"), style="Warning.TLabel", wraplength=760)
         if bool(self.config.get("show_safety_warnings", True)):
             self.safety_label.grid(row=1, column=0, sticky="ew", pady=(8, 0))
@@ -820,14 +1038,33 @@ class OfflineLanGamesHelper:
         left = ttk.Frame(self.root, padding=(10, 0, 6, 8))
         left.grid(row=1, column=0, sticky="nsew")
         left.grid_columnconfigure(0, weight=1)
-        left.grid_rowconfigure(2, weight=1)
+        left.grid_rowconfigure(5, weight=1)
         self.search_label = ttk.Label(left, text=self.tr("search"))
         self.search_label.grid(row=0, column=0, sticky="w")
         self.search_var = tk.StringVar()
         self.search_var.trace_add("write", lambda *_: self.apply_filter())
-        ttk.Entry(left, textvariable=self.search_var).grid(row=1, column=0, sticky="ew", pady=(4, 8))
+        search_row = ttk.Frame(left)
+        search_row.grid(row=1, column=0, sticky="ew", pady=(4, 8))
+        search_row.grid_columnconfigure(0, weight=1)
+        ttk.Entry(search_row, textvariable=self.search_var).grid(row=0, column=0, sticky="ew")
+        self.clear_search_button = ttk.Button(search_row, text=self.tr("clear_search"), command=lambda: self.search_var.set(""))
+        self.clear_search_button.grid(row=0, column=1, padx=(6, 0))
+        self.filter_label = ttk.Label(left, text=self.tr("default_filter"))
+        self.filter_label.grid(row=2, column=0, sticky="w")
+        self.game_filter_var = tk.StringVar(value=self.filter_label_for_key(str(self.config.get("default_game_filter", "all"))))
+        self.game_filter_combo = ttk.Combobox(left, state="readonly", textvariable=self.game_filter_var, values=self.filter_display_values())
+        self.game_filter_combo.grid(row=3, column=0, sticky="ew", pady=(4, 8))
+        self.game_filter_combo.bind("<<ComboboxSelected>>", lambda _event: self.on_filter_changed())
+        refresh_row = ttk.Frame(left)
+        refresh_row.grid(row=4, column=0, sticky="ew", pady=(0, 8))
+        refresh_row.grid_columnconfigure(0, weight=1)
+        refresh_row.grid_columnconfigure(1, weight=1)
+        self.refresh_games_button = ttk.Button(refresh_row, text=self.tr("refresh_games"), command=lambda: self.run_ui_action("Refresh Games", self.refresh_games))
+        self.refresh_games_button.grid(row=0, column=0, sticky="ew", padx=(0, 4))
+        self.refresh_detection_button = ttk.Button(refresh_row, text=self.tr("refresh_installed_detection"), command=lambda: self.run_ui_action("Refresh Installed Detection", self.refresh_installed_detection))
+        self.refresh_detection_button.grid(row=0, column=1, sticky="ew", padx=(4, 0))
         list_frame = ttk.Frame(left)
-        list_frame.grid(row=2, column=0, sticky="nsew")
+        list_frame.grid(row=5, column=0, sticky="nsew")
         list_frame.grid_columnconfigure(0, weight=1)
         list_frame.grid_rowconfigure(0, weight=1)
         self.game_list = tk.Listbox(
@@ -842,7 +1079,7 @@ class OfflineLanGamesHelper:
             highlightbackground=self.colors["border"],
             relief=tk.SOLID,
             bd=1,
-            font=("Segoe UI", 11),
+            font=self.scaled_font(11),
         )
         self.game_list.grid(row=0, column=0, sticky="nsew")
         game_scroll = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.game_list.yview)
@@ -850,7 +1087,10 @@ class OfflineLanGamesHelper:
         self.game_list.configure(yscrollcommand=game_scroll.set)
         self.game_list.bind("<<ListboxSelect>>", self.on_game_selected)
         self.add_custom_button = ttk.Button(left, text=self.tr("add_custom_game"), style="Accent.TButton", command=lambda: self.run_ui_action("Add Custom Game", self.add_custom_game_dialog))
-        self.add_custom_button.grid(row=3, column=0, sticky="ew", pady=(8, 0))
+        self.add_custom_button.grid(row=6, column=0, sticky="ew", pady=(8, 0))
+        self.game_status_var = tk.StringVar(value="")
+        self.game_status_label = ttk.Label(left, textvariable=self.game_status_var, style="Muted.TLabel", wraplength=250)
+        self.game_status_label.grid(row=7, column=0, sticky="ew", pady=(6, 0))
 
         right = ttk.Frame(self.root, padding=(6, 0, 10, 8))
         right.grid(row=1, column=1, sticky="nsew")
@@ -873,6 +1113,15 @@ class OfflineLanGamesHelper:
         self.add_settings_tab()
         self.add_support_tab()
         self.privacy_text = self.add_text_tab("Privacy")
+        self.tool_tab_map = {
+            "firewall_helper": ["Firewall / Permissions"],
+            "server_tools": ["Server Tools"],
+            "lan_test": ["LAN Test"],
+            "invite_export": ["Invite"],
+            "backup_tools": ["Backups"],
+            "input_isolation": ["Input Isolation", "Input Isolation Setup"],
+            "support": ["Support"],
+        }
         self.server_buttons: dict[str, ttk.Button] = {}
         self.add_server_button("Open Server Folder", self.open_server_folder, 0)
         self.add_server_button("Select Server Executable", self.select_server_executable, 1)
@@ -898,6 +1147,14 @@ class OfflineLanGamesHelper:
         self.add_action_button(actions, "Add Firewall Rules", self.add_firewall_rules, 5)
         self.add_action_button(actions, "Remove Firewall Rules", self.remove_firewall_rules, 6)
         self.add_action_button(actions, "Export Tutorial", self.export_tutorial, 7)
+        self.tool_button_map = {
+            "firewall_helper": [
+                self.action_buttons["Add Firewall Rules"],
+                self.action_buttons["Remove Firewall Rules"],
+            ],
+            "custom_games": [self.add_custom_button],
+        }
+        self.apply_tool_visibility()
 
         log_frame = ttk.LabelFrame(self.root, text=self.tr("log_status"), padding=6)
         self.log_frame = log_frame
@@ -973,17 +1230,48 @@ class OfflineLanGamesHelper:
     def add_invite_tab(self) -> None:
         frame = ttk.Frame(self.tabs, padding=10)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid_rowconfigure(1, weight=1)
-        ttk.Label(frame, text="Copy Invite Message", font=("Segoe UI", 12, "bold")).grid(row=0, column=0, sticky="w")
+        frame.grid_rowconfigure(3, weight=1)
+        ttk.Label(frame, text="Invite Export", font=self.scaled_font(12, "bold")).grid(row=0, column=0, sticky="w")
+        form = ttk.LabelFrame(frame, text="Connection Info", padding=8)
+        form.grid(row=1, column=0, sticky="ew", pady=(8, 8))
+        for column in range(4):
+            form.grid_columnconfigure(column, weight=1)
+        self.invite_host_ip_var = tk.StringVar()
+        self.invite_port_var = tk.StringVar()
+        self.invite_password_var = tk.StringVar()
+        self.invite_lan_mode_var = tk.StringVar(value="LAN")
+        self.invite_mode_var = tk.StringVar(value=self.invite_mode_label_for_key(str(self.config.get("default_invite_mode", "short"))))
+        ttk.Label(form, text="Host IP").grid(row=0, column=0, sticky="w")
+        self.invite_ip_combo = ttk.Combobox(form, textvariable=self.invite_host_ip_var)
+        self.invite_ip_combo.grid(row=1, column=0, sticky="ew", padx=(0, 6), pady=(2, 8))
+        ttk.Label(form, text="Port").grid(row=0, column=1, sticky="w")
+        self.invite_port_combo = ttk.Combobox(form, textvariable=self.invite_port_var)
+        self.invite_port_combo.grid(row=1, column=1, sticky="ew", padx=(0, 6), pady=(2, 8))
+        ttk.Label(form, text=self.tr("server_password")).grid(row=0, column=2, sticky="w")
+        ttk.Entry(form, textvariable=self.invite_password_var, show="*").grid(row=1, column=2, sticky="ew", padx=(0, 6), pady=(2, 8))
+        ttk.Label(form, text=self.tr("lan_vpn_mode")).grid(row=0, column=3, sticky="w")
+        ttk.Combobox(form, textvariable=self.invite_lan_mode_var, values=["LAN", "VPN LAN", "Local server"], state="readonly").grid(row=1, column=3, sticky="ew", pady=(2, 8))
+        self.invite_mode_label = ttk.Label(form, text=self.tr("invite_mode"))
+        self.invite_mode_label.grid(row=2, column=0, sticky="w")
+        self.invite_mode_combo = ttk.Combobox(form, textvariable=self.invite_mode_var, values=self.invite_mode_display_values(), state="readonly")
+        self.invite_mode_combo.grid(row=3, column=0, sticky="ew", padx=(0, 6))
+        self.invite_mode_combo.bind("<<ComboboxSelected>>", lambda _event: self.update_invite_tab())
+        ttk.Button(form, text="Use Selected Host IP", command=lambda: self.run_ui_action("Use Selected Host IP", self.use_selected_ip_for_invite)).grid(row=3, column=1, sticky="ew", padx=(0, 6))
+        ttk.Button(form, text="Use Game Default Port", command=lambda: self.run_ui_action("Use Game Default Port", self.use_default_port_for_invite)).grid(row=3, column=2, sticky="ew", padx=(0, 6))
+        ttk.Button(form, text="Refresh Invite", command=lambda: self.run_ui_action("Refresh Invite", self.update_invite_tab)).grid(row=3, column=3, sticky="ew")
+        controls = ttk.Frame(frame)
+        controls.grid(row=2, column=0, sticky="ew", pady=(0, 8))
+        for column in range(5):
+            controls.grid_columnconfigure(column, weight=1)
+        ttk.Button(controls, text=self.tr("copy_invite"), command=lambda: self.run_ui_action("Copy Invite", self.copy_invite)).grid(row=0, column=0, sticky="ew", padx=(0, 5))
+        ttk.Button(controls, text=self.tr("export_invite"), command=lambda: self.run_ui_action("Export Invite", self.export_invite)).grid(row=0, column=1, sticky="ew", padx=(0, 5))
+        ttk.Button(controls, text=self.tr("copy_ip_only"), command=lambda: self.run_ui_action("Copy IP Only", self.copy_invite_ip_only)).grid(row=0, column=2, sticky="ew", padx=(0, 5))
+        ttk.Button(controls, text=self.tr("copy_ip_port_only"), command=lambda: self.run_ui_action("Copy IP:Port Only", self.copy_invite_ip_port_only)).grid(row=0, column=3, sticky="ew", padx=(0, 5))
+        ttk.Button(controls, text=self.tr("copy_join_address"), command=lambda: self.run_ui_action("Copy Join Address", self.copy_join_address)).grid(row=0, column=4, sticky="ew")
         self.invite_text = tk.Text(frame, wrap=tk.WORD, height=18)
-        self.invite_text.grid(row=1, column=0, sticky="nsew", pady=(8, 8))
+        self.invite_text.grid(row=3, column=0, sticky="nsew")
         self.style_text_widget(self.invite_text, height=18)
         self.invite_text.configure(state=tk.DISABLED)
-        controls = ttk.Frame(frame)
-        controls.grid(row=2, column=0, sticky="ew")
-        ttk.Button(controls, text="Refresh Invite", command=lambda: self.run_ui_action("Refresh Invite", self.update_invite_tab)).grid(row=0, column=0, padx=(0, 6))
-        ttk.Button(controls, text="Copy Invite", command=lambda: self.run_ui_action("Copy Invite", self.copy_invite)).grid(row=0, column=1, padx=(0, 6))
-        ttk.Button(controls, text="Export Invite", command=lambda: self.run_ui_action("Export Invite", self.export_invite)).grid(row=0, column=2, padx=(0, 6))
         self.tabs.add(frame, text="Invite")
         self.tab_widgets["Invite"] = frame
 
@@ -1257,11 +1545,10 @@ class OfflineLanGamesHelper:
     def add_settings_tab(self) -> None:
         frame = ttk.Frame(self.tabs, padding=12)
         frame.grid_columnconfigure(0, weight=1)
-        frame.grid_columnconfigure(1, weight=1)
-        frame.grid_rowconfigure(4, weight=1)
+        frame.grid_rowconfigure(1, weight=1)
 
         header = ttk.Frame(frame)
-        header.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 10))
+        header.grid(row=0, column=0, sticky="ew", pady=(0, 10))
         header.grid_columnconfigure(1, weight=1)
         if KIWI_LOGO_PATH.exists():
             try:
@@ -1269,14 +1556,17 @@ class OfflineLanGamesHelper:
                 ttk.Label(header, image=self.settings_logo).grid(row=0, column=0, rowspan=2, sticky="w", padx=(0, 12))
             except tk.TclError:
                 self.settings_logo = None
-        self.settings_title_label = ttk.Label(header, text=self.tr("settings"), font=("Segoe UI", 16, "bold"))
+        self.settings_title_label = ttk.Label(header, text=self.tr("settings"), font=self.scaled_font(16, "bold"))
         self.settings_title_label.grid(row=0, column=1, sticky="w")
         self.settings_privacy_label = ttk.Label(header, text=self.tr("privacy_local"), style="Muted.TLabel", wraplength=760)
         self.settings_privacy_label.grid(row=1, column=1, sticky="w")
 
-        appearance = ttk.LabelFrame(frame, text=self.tr("settings"), padding=10)
-        appearance.grid(row=1, column=0, sticky="nsew", padx=(0, 8), pady=6)
+        settings_tabs = ttk.Notebook(frame)
+        settings_tabs.grid(row=1, column=0, sticky="nsew")
+
+        appearance = ttk.Frame(settings_tabs, padding=10)
         appearance.grid_columnconfigure(1, weight=1)
+        settings_tabs.add(appearance, text=self.tr("appearance"))
         self.language_label = ttk.Label(appearance, text=self.tr("language"))
         self.language_label.grid(row=0, column=0, sticky="w", pady=4)
         self.language_var = tk.StringVar(value="Italiano" if self.language == "it" else "English")
@@ -1292,26 +1582,95 @@ class OfflineLanGamesHelper:
         self.theme_combo = ttk.Combobox(appearance, textvariable=self.theme_var, values=list(theme_names.values()), state="readonly")
         self.theme_combo.grid(row=1, column=1, sticky="ew", pady=4)
         self.theme_combo.bind("<<ComboboxSelected>>", lambda _event: self.change_theme())
-
-        defaults = ttk.LabelFrame(frame, text=self.tr("default_behavior"), padding=10)
-        defaults.grid(row=1, column=1, sticky="nsew", padx=(8, 0), pady=6)
+        self.ui_scale_label = ttk.Label(appearance, text=self.tr("ui_scale"))
+        self.ui_scale_label.grid(row=2, column=0, sticky="w", pady=4)
+        self.ui_scale_var = tk.StringVar(value=self.ui_scale)
+        self.ui_scale_combo = ttk.Combobox(appearance, textvariable=self.ui_scale_var, values=UI_SCALE_VALUES, state="readonly")
+        self.ui_scale_combo.grid(row=2, column=1, sticky="ew", pady=4)
+        self.ui_scale_combo.bind("<<ComboboxSelected>>", lambda _event: self.change_ui_scale())
         self.show_safety_var = tk.BooleanVar(value=bool(self.config.get("show_safety_warnings", True)))
         self.remember_game_var = tk.BooleanVar(value=bool(self.config.get("remember_last_selected_game", True)))
-        self.show_safety_check = ttk.Checkbutton(defaults, text=self.tr("show_safety_warnings"), variable=self.show_safety_var, command=self.save_settings)
-        self.show_safety_check.grid(row=0, column=0, sticky="w", pady=4)
-        self.remember_game_check = ttk.Checkbutton(defaults, text=self.tr("remember_last_game"), variable=self.remember_game_var, command=self.save_settings)
-        self.remember_game_check.grid(row=1, column=0, sticky="w", pady=4)
+        self.compact_mode_var = tk.BooleanVar(value=bool(self.config.get("compact_mode", False)))
+        self.animations_var = tk.BooleanVar(value=bool(self.config.get("animations", True)))
+        self.show_safety_check = ttk.Checkbutton(appearance, text=self.tr("show_safety_warnings"), variable=self.show_safety_var, command=self.save_settings)
+        self.show_safety_check.grid(row=3, column=0, columnspan=2, sticky="w", pady=4)
+        self.remember_game_check = ttk.Checkbutton(appearance, text=self.tr("remember_last_game"), variable=self.remember_game_var, command=self.save_settings)
+        self.remember_game_check.grid(row=4, column=0, columnspan=2, sticky="w", pady=4)
+        self.compact_check = ttk.Checkbutton(appearance, text=self.tr("compact_mode"), variable=self.compact_mode_var, command=self.save_settings)
+        self.compact_check.grid(row=5, column=0, columnspan=2, sticky="w", pady=4)
+        self.animations_check = ttk.Checkbutton(appearance, text=self.tr("animations"), variable=self.animations_var, command=self.save_settings)
+        self.animations_check.grid(row=6, column=0, columnspan=2, sticky="w", pady=4)
 
-        paths = ttk.LabelFrame(frame, text=self.tr("paths"), padding=10)
-        paths.grid(row=2, column=0, columnspan=2, sticky="nsew", pady=6)
+        tools = ttk.Frame(settings_tabs, padding=10)
+        tools.grid_columnconfigure(0, weight=1)
+        tools.grid_rowconfigure(2, weight=1)
+        settings_tabs.add(tools, text=self.tr("tool_manager"))
+        self.tool_manager_label = ttk.Label(tools, text=self.tr("tool_manager"), font=self.scaled_font(13, "bold"))
+        self.tool_manager_label.grid(row=0, column=0, sticky="w")
+        self.tool_manager_desc_label = ttk.Label(tools, text=self.tr("tool_manager_description"), style="Warning.TLabel", wraplength=860, justify=tk.LEFT)
+        self.tool_manager_desc_label.grid(row=1, column=0, sticky="ew", pady=(6, 8))
+        self.tool_tree = ttk.Treeview(tools, columns=("tool", "state", "visible"), show="headings", height=10)
+        self.tool_tree.heading("tool", text="Tool")
+        self.tool_tree.heading("state", text="Enabled")
+        self.tool_tree.heading("visible", text="Visible")
+        self.tool_tree.column("tool", width=360, anchor=tk.W)
+        self.tool_tree.column("state", width=120, anchor=tk.CENTER)
+        self.tool_tree.column("visible", width=120, anchor=tk.CENTER)
+        self.tool_tree.grid(row=2, column=0, sticky="nsew")
+        tool_scroll = ttk.Scrollbar(tools, orient=tk.VERTICAL, command=self.tool_tree.yview)
+        tool_scroll.grid(row=2, column=1, sticky="ns")
+        self.tool_tree.configure(yscrollcommand=tool_scroll.set)
+        tool_buttons = ttk.Frame(tools)
+        tool_buttons.grid(row=3, column=0, sticky="ew", pady=(8, 0))
+        for column in range(6):
+            tool_buttons.grid_columnconfigure(column, weight=1)
+        self.tool_show_button = ttk.Button(tool_buttons, text=self.tr("show_tool"), command=lambda: self.run_ui_action("Show Tool", self.show_selected_tool))
+        self.tool_hide_button = ttk.Button(tool_buttons, text=self.tr("hide_tool"), command=lambda: self.run_ui_action("Hide Tool", self.hide_selected_tool))
+        self.tool_enable_button = ttk.Button(tool_buttons, text=self.tr("enable_tool"), command=lambda: self.run_ui_action("Enable Tool", self.enable_selected_tool))
+        self.tool_disable_button = ttk.Button(tool_buttons, text=self.tr("disable_tool"), command=lambda: self.run_ui_action("Disable Tool", self.disable_selected_tool))
+        self.tool_restore_button = ttk.Button(tool_buttons, text=self.tr("restore_all_tools"), command=lambda: self.run_ui_action("Restore All Tools", self.restore_all_tools))
+        self.tool_suggest_button = ttk.Button(tool_buttons, text=self.tr("suggest_unused_tools"), command=lambda: self.run_ui_action("Suggest Unused Tools", self.suggest_unused_tools))
+        for index, button in enumerate([self.tool_show_button, self.tool_hide_button, self.tool_enable_button, self.tool_disable_button, self.tool_restore_button, self.tool_suggest_button]):
+            button.grid(row=0, column=index, sticky="ew", padx=3)
+        self.hide_unused_var = tk.BooleanVar(value=bool(self.config.get("hide_unused_tools_automatically", False)))
+        ttk.Checkbutton(tools, text=self.tr("hide_unused_tools_automatically"), variable=self.hide_unused_var, command=self.save_settings).grid(row=4, column=0, sticky="w", pady=(8, 0))
+        ttk.Label(tools, text=self.tr("settings_core_note"), style="Muted.TLabel").grid(row=5, column=0, sticky="w", pady=(4, 0))
+        self.populate_tool_tree()
+
+        game_invite = ttk.Frame(settings_tabs, padding=10)
+        game_invite.grid_columnconfigure(1, weight=1)
+        settings_tabs.add(game_invite, text=f"{self.tr('game_list_settings')} / {self.tr('invite_export_settings')}")
+        ttk.Label(game_invite, text=self.tr("default_filter")).grid(row=0, column=0, sticky="w", pady=4)
+        self.settings_filter_var = tk.StringVar(value=self.filter_label_for_key(str(self.config.get("default_game_filter", "all"))))
+        self.settings_filter_combo = ttk.Combobox(game_invite, textvariable=self.settings_filter_var, values=self.filter_display_values(), state="readonly")
+        self.settings_filter_combo.grid(row=0, column=1, sticky="ew", pady=4)
+        self.settings_filter_combo.bind("<<ComboboxSelected>>", lambda _event: self.change_default_filter_setting())
+        self.show_hidden_games_var = tk.BooleanVar(value=bool(self.config.get("show_hidden_games", False)))
+        ttk.Checkbutton(game_invite, text=self.tr("show_hidden_games"), variable=self.show_hidden_games_var, command=self.save_settings).grid(row=1, column=0, columnspan=2, sticky="w", pady=4)
+        ttk.Button(game_invite, text=self.tr("reset_hidden_games"), command=lambda: self.run_ui_action("Reset Hidden Games", self.reset_hidden_games)).grid(row=2, column=0, sticky="ew", pady=4)
+        ttk.Button(game_invite, text=self.tr("refresh_detection"), command=lambda: self.run_ui_action("Refresh Installed Detection", self.refresh_installed_detection)).grid(row=2, column=1, sticky="ew", pady=4, padx=(8, 0))
+        self.invite_mode_label = ttk.Label(game_invite, text=self.tr("invite_mode"))
+        self.invite_mode_label.grid(row=3, column=0, sticky="w", pady=(16, 4))
+        self.default_invite_var = tk.StringVar(value=self.invite_mode_label_for_key(str(self.config.get("default_invite_mode", "short"))))
+        self.default_invite_combo = ttk.Combobox(game_invite, textvariable=self.default_invite_var, values=self.invite_mode_display_values(), state="readonly")
+        self.default_invite_combo.grid(row=3, column=1, sticky="ew", pady=(16, 4))
+        self.default_invite_combo.bind("<<ComboboxSelected>>", lambda _event: self.change_default_invite_mode())
+        self.include_lan_note_var = tk.BooleanVar(value=bool(self.config.get("include_lan_vpn_note", True)))
+        self.include_lan_note_check = ttk.Checkbutton(game_invite, text=self.tr("include_lan_vpn_note"), variable=self.include_lan_note_var, command=self.save_settings)
+        self.include_lan_note_check.grid(row=4, column=0, columnspan=2, sticky="w", pady=4)
+
+        paths = ttk.Frame(settings_tabs, padding=10)
+        settings_tabs.add(paths, text=self.tr("paths"))
         paths.grid_columnconfigure(1, weight=1)
         self.ds4_settings_var = tk.StringVar(value=self.config.get("ds4windows_path", ""))
+        self.hidhide_settings_var = tk.StringVar(value=self.config.get("hidhide_client_path", ""))
         self.nucleus_settings_var = tk.StringVar(value=self.config.get("nucleus_coop_path", ""))
         self.prism_settings_var = tk.StringVar(value=self.config.get("prism_launcher_path", ""))
         self.export_settings_var = tk.StringVar(value=self.config.get("default_export_folder", ""))
         self.backup_settings_var = tk.StringVar(value=self.config.get("default_backup_folder", ""))
         path_rows = [
             ("DS4Windows path", self.ds4_settings_var, lambda: self.select_exe_setting("ds4windows_path", self.ds4_settings_var, "Select DS4Windows.exe")),
+            ("HidHide path", self.hidhide_settings_var, lambda: self.select_exe_setting("hidhide_client_path", self.hidhide_settings_var, "Select HidHideClient.exe")),
             ("Nucleus Co-op path", self.nucleus_settings_var, lambda: self.select_exe_setting("nucleus_coop_path", self.nucleus_settings_var, "Select NucleusCoop.exe")),
             ("Prism Launcher path", self.prism_settings_var, lambda: self.select_exe_setting("prism_launcher_path", self.prism_settings_var, "Select PrismLauncher.exe")),
             (self.tr("default_export_folder"), self.export_settings_var, lambda: self.select_folder_setting("default_export_folder", self.export_settings_var, "Select default export folder")),
@@ -1325,24 +1684,34 @@ class OfflineLanGamesHelper:
             ttk.Entry(paths, textvariable=variable).grid(row=row, column=1, sticky="ew", padx=8, pady=3)
             ttk.Button(paths, text=self.tr("select"), command=lambda cb=callback: self.run_ui_action("Select settings path", cb)).grid(row=row, column=2, sticky="ew", pady=3)
 
-        support = ttk.LabelFrame(frame, text=self.tr("support_project"), padding=10)
-        support.grid(row=3, column=0, sticky="nsew", padx=(0, 8), pady=6)
+        support = ttk.Frame(settings_tabs, padding=10)
         support.grid_columnconfigure(0, weight=1)
+        settings_tabs.add(support, text=f"{self.tr('privacy')} / {self.tr('support')}")
+        support.grid_columnconfigure(0, weight=1)
+        ttk.Label(
+            support,
+            text=self.tr("privacy_local"),
+            style="Warning.TLabel",
+            wraplength=760,
+            justify=tk.LEFT,
+        ).grid(row=0, column=0, columnspan=3, sticky="ew", pady=(0, 8))
         ttk.Label(
             support,
             text="Donations are optional and do not unlock extra features.",
             style="Muted.TLabel",
             wraplength=480,
-        ).grid(row=0, column=0, columnspan=3, sticky="w", pady=(0, 8))
+        ).grid(row=1, column=0, columnspan=3, sticky="w", pady=(0, 8))
         self.settings_paypal_button = ttk.Button(support, text=self.tr("donate"), command=lambda: self.run_ui_action("Donate with PayPal", self.open_paypal_donation))
-        self.settings_paypal_button.grid(row=1, column=0, sticky="ew", padx=(0, 5))
+        self.settings_paypal_button.grid(row=2, column=0, sticky="ew", padx=(0, 5))
         self.settings_sponsor_button = ttk.Button(support, text=self.tr("sponsor"), command=lambda: self.run_ui_action("Sponsor on GitHub", self.open_github_sponsors))
-        self.settings_sponsor_button.grid(row=1, column=1, sticky="ew", padx=5)
+        self.settings_sponsor_button.grid(row=2, column=1, sticky="ew", padx=5)
         self.settings_copy_donation_button = ttk.Button(support, text=self.tr("copy_donation"), command=lambda: self.run_ui_action("Copy Donation Link", self.copy_donation_link))
-        self.settings_copy_donation_button.grid(row=1, column=2, sticky="ew", padx=(5, 0))
+        self.settings_copy_donation_button.grid(row=2, column=2, sticky="ew", padx=(5, 0))
+        ttk.Button(support, text=self.tr("open_privacy"), command=lambda: self.run_ui_action("Open Privacy Policy", self.open_privacy_file)).grid(row=3, column=0, sticky="ew", pady=(12, 0), padx=(0, 5))
+        ttk.Button(support, text=self.tr("open_github_windows"), command=lambda: self.run_ui_action("Open GitHub Repository", self.open_windows_repository)).grid(row=3, column=1, sticky="ew", pady=(12, 0), padx=5)
 
-        about = ttk.LabelFrame(frame, text=self.tr("about"), padding=10)
-        about.grid(row=3, column=1, sticky="nsew", padx=(8, 0), pady=6)
+        about = ttk.Frame(settings_tabs, padding=10)
+        settings_tabs.add(about, text=self.tr("about"))
         about.grid_columnconfigure(0, weight=1)
         self.about_label = ttk.Label(
             about,
@@ -1351,13 +1720,24 @@ class OfflineLanGamesHelper:
             wraplength=520,
         )
         self.about_label.grid(row=0, column=0, sticky="w")
-        buttons = ttk.Frame(about)
-        buttons.grid(row=1, column=0, sticky="ew", pady=(10, 0))
-        ttk.Button(buttons, text=self.tr("open_privacy"), command=lambda: self.run_ui_action("Open Privacy Policy", self.open_privacy_file)).grid(row=0, column=0, sticky="ew", padx=(0, 6))
-        ttk.Button(buttons, text=self.tr("open_github_windows"), command=lambda: self.run_ui_action("Open GitHub Repository", self.open_windows_repository)).grid(row=0, column=1, sticky="ew")
+
+        storage = ttk.Frame(settings_tabs, padding=10)
+        storage.grid_columnconfigure(0, weight=1)
+        settings_tabs.add(storage, text=self.tr("storage_cleanup"))
+        ttk.Label(
+            storage,
+            text="Cleanup only touches app-generated files such as exported guides, temporary logs, detection cache, and local settings after confirmation. It does not delete games, saves, external programs, or system files.",
+            style="Warning.TLabel",
+            wraplength=820,
+            justify=tk.LEFT,
+        ).grid(row=0, column=0, sticky="ew", pady=(0, 8))
+        ttk.Button(storage, text=self.tr("delete_exported_guides"), command=lambda: self.run_ui_action("Delete Exported Guides", self.delete_exported_guides)).grid(row=1, column=0, sticky="ew", pady=4)
+        ttk.Button(storage, text=self.tr("delete_temp_logs"), command=lambda: self.run_ui_action("Delete Temporary Logs", self.delete_temp_logs)).grid(row=2, column=0, sticky="ew", pady=4)
+        ttk.Button(storage, text=self.tr("clear_detection_cache"), command=lambda: self.run_ui_action("Clear Detection Cache", self.clear_detection_cache)).grid(row=3, column=0, sticky="ew", pady=4)
+        ttk.Button(storage, text=self.tr("reset_local_settings"), command=lambda: self.run_ui_action("Reset Local Settings", self.reset_local_settings)).grid(row=4, column=0, sticky="ew", pady=4)
 
         self.settings_status_var = tk.StringVar(value=self.tr("status_ready"))
-        ttk.Label(frame, textvariable=self.settings_status_var, style="Success.TLabel").grid(row=4, column=0, columnspan=2, sticky="ew", pady=(8, 0))
+        ttk.Label(frame, textvariable=self.settings_status_var, style="Success.TLabel").grid(row=2, column=0, sticky="ew", pady=(8, 0))
         self.tabs.add(frame, text="Settings")
         self.tab_widgets["Settings"] = frame
 
@@ -1391,6 +1771,286 @@ class OfflineLanGamesHelper:
         button.grid(row=row, column=column, sticky="ew", padx=3, pady=3)
         self.server_buttons[text] = button
 
+    def show_settings(self) -> None:
+        frame = self.tab_widgets.get("Settings")
+        if frame is not None:
+            self.tabs.select(frame)
+
+    def filter_display_values(self) -> list[str]:
+        return [self.filter_label_for_key(filter_id) for filter_id in GAME_FILTER_IDS]
+
+    def filter_label_for_key(self, filter_id: str) -> str:
+        labels = {
+            "all": self.tr("show_all_games"),
+            "installed": self.tr("show_installed_only"),
+            "favorites": self.tr("favorites"),
+            "dedicated_server": self.tr("dedicated_server"),
+            "in_game_host": self.tr("in_game_host"),
+        }
+        return labels.get(filter_id, labels["all"])
+
+    def filter_key_from_label(self, label: str) -> str:
+        lookup = {self.filter_label_for_key(filter_id): filter_id for filter_id in GAME_FILTER_IDS}
+        return lookup.get(label, "all")
+
+    def current_filter_key(self) -> str:
+        return self.filter_key_from_label(getattr(self, "game_filter_var", tk.StringVar(value="")).get())
+
+    def invite_mode_display_values(self) -> list[str]:
+        return [self.invite_mode_label_for_key(mode_id) for mode_id in INVITE_MODE_IDS]
+
+    def invite_mode_label_for_key(self, mode_id: str) -> str:
+        labels = {
+            "ip_only": self.tr("ip_only"),
+            "ip_port_only": self.tr("ip_port_only"),
+            "short": self.tr("short_invite"),
+            "full": self.tr("full_useful_invite"),
+        }
+        return labels.get(mode_id, labels["short"])
+
+    def invite_mode_key_from_label(self, label: str) -> str:
+        lookup = {self.invite_mode_label_for_key(mode_id): mode_id for mode_id in INVITE_MODE_IDS}
+        return lookup.get(label, "short")
+
+    def on_filter_changed(self) -> None:
+        filter_key = self.current_filter_key()
+        self.config["default_game_filter"] = filter_key
+        save_json_file(CONFIG_FILE, self.config)
+        self.apply_filter()
+
+    def refresh_games(self) -> None:
+        if hasattr(self, "game_status_var"):
+            self.game_status_var.set(self.tr("loading_games"))
+        self.builtin_games = self.load_game_catalog()
+        self.reload_games()
+        if self.catalog_load_error:
+            messagebox.showerror(APP_TITLE, self.catalog_load_error)
+            self.log(self.catalog_load_error)
+        else:
+            self.log("Game catalog refreshed from games.json.")
+
+    def refresh_installed_detection(self) -> None:
+        if self.detection_running:
+            self.log("Installed detection is already running.")
+            return
+        self.detection_running = True
+        if hasattr(self, "refresh_detection_button"):
+            self.refresh_detection_button.configure(state=tk.DISABLED)
+        if hasattr(self, "game_status_var"):
+            self.game_status_var.set("Detecting installed games...")
+
+        def worker() -> None:
+            detected: dict[str, bool] = {}
+            for game in list(self.games):
+                try:
+                    detected[game["name"]] = bool(self.find_game_path(game))
+                except Exception:
+                    detected[game["name"]] = False
+            self.root.after(0, lambda: self.finish_installed_detection(detected))
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def finish_installed_detection(self, detected: dict[str, bool]) -> None:
+        self.installed_cache = detected
+        self.config["installed_cache"] = detected
+        self.config["detection_cache_updated"] = time.strftime("%Y-%m-%d %H:%M:%S")
+        save_json_file(CONFIG_FILE, self.config)
+        self.detection_running = False
+        if hasattr(self, "refresh_detection_button"):
+            self.refresh_detection_button.configure(state=tk.NORMAL)
+        installed_count = sum(1 for value in detected.values() if value)
+        self.game_status_var.set(f"Installed detection complete: {installed_count} detected.")
+        self.apply_filter()
+        self.log(f"Installed detection complete: {installed_count} supported games detected.")
+
+    def apply_tool_visibility(self) -> None:
+        for tool_id, tab_titles in self.tool_tab_map.items():
+            visible = self.is_tool_visible(tool_id)
+            for title in tab_titles:
+                frame = self.tab_widgets.get(title)
+                if frame is None:
+                    continue
+                try:
+                    if visible:
+                        self.tabs.add(frame, text=title)
+                    else:
+                        self.tabs.hide(frame)
+                except tk.TclError:
+                    pass
+        for tool_id, widgets in self.tool_button_map.items():
+            visible = self.is_tool_visible(tool_id)
+            for widget in widgets:
+                try:
+                    if visible:
+                        widget.grid()
+                    else:
+                        widget.grid_remove()
+                except tk.TclError:
+                    pass
+        if hasattr(self, "tool_tree"):
+            self.populate_tool_tree()
+
+    def populate_tool_tree(self) -> None:
+        if not hasattr(self, "tool_tree"):
+            return
+        current_selection = self.selected_tool_id()
+        self.tool_tree.delete(*self.tool_tree.get_children())
+        for tool_id, label in OPTIONAL_TOOLS.items():
+            enabled = "Yes" if self.is_tool_enabled(tool_id) else "No"
+            visible = "No" if tool_id in self.hidden_tools else "Yes"
+            self.tool_tree.insert("", tk.END, iid=tool_id, values=(f"{label} - {tool_id}", enabled, visible))
+        if current_selection and current_selection in OPTIONAL_TOOLS:
+            self.tool_tree.selection_set(current_selection)
+
+    def selected_tool_id(self) -> str:
+        if not hasattr(self, "tool_tree"):
+            return ""
+        selection = self.tool_tree.selection()
+        return selection[0] if selection else ""
+
+    def save_tool_settings(self) -> None:
+        self.config["enabled_tools"] = {tool_id: bool(self.enabled_tools.get(tool_id, True)) for tool_id in OPTIONAL_TOOLS}
+        self.config["hidden_tools"] = sorted(tool_id for tool_id in self.hidden_tools if tool_id in OPTIONAL_TOOLS)
+        save_json_file(CONFIG_FILE, self.config)
+        self.apply_tool_visibility()
+
+    def show_selected_tool(self) -> None:
+        tool_id = self.selected_tool_id()
+        if not tool_id:
+            messagebox.showwarning(APP_TITLE, "Select a tool first.")
+            return
+        self.hidden_tools.discard(tool_id)
+        self.save_tool_settings()
+        self.log(f"Tool shown: {OPTIONAL_TOOLS.get(tool_id, tool_id)}")
+
+    def hide_selected_tool(self) -> None:
+        tool_id = self.selected_tool_id()
+        if not tool_id:
+            messagebox.showwarning(APP_TITLE, "Select a tool first.")
+            return
+        self.hidden_tools.add(tool_id)
+        self.save_tool_settings()
+        self.log(f"Tool hidden: {OPTIONAL_TOOLS.get(tool_id, tool_id)}")
+
+    def enable_selected_tool(self) -> None:
+        tool_id = self.selected_tool_id()
+        if not tool_id:
+            messagebox.showwarning(APP_TITLE, "Select a tool first.")
+            return
+        self.enabled_tools[tool_id] = True
+        self.save_tool_settings()
+        self.log(f"Tool enabled: {OPTIONAL_TOOLS.get(tool_id, tool_id)}")
+
+    def disable_selected_tool(self) -> None:
+        tool_id = self.selected_tool_id()
+        if not tool_id:
+            messagebox.showwarning(APP_TITLE, "Select a tool first.")
+            return
+        self.enabled_tools[tool_id] = False
+        self.save_tool_settings()
+        self.log(f"Tool disabled: {OPTIONAL_TOOLS.get(tool_id, tool_id)}")
+
+    def restore_all_tools(self) -> None:
+        self.hidden_tools.clear()
+        for tool_id in OPTIONAL_TOOLS:
+            self.enabled_tools[tool_id] = True
+        self.save_tool_settings()
+        messagebox.showinfo(APP_TITLE, self.tr("hidden_tools_can_be_restored"))
+        self.log("All optional tools restored.")
+
+    def suggest_unused_tools(self) -> None:
+        suggestions: list[str] = []
+        checks = [
+            ("hidhide_helper", self.config.get("hidhide_client_path", "") or shutil.which("HidHideClient.exe")),
+            ("ds4windows_helper", self.config.get("ds4windows_path", "")),
+            ("nucleus_helper", self.config.get("nucleus_coop_path", "")),
+        ]
+        for tool_id, path in checks:
+            if not path or not Path(str(path)).exists():
+                suggestions.append(tool_id)
+        if not suggestions:
+            messagebox.showinfo(APP_TITLE, "No unused Windows helper tools were suggested.")
+            self.log("Tool Manager found no unused tools to suggest.")
+            return
+        message = "Suggested tools to hide because related apps were not found:\n\n" + "\n".join(f"- {OPTIONAL_TOOLS[item]}" for item in suggestions)
+        if messagebox.askyesno(APP_TITLE, message + "\n\nHide these app tools now? This will not uninstall anything."):
+            self.hidden_tools.update(suggestions)
+            self.save_tool_settings()
+            self.log("Suggested unused tools hidden.")
+
+    def change_ui_scale(self) -> None:
+        self.ui_scale = self.ui_scale_var.get() if self.ui_scale_var.get() in UI_SCALE_VALUES else "100%"
+        self.config["ui_scale"] = self.ui_scale
+        save_json_file(CONFIG_FILE, self.config)
+        self.configure_style()
+        self.apply_theme_to_widgets()
+        self.log(f"UI scale changed to {self.ui_scale}.")
+
+    def change_default_filter_setting(self) -> None:
+        filter_key = self.filter_key_from_label(self.settings_filter_var.get())
+        self.config["default_game_filter"] = filter_key
+        self.game_filter_var.set(self.filter_label_for_key(filter_key))
+        save_json_file(CONFIG_FILE, self.config)
+        self.apply_filter()
+
+    def change_default_invite_mode(self) -> None:
+        mode_key = self.invite_mode_key_from_label(self.default_invite_var.get())
+        self.config["default_invite_mode"] = mode_key
+        if hasattr(self, "invite_mode_var"):
+            self.invite_mode_var.set(self.invite_mode_label_for_key(mode_key))
+            self.update_invite_tab()
+        save_json_file(CONFIG_FILE, self.config)
+        self.log(f"Default invite mode changed to {mode_key}.")
+
+    def reset_hidden_games(self) -> None:
+        self.hidden_games.clear()
+        self.config["hidden_games"] = []
+        save_json_file(CONFIG_FILE, self.config)
+        self.apply_filter()
+        self.log("Hidden games reset.")
+
+    def delete_exported_guides(self) -> None:
+        export_dir = self.export_dir_path()
+        if not export_dir.exists():
+            self.log("No exported guides folder exists.")
+            return
+        if not messagebox.askyesno(APP_TITLE, f"Delete app-generated exported guides in:\n{export_dir}?"):
+            return
+        for path in export_dir.glob("*"):
+            if path.is_file():
+                path.unlink(missing_ok=True)
+        self.log("Exported guides deleted.")
+
+    def delete_temp_logs(self) -> None:
+        logs_dir = APP_DIR / "logs"
+        if not logs_dir.exists():
+            self.log("No logs folder exists.")
+            return
+        if not messagebox.askyesno(APP_TITLE, f"Delete app-generated logs in:\n{logs_dir}?"):
+            return
+        for path in logs_dir.glob("*"):
+            if path.is_file():
+                path.unlink(missing_ok=True)
+        self.log("Temporary logs deleted.")
+
+    def clear_detection_cache(self) -> None:
+        self.installed_cache = {}
+        self.config["installed_cache"] = {}
+        self.config["detection_cache_updated"] = ""
+        save_json_file(CONFIG_FILE, self.config)
+        self.apply_filter()
+        self.log("Installed detection cache cleared.")
+
+    def reset_local_settings(self) -> None:
+        if not messagebox.askyesno(APP_TITLE, "Reset local app settings? This does not delete games, saves, external programs, or system files."):
+            return
+        preserve_custom = self.config.get("custom_games", [])
+        self.config = merge_config(DEFAULT_CONFIG)
+        self.config["custom_games"] = preserve_custom
+        save_json_file(CONFIG_FILE, self.config)
+        messagebox.showinfo(APP_TITLE, "Local settings were reset. Restart the app to reload all UI state.")
+        self.log("Local settings reset; restart recommended.")
+
     def run_ui_action(self, action_name: str, callback: Callable[[], None]) -> None:
         self.log(f"Clicked: {action_name}")
         try:
@@ -1422,6 +2082,20 @@ class OfflineLanGamesHelper:
             self.search_label.configure(text=self.tr("search"))
         if hasattr(self, "add_custom_button"):
             self.add_custom_button.configure(text=self.tr("add_custom_game"))
+        if hasattr(self, "settings_header_button"):
+            self.settings_header_button.configure(text=self.tr("settings"))
+        if hasattr(self, "clear_search_button"):
+            self.clear_search_button.configure(text=self.tr("clear_search"))
+        if hasattr(self, "filter_label"):
+            self.filter_label.configure(text=self.tr("default_filter"))
+        if hasattr(self, "game_filter_combo"):
+            current_filter = str(self.config.get("default_game_filter", "all"))
+            self.game_filter_combo.configure(values=self.filter_display_values())
+            self.game_filter_var.set(self.filter_label_for_key(current_filter))
+        if hasattr(self, "refresh_games_button"):
+            self.refresh_games_button.configure(text=self.tr("refresh_games"))
+        if hasattr(self, "refresh_detection_button"):
+            self.refresh_detection_button.configure(text=self.tr("refresh_installed_detection"))
         if hasattr(self, "selected_ip_label"):
             self.selected_ip_label.configure(text=self.tr("selected_ip"))
         if hasattr(self, "host_network_frame"):
@@ -1492,6 +2166,37 @@ class OfflineLanGamesHelper:
             theme_label = {"light": self.tr("light"), "dark": self.tr("dark"), "system": self.tr("system")}.get(self.theme_name, self.tr("light"))
             self.theme_var.set(theme_label)
             self.theme_display_to_key = {self.tr("light"): "light", self.tr("dark"): "dark", self.tr("system"): "system"}
+            if hasattr(self, "ui_scale_label"):
+                self.ui_scale_label.configure(text=self.tr("ui_scale"))
+            if hasattr(self, "compact_check"):
+                self.compact_check.configure(text=self.tr("compact_mode"))
+            if hasattr(self, "animations_check"):
+                self.animations_check.configure(text=self.tr("animations"))
+            if hasattr(self, "tool_manager_label"):
+                self.tool_manager_label.configure(text=self.tr("tool_manager"))
+            if hasattr(self, "tool_manager_desc_label"):
+                self.tool_manager_desc_label.configure(text=self.tr("tool_manager_description"))
+            if hasattr(self, "tool_restore_button"):
+                self.tool_restore_button.configure(text=self.tr("restore_all_tools"))
+            if hasattr(self, "tool_suggest_button"):
+                self.tool_suggest_button.configure(text=self.tr("suggest_unused_tools"))
+            if hasattr(self, "tool_show_button"):
+                self.tool_show_button.configure(text=self.tr("show_tool"))
+            if hasattr(self, "tool_hide_button"):
+                self.tool_hide_button.configure(text=self.tr("hide_tool"))
+            if hasattr(self, "tool_enable_button"):
+                self.tool_enable_button.configure(text=self.tr("enable_tool"))
+            if hasattr(self, "tool_disable_button"):
+                self.tool_disable_button.configure(text=self.tr("disable_tool"))
+            if hasattr(self, "invite_mode_label"):
+                self.invite_mode_label.configure(text=self.tr("invite_mode"))
+            if hasattr(self, "default_invite_combo"):
+                self.default_invite_combo.configure(values=self.invite_mode_display_values())
+                self.default_invite_var.set(self.invite_mode_label_for_key(str(self.config.get("default_invite_mode", "short"))))
+            if hasattr(self, "include_lan_note_check"):
+                self.include_lan_note_check.configure(text=self.tr("include_lan_vpn_note"))
+            if hasattr(self, "tool_tree"):
+                self.populate_tool_tree()
 
     def apply_theme_to_widgets(self) -> None:
         def walk(widget: tk.Widget) -> None:
@@ -1514,6 +2219,11 @@ class OfflineLanGamesHelper:
     def save_settings(self) -> None:
         self.config["show_safety_warnings"] = bool(getattr(self, "show_safety_var", tk.BooleanVar(value=True)).get())
         self.config["remember_last_selected_game"] = bool(getattr(self, "remember_game_var", tk.BooleanVar(value=True)).get())
+        self.config["compact_mode"] = bool(getattr(self, "compact_mode_var", tk.BooleanVar(value=False)).get())
+        self.config["animations"] = bool(getattr(self, "animations_var", tk.BooleanVar(value=True)).get())
+        self.config["hide_unused_tools_automatically"] = bool(getattr(self, "hide_unused_var", tk.BooleanVar(value=False)).get())
+        self.config["show_hidden_games"] = bool(getattr(self, "show_hidden_games_var", tk.BooleanVar(value=False)).get())
+        self.config["include_lan_vpn_note"] = bool(getattr(self, "include_lan_note_var", tk.BooleanVar(value=True)).get())
         if self.current_game and self.config["remember_last_selected_game"]:
             self.config["last_selected_game"] = self.current_game["name"]
         save_json_file(CONFIG_FILE, self.config)
@@ -1524,6 +2234,7 @@ class OfflineLanGamesHelper:
                 self.safety_label.grid_remove()
         if hasattr(self, "settings_status_var"):
             self.settings_status_var.set(self.tr("settings_saved"))
+        self.apply_filter()
         self.log(self.tr("settings_saved"))
 
     def change_language(self) -> None:
@@ -1592,20 +2303,46 @@ class OfflineLanGamesHelper:
     def reload_games(self) -> None:
         self.custom_games = [normalize_game(game, custom=True) for game in self.config.get("custom_games", [])]
         self.games = self.builtin_games + self.custom_games
+        if self.catalog_load_error and hasattr(self, "game_status_var"):
+            self.game_status_var.set(self.catalog_load_error)
+        elif not self.games and hasattr(self, "game_status_var"):
+            self.game_status_var.set(self.tr("no_games_found"))
         self.apply_filter(select_first=True)
 
     def apply_filter(self, select_first: bool = False) -> None:
         query = self.search_var.get().strip().lower()
+        filter_key = self.current_filter_key() if hasattr(self, "game_filter_var") else "all"
         previous = self.current_game["name"] if self.current_game else ""
-        self.filtered_games = [game for game in self.games if query in game["name"].lower()]
+        games = list(self.games)
+        if not bool(self.config.get("show_hidden_games", False)):
+            games = [game for game in games if game["name"] not in self.hidden_games]
+        if query:
+            games = [game for game in games if query in game["name"].lower()]
+        if filter_key == "installed":
+            installed_names = {name for name, installed in self.installed_cache.items() if installed} | self.manual_installed_games
+            if installed_names:
+                games = [game for game in games if game["name"] in installed_names]
+            elif self.games:
+                self.game_status_var.set(self.tr("no_installed_detected"))
+        elif filter_key == "favorites":
+            games = [game for game in games if game["name"] in self.favorite_games]
+        elif filter_key == "dedicated_server":
+            games = [game for game in games if str(game.get("server_support", "none")) not in {"none", "in_game_host"}]
+        elif filter_key == "in_game_host":
+            games = [game for game in games if str(game.get("server_support", "none")) == "in_game_host"]
+        self.filtered_games = games
         self.game_list.delete(0, tk.END)
         for game in self.filtered_games:
             suffix = " (custom)" if game.get("custom") else ""
             self.game_list.insert(tk.END, game["name"] + suffix)
         if not self.filtered_games:
             self.current_game = None
+            if hasattr(self, "game_status_var"):
+                self.game_status_var.set(self.tr("no_matching_games_found") if query else self.tr("no_games_found"))
             self.update_all_tabs()
             return
+        if hasattr(self, "game_status_var") and not (filter_key == "installed" and not any(self.installed_cache.values())):
+            self.game_status_var.set(f"{len(self.filtered_games)} games shown.")
         index = 0
         remembered = self.config.get("last_selected_game") if self.config.get("remember_last_selected_game", True) else ""
         target_name = remembered if select_first and remembered else previous
@@ -1631,8 +2368,8 @@ class OfflineLanGamesHelper:
         if self.config.get("remember_last_selected_game", True):
             self.config["last_selected_game"] = game["name"]
             save_json_file(CONFIG_FILE, self.config)
-        self.current_path = self.config.get("paths", {}).get(game["name"]) or self.find_game_path(game)
-        self.current_server_path = self.config.get("server_paths", {}).get(game["name"]) or self.find_server_path(game)
+        self.current_path = self.config.get("paths", {}).get(game["name"]) or None
+        self.current_server_path = self.config.get("server_paths", {}).get(game["name"]) or None
         self.update_all_tabs()
         self.log(f"Selected game: {game['name']}")
 
@@ -1846,6 +2583,14 @@ class OfflineLanGamesHelper:
         if not game:
             self.set_text(self.invite_text, "No game selected.")
             return
+        ip_values = [item.ip for item in self.addresses] or ([self.main_ip] if self.main_ip else [])
+        self.invite_ip_combo.configure(values=ip_values)
+        if not self.invite_host_ip_var.get().strip():
+            self.invite_host_ip_var.set(self.selected_ip() or "HOST_LAN_IP")
+        port_values = self.invite_port_values(game)
+        self.invite_port_combo.configure(values=port_values)
+        if not self.invite_port_var.get().strip() and port_values:
+            self.invite_port_var.set(port_values[0])
         self.set_text(self.invite_text, self.build_invite_message(game))
 
     def update_backup_tab(self) -> None:
@@ -2069,6 +2814,8 @@ class OfflineLanGamesHelper:
 
     def set_game_path(self, game: dict[str, Any], path: str) -> None:
         self.config.setdefault("paths", {})[game["name"]] = path
+        self.installed_cache[game["name"]] = True
+        self.config["installed_cache"] = self.installed_cache
         save_json_file(CONFIG_FILE, self.config)
         self.current_path = path
         self.update_all_tabs()
@@ -2152,26 +2899,92 @@ class OfflineLanGamesHelper:
 
         threading.Thread(target=worker, daemon=True).start()
 
-    def build_invite_message(self, game: dict[str, Any]) -> str:
-        ip = self.selected_ip() or "HOST_LAN_IP"
-        port = first_port_range(game.get("ports", [])) or first_port_range(game.get("server_ports", [])) or "varies by game/server"
-        client_steps = "\n".join(f"{index + 1}. {step}" for index, step in enumerate(game.get("client_tutorial", [])))
-        return "\n".join(
+    def invite_port_values(self, game: dict[str, Any]) -> list[str]:
+        values: list[str] = []
+        for entry in list(game.get("ports", [])) + list(game.get("server_ports", [])):
+            port_range = str(entry.get("range", "")).strip()
+            if not port_range:
+                continue
+            first = first_tcp_port_value(port_range)
+            for candidate in (first, port_range):
+                if candidate and candidate not in values:
+                    values.append(str(candidate))
+        return values
+
+    def use_selected_ip_for_invite(self) -> None:
+        value = self.selected_ip() or "HOST_LAN_IP"
+        self.invite_host_ip_var.set(value)
+        self.update_invite_tab()
+
+    def use_default_port_for_invite(self) -> None:
+        game = self.selected_game_required()
+        if not game:
+            return
+        values = self.invite_port_values(game)
+        if not values:
+            messagebox.showwarning(APP_TITLE, "No default port is listed for this game.")
+            return
+        self.invite_port_var.set(values[0])
+        self.update_invite_tab()
+
+    def current_invite_address(self) -> tuple[str, str, str]:
+        ip = self.invite_host_ip_var.get().strip() if hasattr(self, "invite_host_ip_var") else ""
+        if not ip:
+            ip = self.selected_ip() or "HOST_LAN_IP"
+        port = self.invite_port_var.get().strip() if hasattr(self, "invite_port_var") else ""
+        port_for_join = first_tcp_port_value(port) or port
+        join = f"{ip}:{port_for_join}" if port_for_join else ip
+        return ip, port, join
+
+    def short_join_instruction(self, game: dict[str, Any], join_address: str) -> str:
+        steps = [str(step).strip() for step in game.get("client_tutorial", []) if str(step).strip()]
+        for step in steps:
+            lowered = step.lower()
+            if "direct" in lowered or "join" in lowered or "lan" in lowered or "ip" in lowered:
+                return step.replace("HOST_LAN_IP", join_address)
+        return f"Use the game's LAN/direct connect option and enter {join_address}."
+
+    def build_invite_message(self, game: dict[str, Any], mode: str | None = None) -> str:
+        mode_id = mode or self.invite_mode_key_from_label(getattr(self, "invite_mode_var", tk.StringVar(value="")).get())
+        ip, port, join_address = self.current_invite_address()
+        if mode_id == "ip_only":
+            return ip
+        if mode_id == "ip_port_only":
+            return join_address
+        how_to_join = self.short_join_instruction(game, join_address)
+        note = (
+            "Same LAN/VPN and same game/mod version required."
+            if bool(self.config.get("include_lan_vpn_note", True))
+            else "Same game/mod version required."
+        )
+        if mode_id == "short":
+            return "\n".join(
+                [
+                    f"Game: {game['name']}",
+                    f"Join: {join_address}",
+                    f"How to join: {how_to_join}",
+                    f"Note: {note}",
+                ]
+            )
+        password = self.invite_password_var.get().strip() if hasattr(self, "invite_password_var") else ""
+        lan_mode = self.invite_lan_mode_var.get().strip() if hasattr(self, "invite_lan_mode_var") else ""
+        lines = [
+            f"Game: {game['name']}",
+            f"Join: {join_address}",
+        ]
+        if port:
+            lines.append(f"Port: {port}")
+        if password:
+            lines.append(f"Password: {password}")
+        if lan_mode:
+            lines.append(f"Mode: {lan_mode}")
+        lines.extend(
             [
-                f"Offline LAN invite for {game['name']}",
-                "",
-                f"Host IP: {ip}",
-                f"Port(s): {port}",
-                "",
-                "Join steps:",
-                client_steps or "Use the game's LAN/local network join option.",
-                "",
-                "Notes:",
-                "- Join the same LAN or VPN LAN as the host.",
-                "- Use the same game version and matching mods/content.",
-                "- This invite is for legitimate local/offline play only.",
+                f"How to join: {how_to_join}",
+                f"Note: {note}",
             ]
         )
+        return "\n".join(lines)
 
     def copy_invite(self) -> None:
         game = self.selected_game_required()
@@ -2180,8 +2993,26 @@ class OfflineLanGamesHelper:
         text = self.build_invite_message(game)
         self.root.clipboard_clear()
         self.root.clipboard_append(text)
-        messagebox.showinfo(APP_TITLE, "Invite message copied.")
+        messagebox.showinfo(APP_TITLE, self.tr("invite_copied"))
         self.log(f"Invite copied for {game['name']}.")
+
+    def copy_invite_ip_only(self) -> None:
+        ip, _port, _join = self.current_invite_address()
+        self.root.clipboard_clear()
+        self.root.clipboard_append(ip)
+        self.log(f"Copied invite IP: {ip}")
+
+    def copy_invite_ip_port_only(self) -> None:
+        _ip, _port, join = self.current_invite_address()
+        self.root.clipboard_clear()
+        self.root.clipboard_append(join)
+        self.log(f"Copied invite IP:Port: {join}")
+
+    def copy_join_address(self) -> None:
+        _ip, _port, join = self.current_invite_address()
+        self.root.clipboard_clear()
+        self.root.clipboard_append(join)
+        self.log(f"Copied join address: {join}")
 
     def export_invite(self) -> None:
         game = self.selected_game_required()
@@ -2189,9 +3020,9 @@ class OfflineLanGamesHelper:
             return
         export_dir = self.export_dir_path()
         export_dir.mkdir(parents=True, exist_ok=True)
-        output = export_dir / f"{safe_filename(game['name'])}_Invite.md"
+        output = export_dir / f"{safe_filename(game['name'])}_Invite.txt"
         output.write_text(self.build_invite_message(game), encoding="utf-8")
-        messagebox.showinfo(APP_TITLE, f"Invite exported:\n{output}")
+        messagebox.showinfo(APP_TITLE, f"{self.tr('invite_exported')}\n{output}")
         self.log(f"Invite exported: {output}")
 
     def select_save_folder(self) -> None:

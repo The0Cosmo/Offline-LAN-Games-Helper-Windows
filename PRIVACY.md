@@ -31,11 +31,35 @@ The app may save local settings, such as:
 
 These files stay on your device.
 
-## Settings and Language
+## Settings and Preferences
 
-The app may save local preferences such as selected language, theme, selected paths, default export/backup folders, and offline mode.
+The app may save local preferences such as selected language, theme, UI scale, hidden tools, enabled tools, default invite mode, selected paths, default export/backup folders, and offline mode.
 
 These settings stay on your device and are not uploaded.
+
+## Tool Manager
+
+The app may save which optional helper tools are hidden or disabled.
+
+These preferences stay on your device and are not uploaded.
+
+Tool Manager only changes the app interface. It does not uninstall external programs, delete games, delete saves, or remove system files.
+
+## Invite Export
+
+The app may generate invite text using the selected local IP address, port, game name, and optional password entered by the user.
+
+Invite text is copied or exported only when the user clicks the related button.
+
+The app does not upload invite text.
+
+## Local Detection and Cache
+
+The app may cache local game detection results and UI preferences to improve performance.
+
+This data stays on your device and is not uploaded.
+
+The app does not scan the entire disk aggressively.
 
 ## Internet Access
 

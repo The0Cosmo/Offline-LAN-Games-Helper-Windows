@@ -79,6 +79,30 @@ The app includes a `Settings` tab with:
 
 Settings are saved locally in `user_config.json` and are never uploaded.
 
+## Tool Manager
+
+The app includes a Tool Manager in Settings that lets users hide or disable helper tools they do not use.
+
+This only changes the app interface. It does not uninstall external programs, delete games, delete saves, or remove system files.
+
+Hidden tools can be restored at any time from Settings.
+
+Optional tools that can be hidden or disabled include Firewall Helper, Server Tools, Controller Tools, HidHide Helper, DS4Windows Helper, Nucleus Co-op Helper, Input Isolation Helper, Backup Tools, Invite Export, Custom Games, LAN Test, and the main Support tab.
+
+Settings, About, Privacy, and Tool Manager are core pages and cannot be hidden.
+
+## Performance and Game Loading
+
+The app loads `games.json` once at startup and keeps the parsed game catalog in memory.
+
+It does not scan the whole disk and does not aggressively detect installed games at startup. Supported games are shown immediately. Installed-game detection is local and runs only when the user clicks `Refresh Installed Detection`.
+
+Use `Refresh Games` to reload the catalog manually after editing `games.json`.
+
+## Responsive UI
+
+The interface uses a minimal kiwi-inspired light/dark palette, scrollable long-text panels, a minimum window size, and a UI scale setting. It is designed to stay readable on resized windows and high-DPI displays.
+
 ## Kiwi Logo
 
 The app icon and About/Settings logo are generated locally by `make_icon.py` as original kiwi-themed artwork:
@@ -190,7 +214,18 @@ This is not a scanner. It does not scan the internet, random IP ranges, or LAN r
 
 ## Invites
 
-Use `Copy Invite` or `Export Invite` to generate a ready-to-send message with the selected game name, host IP, port, and client join instructions.
+Invite Export creates a short shareable message with only useful connection information.
+
+Available invite modes:
+
+- IP Only
+- IP:Port Only
+- Short Invite
+- Full Useful Invite
+
+Invite Export can copy the IP only, copy IP:Port, copy the join address, copy the invite, or export a short `.txt` file. It can include a server password only when the user manually enters one.
+
+Invite Export does not include long tutorials, license text, privacy text, donation links, or unrelated setup instructions.
 
 ## Backups
 

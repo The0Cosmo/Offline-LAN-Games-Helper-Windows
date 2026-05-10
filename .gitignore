@@ -10,3 +10,4 @@ exported_guides/
 logs/
 .DS_Store
 Thumbs.db
+.aider*
