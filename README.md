@@ -339,6 +339,7 @@ Examples intentionally excluded include VALORANT, osu!, Grand Theft Auto V, Cybe
 - Verify that clients can ping the host IP.
 - Temporarily disabling the firewall can help diagnose a firewall issue, but re-enable it after testing.
 - For dedicated servers, read the official server documentation for config files, saves, and ports.
+<<<<<<< HEAD
 
 ## Optimized UI Update
 
@@ -366,3 +367,5 @@ The Home page now shows a session summary with the selected game, LAN IP, join-a
 When you select a game, the app now shows a small loading bar while that game's LAN/offline details are prepared. Game details are loaded only after a game is clicked and are cached after the first load, so switching back to the same game is faster.
 
 The game catalog is still loaded once and filtered from memory. Installed-game detection stays manual/background so the UI does not freeze.
+=======
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79

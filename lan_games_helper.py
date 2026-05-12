@@ -337,8 +337,11 @@ TRANSLATIONS = {
         "refresh_games": "Refresh Games",
         "refresh_installed_detection": "Refresh Installed Detection",
         "loading_games": "Loading games...",
+<<<<<<< HEAD
         "loading_game_details": "Loading game details...",
         "game_details_ready": "Game details ready.",
+=======
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
         "no_games_found": "No games found.",
         "games_json_error": "games.json could not be loaded.",
         "no_matching_games_found": "No matching games found.",
@@ -463,8 +466,11 @@ TRANSLATIONS = {
         "refresh_games": "Aggiorna giochi",
         "refresh_installed_detection": "Aggiorna rilevamento installati",
         "loading_games": "Caricamento giochi...",
+<<<<<<< HEAD
         "loading_game_details": "Caricamento dettagli gioco...",
         "game_details_ready": "Dettagli gioco pronti.",
+=======
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
         "no_games_found": "Nessun gioco trovato.",
         "games_json_error": "Impossibile caricare games.json.",
         "no_matching_games_found": "Nessun gioco corrispondente trovato.",
@@ -884,8 +890,11 @@ class OfflineLanGamesHelper:
         self.current_path: str | None = None
         self.current_server_path: str | None = None
         self.game_detail_cache: dict[tuple[str, str], str] = {}
+<<<<<<< HEAD
         self.game_select_job: str | None = None
         self.game_loading_active = False
+=======
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
         self.installed_detection_cache: dict[str, bool] = dict(self.installed_cache)
         self.addresses: list[AddressInfo] = []
         self.main_ip = ""
@@ -897,8 +906,11 @@ class OfflineLanGamesHelper:
         self.tool_button_map: dict[str, list[tk.Widget]] = {}
         self.action_buttons: dict[str, ttk.Button] = {}
         self.kiwi_photo: tk.PhotoImage | None = None
+<<<<<<< HEAD
         self.settings_window: tk.Toplevel | None = None
         self.text_widgets: list[tk.Text] = []
+=======
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
 
         self.build_ui()
         self.reload_games()
@@ -994,7 +1006,10 @@ class OfflineLanGamesHelper:
         self.style.configure("Hidden.TNotebook", background=self.colors["bg"], borderwidth=0)
         self.style.configure("Treeview", background=self.colors["panel"], fieldbackground=self.colors["panel"], foreground=self.colors["text"], rowheight=max(28, int(28 * self.ui_scale_multiplier())), bordercolor=self.colors["border"])
         self.style.configure("Treeview.Heading", background=self.colors["panel_alt"], foreground=self.colors["text"], font=self.scaled_font(11, "bold"))
+<<<<<<< HEAD
         self.style.configure("Horizontal.TProgressbar", troughcolor=self.colors["panel_alt"], background=self.colors["accent"], bordercolor=self.colors["border"], lightcolor=self.colors["accent"], darkcolor=self.colors["accent_dark"])
+=======
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
 
     def style_text_widget(self, widget: tk.Text, *, height: int | None = None) -> None:
         if height is not None:
@@ -1011,8 +1026,11 @@ class OfflineLanGamesHelper:
             pady=8,
             font=self.scaled_font(11),
         )
+<<<<<<< HEAD
         if hasattr(self, "text_widgets") and widget not in self.text_widgets:
             self.text_widgets.append(widget)
+=======
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
 
     def localize_widget(self, widget: tk.Widget, key: str) -> tk.Widget:
         try:
@@ -1042,6 +1060,7 @@ class OfflineLanGamesHelper:
         ttk.Label(title_frame, text=f"v{APP_VERSION}  |  Created by KiwiLiu", style="Muted.TLabel").grid(row=1, column=1, sticky="w")
         self.settings_header_button = ttk.Button(title_frame, text=self.tr("settings"), command=lambda: self.run_ui_action("Open Settings", self.show_settings))
         self.settings_header_button.grid(row=0, column=2, rowspan=2, sticky="ns", padx=(14, 0))
+<<<<<<< HEAD
 
         self.text_size_frame = ttk.Frame(title_frame)
         self.text_size_frame.grid(row=0, column=3, rowspan=2, sticky="ns", padx=(8, 0))
@@ -1052,6 +1071,8 @@ class OfflineLanGamesHelper:
         self.text_size_status_label.grid(row=0, column=1, sticky="ew", padx=(0, 4))
         self.text_size_plus_button = ttk.Button(self.text_size_frame, text="A+", width=3, command=self.increase_text_size)
         self.text_size_plus_button.grid(row=0, column=2, sticky="ew")
+=======
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
         self.safety_label = ttk.Label(header, text=self.tr("safety_warning"), style="Warning.TLabel", wraplength=760)
         if bool(self.config.get("show_safety_warnings", True)):
             self.safety_label.grid(row=1, column=0, sticky="ew", pady=(8, 0))
@@ -1105,6 +1126,10 @@ class OfflineLanGamesHelper:
             ("controller_tools", "Controller Tools", "Input Isolation"),
             ("backup_tools", "Backups", "Backups"),
             ("troubleshooting", "Troubleshooting", "Troubleshooting"),
+<<<<<<< HEAD
+=======
+            ("core", "Settings", "Settings"),
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
             ("support", "Support", "Support"),
             ("core", "Privacy", "Privacy"),
         ]
@@ -1137,8 +1162,12 @@ class OfflineLanGamesHelper:
         self.add_input_isolation_tab()
         self.add_input_isolation_setup_tab()
         self.troubleshooting_text = self.add_text_tab("Troubleshooting")
+<<<<<<< HEAD
         # Settings is intentionally not added to the main game/tool menu.
         # It opens in its own resizable window from the fixed header button.
+=======
+        self.add_settings_tab()
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
         self.add_support_tab()
         self.privacy_text = self.add_text_tab("Privacy")
         self.tool_tab_map = {
@@ -1206,6 +1235,7 @@ class OfflineLanGamesHelper:
         frame.grid_columnconfigure(0, weight=1)
         frame.grid_rowconfigure(1, weight=1)
         ttk.Label(frame, text="Home", font=self.scaled_font(16, "bold")).grid(row=0, column=0, sticky="w")
+<<<<<<< HEAD
         home_body = ttk.Frame(frame)
         home_body.grid(row=1, column=0, sticky="nsew", pady=(8, 0))
         home_body.grid_columnconfigure(0, weight=1)
@@ -1215,6 +1245,10 @@ class OfflineLanGamesHelper:
         self.home_scroll = ttk.Scrollbar(home_body, orient="vertical", command=self.home_text.yview)
         self.home_scroll.grid(row=0, column=1, sticky="ns")
         self.home_text.configure(yscrollcommand=self.home_scroll.set)
+=======
+        self.home_text = tk.Text(frame, wrap=tk.WORD, height=16)
+        self.home_text.grid(row=1, column=0, sticky="nsew", pady=(8, 0))
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
         self.style_text_widget(self.home_text, height=16)
         self.home_text.configure(state=tk.DISABLED)
         self.tabs.add(frame, text="Home")
@@ -1298,13 +1332,18 @@ class OfflineLanGamesHelper:
         right = ttk.Frame(frame, padding=(8, 8, 0, 0))
         right.grid(row=1, column=1, rowspan=2, sticky="nsew")
         right.grid_columnconfigure(0, weight=1)
+<<<<<<< HEAD
         right.grid_rowconfigure(3, weight=1)
+=======
+        right.grid_rowconfigure(2, weight=1)
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
         self.games_page_title = ttk.Label(right, text="Selected game details", font=self.scaled_font(14, "bold"))
         self.games_page_title.grid(row=0, column=0, sticky="w")
         self.game_actions_frame = ttk.LabelFrame(right, text=self.tr("actions"), padding=6)
         self.game_actions_frame.grid(row=1, column=0, sticky="ew", pady=(8, 8))
         for column in range(8):
             self.game_actions_frame.grid_columnconfigure(column, weight=1, uniform="actions")
+<<<<<<< HEAD
 
         self.game_loading_frame = ttk.Frame(right)
         self.game_loading_frame.grid(row=2, column=0, sticky="ew", pady=(0, 8))
@@ -1317,6 +1356,10 @@ class OfflineLanGamesHelper:
 
         self.games_detail_text = tk.Text(right, wrap=tk.WORD)
         self.games_detail_text.grid(row=3, column=0, sticky="nsew")
+=======
+        self.games_detail_text = tk.Text(right, wrap=tk.WORD)
+        self.games_detail_text.grid(row=2, column=0, sticky="nsew")
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
         self.style_text_widget(self.games_detail_text, height=24)
         self.games_detail_text.configure(state=tk.DISABLED)
 
@@ -1720,9 +1763,14 @@ class OfflineLanGamesHelper:
         self.tabs.add(frame, text="Input Isolation Setup")
         self.tab_widgets["Input Isolation Setup"] = frame
 
+<<<<<<< HEAD
     def add_settings_tab(self, parent: tk.Widget | None = None) -> None:
         container = parent if parent is not None else self.tabs
         frame = ttk.Frame(container, padding=12)
+=======
+    def add_settings_tab(self) -> None:
+        frame = ttk.Frame(self.tabs, padding=12)
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
         frame.grid_columnconfigure(0, weight=1)
         frame.grid_rowconfigure(1, weight=1)
 
@@ -1767,8 +1815,11 @@ class OfflineLanGamesHelper:
         self.ui_scale_combo = ttk.Combobox(appearance, textvariable=self.ui_scale_var, values=UI_SCALE_VALUES, state="readonly")
         self.ui_scale_combo.grid(row=2, column=1, sticky="ew", pady=4)
         self.ui_scale_combo.bind("<<ComboboxSelected>>", lambda _event: self.change_ui_scale())
+<<<<<<< HEAD
         self.ui_scale_value_label = ttk.Label(appearance, text=f"Current: {self.ui_scale}", style="Muted.TLabel")
         self.ui_scale_value_label.grid(row=2, column=2, sticky="w", padx=(8, 0), pady=4)
+=======
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
         self.show_safety_var = tk.BooleanVar(value=bool(self.config.get("show_safety_warnings", True)))
         self.remember_game_var = tk.BooleanVar(value=bool(self.config.get("remember_last_selected_game", True)))
         self.compact_mode_var = tk.BooleanVar(value=bool(self.config.get("compact_mode", False)))
@@ -1919,11 +1970,16 @@ class OfflineLanGamesHelper:
 
         self.settings_status_var = tk.StringVar(value=self.tr("status_ready"))
         ttk.Label(frame, textvariable=self.settings_status_var, style="Success.TLabel").grid(row=2, column=0, sticky="ew", pady=(8, 0))
+<<<<<<< HEAD
         if parent is None:
             self.tabs.add(frame, text="Settings")
             self.tab_widgets["Settings"] = frame
         else:
             frame.grid(row=0, column=0, sticky="nsew")
+=======
+        self.tabs.add(frame, text="Settings")
+        self.tab_widgets["Settings"] = frame
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
 
     def add_support_tab(self) -> None:
         frame = ttk.Frame(self.tabs, padding=10)
@@ -1956,6 +2012,7 @@ class OfflineLanGamesHelper:
         self.server_buttons[text] = button
 
     def show_settings(self) -> None:
+<<<<<<< HEAD
         """Open Settings in a separate window instead of the game/tool menu."""
         if self.settings_window is not None and self.settings_window.winfo_exists():
             self.settings_window.lift()
@@ -1982,6 +2039,9 @@ class OfflineLanGamesHelper:
         if self.settings_window is not None and self.settings_window.winfo_exists():
             self.settings_window.destroy()
         self.settings_window = None
+=======
+        self.show_page("Settings")
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
 
     def filter_display_values(self) -> list[str]:
         return [self.filter_label_for_key(filter_id) for filter_id in GAME_FILTER_IDS]
@@ -2216,6 +2276,7 @@ class OfflineLanGamesHelper:
             self.save_tool_settings()
             self.log("Suggested unused tools hidden.")
 
+<<<<<<< HEAD
     def set_ui_scale_value(self, value: str) -> None:
         if value not in UI_SCALE_VALUES:
             return
@@ -2223,11 +2284,17 @@ class OfflineLanGamesHelper:
         self.config["ui_scale"] = self.ui_scale
         if hasattr(self, "ui_scale_var"):
             self.ui_scale_var.set(self.ui_scale)
+=======
+    def change_ui_scale(self) -> None:
+        self.ui_scale = self.ui_scale_var.get() if self.ui_scale_var.get() in UI_SCALE_VALUES else "100%"
+        self.config["ui_scale"] = self.ui_scale
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
         save_json_file(CONFIG_FILE, self.config)
         self.configure_style()
         self.refresh_scaled_fonts()
         self.apply_theme_to_widgets()
         self.apply_language()
+<<<<<<< HEAD
         self.update_text_size_labels()
         self.update_home_tab()
         self.log(f"Text size changed to {self.ui_scale}.")
@@ -2251,6 +2318,9 @@ class OfflineLanGamesHelper:
     def change_ui_scale(self) -> None:
         value = self.ui_scale_var.get() if self.ui_scale_var.get() in UI_SCALE_VALUES else "100%"
         self.set_ui_scale_value(value)
+=======
+        self.log(f"UI scale changed to {self.ui_scale}.")
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
 
     def refresh_scaled_fonts(self) -> None:
         if hasattr(self, "title_label"):
@@ -2261,6 +2331,7 @@ class OfflineLanGamesHelper:
             self.settings_title_label.configure(font=self.scaled_font(16, "bold"))
         if hasattr(self, "tool_manager_label"):
             self.tool_manager_label.configure(font=self.scaled_font(13, "bold"))
+<<<<<<< HEAD
         if hasattr(self, "text_size_status_label"):
             self.text_size_status_label.configure(font=self.scaled_font(10, "bold"))
         for widget in getattr(self, "text_widgets", []):
@@ -2268,6 +2339,8 @@ class OfflineLanGamesHelper:
                 widget.configure(font=self.scaled_font(11))
             except tk.TclError:
                 pass
+=======
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
 
     def change_default_filter_setting(self) -> None:
         filter_key = self.filter_key_from_label(self.settings_filter_var.get())
@@ -2615,7 +2688,11 @@ class OfflineLanGamesHelper:
             self.game_status_var.set(self.catalog_load_error)
         elif not self.games and hasattr(self, "game_status_var"):
             self.game_status_var.set(self.tr("no_games_found"))
+<<<<<<< HEAD
         self.apply_filter(select_first=False)
+=======
+        self.apply_filter(select_first=True)
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
 
     def apply_filter(self, select_first: bool = False) -> None:
         query = self.search_var.get().strip().lower()
@@ -2653,6 +2730,7 @@ class OfflineLanGamesHelper:
             return
         if hasattr(self, "game_status_var") and not (filter_key == "installed" and not any(self.installed_cache.values())):
             self.game_status_var.set(f"{len(self.filtered_games)} games shown.")
+<<<<<<< HEAD
         target_name = previous
         if select_first:
             remembered = self.config.get("last_selected_game") if self.config.get("remember_last_selected_game", True) else ""
@@ -2669,6 +2747,18 @@ class OfflineLanGamesHelper:
         self.selected_game_data = None
         self.games_page_title.configure(text="Selected game details")
         self.render_games_page_details()
+=======
+        index = 0
+        remembered = self.config.get("last_selected_game") if self.config.get("remember_last_selected_game", True) else ""
+        target_name = remembered if select_first and remembered else previous
+        if target_name:
+            for i, game in enumerate(self.filtered_games):
+                if game["name"] == target_name:
+                    index = i
+                    break
+        self.game_list.selection_set(index)
+        self.on_game_selected()
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
 
     def selected_game(self) -> dict[str, Any] | None:
         selection = self.game_list.curselection()
@@ -2680,6 +2770,7 @@ class OfflineLanGamesHelper:
         game = self.selected_game()
         if not game:
             return
+<<<<<<< HEAD
         if self.current_game and self.current_game.get("name") == game.get("name") and not self.game_loading_active:
             return
         # Show a real loading state before the heavier detail/update work runs.
@@ -2737,6 +2828,20 @@ class OfflineLanGamesHelper:
         if hasattr(self, "game_status_var") and self.current_game:
             self.game_status_var.set(self.tr("game_details_ready"))
 
+=======
+        if self.current_game and self.current_game.get("name") == game.get("name"):
+            return
+        self.current_game = game
+        self.selected_game_data = game
+        if self.config.get("remember_last_selected_game", True):
+            self.config["last_selected_game"] = game["name"]
+            save_json_file(CONFIG_FILE, self.config)
+        self.current_path = self.config.get("paths", {}).get(game["name"]) or None
+        self.current_server_path = self.config.get("server_paths", {}).get(game["name"]) or None
+        self.update_all_tabs()
+        self.log(f"Selected game: {game['name']}")
+
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
     def selected_ip(self) -> str:
         selected = self.ip_combo.get().strip()
         return selected.split(" - ", 1)[0] if selected else self.main_ip
@@ -2784,15 +2889,19 @@ class OfflineLanGamesHelper:
         self.render_games_page_details()
 
     def update_home_tab(self) -> None:
+<<<<<<< HEAD
         game_name = self.current_game["name"] if self.current_game else "none"
         port = self.port_var.get() if hasattr(self, "port_var") else ""
         join_address = f"{self.main_ip}:{port}" if self.main_ip and port else (self.main_ip or "not ready")
         visible_games = len(getattr(self, "filtered_games", []) or [])
         total_games = len(getattr(self, "games", []) or [])
+=======
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
         lines = [
             "Offline LAN Games Helper",
             "Created by KiwiLiu",
             "",
+<<<<<<< HEAD
             "SESSION SUMMARY",
             f"- Selected game: {game_name}",
             f"- Primary LAN IPv4: {self.main_ip or 'not detected'}",
@@ -2816,17 +2925,36 @@ class OfflineLanGamesHelper:
             "SAFETY",
             "- No DRM bypass, launcher bypass, authentication bypass, anti-cheat bypass, or online-service bypass.",
             "- No game file modification or unofficial server files.",
+=======
+            f"Selected game: {self.current_game['name'] if self.current_game else 'none'}",
+            f"Primary LAN IPv4: {self.main_ip or 'not detected'}",
+            "",
+            "Quick actions:",
+            "- Use Games to choose a title and launch details.",
+            "- Use Invite for short connection info only.",
+            "- Use Refresh Installed Detection when needed.",
+            "",
+            "Safety:",
+            "- No DRM bypass, launcher bypass, authentication bypass, anti-cheat bypass, or online-service bypass.",
+            "- No game file modification.",
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
         ]
         self.set_text(self.home_text, "\n".join(lines))
 
     def render_games_page_details(self) -> None:
         if not getattr(self, "games_detail_text", None):
             return
+<<<<<<< HEAD
         if getattr(self, "game_loading_active", False):
             return
         game = self.current_game
         if not game:
             self.set_text(self.games_detail_text, "Select a game to view LAN/offline setup details.")
+=======
+        game = self.current_game
+        if not game:
+            self.set_text(self.games_detail_text, "No game selected.")
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
             return
         cache_key = (game["name"], "static")
         cached = self.game_detail_cache.get(cache_key)

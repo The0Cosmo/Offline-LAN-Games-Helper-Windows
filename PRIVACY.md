@@ -105,6 +105,7 @@ This project is not affiliated with Steam, Valve, Paradox, Epic Games, Rockstar,
 
 For privacy questions, contact:
 KiwiLiu (GitHub: The0Cosmo).
+<<<<<<< HEAD
 
 ## Optimized Game Loading
 
@@ -121,3 +122,5 @@ The app may save the selected text size, theme, and other interface preferences 
 ## Local Loading Cache
 
 The app may cache selected game details locally in memory while the app is open so repeated selections load faster. This cache is not uploaded and is cleared when the app closes.
+=======
+>>>>>>> 006433c3536e32fe625d29e38a5463c97e812a79
