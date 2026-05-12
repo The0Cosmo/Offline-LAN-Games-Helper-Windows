@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+build/
+dist/
+*.spec
+user_config.json
+exported_guides/
+logs/
+.DS_Store
+Thumbs.db
+.aider*

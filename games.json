@@ -1,0 +1,3190 @@
+[
+  {
+    "name": "Hearts of Iron IV",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Host lobby. No official headless dedicated server.",
+    "exe_names": [
+      "hoi4.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV\\hoi4.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Hearts of Iron IV\\hoi4.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Hearts of Iron IV"
+    ],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "1630-1641"
+      },
+      {
+        "protocol": "UDP",
+        "range": "1630-1641"
+      }
+    ],
+    "host_tutorial": [
+      "Launch HOI4 normally.",
+      "Go to Multiplayer -> Host.",
+      "Stay in the lobby. The host player lobby is the LAN host."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Launch HOI4 normally.",
+      "Use Multiplayer -> Scan LAN / Refresh LAN.",
+      "Server ID is not the same as LAN IP and may require Paradox online services.",
+      "If supported by your installed version, try console/direct connect: connect HOST_LAN_IP."
+    ],
+    "offline_notes": [
+      "HOI4 has no official headless dedicated server.",
+      "All players need the same game version, checksum, mods, and compatible DLC setup.",
+      "The official launcher may be required to start legitimate installed copies; this helper does not bypass it."
+    ],
+    "troubleshooting": [
+      "Make sure the host is already inside the multiplayer lobby before clients scan LAN.",
+      "Verify all players have the same checksum.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "Launches hoi4.exe normally. No launcher, DRM, or game-file bypass is performed."
+    ],
+    "server_support": "in_game_host",
+    "server_notes": [
+      "This game does not have a supported dedicated server tool. Host from inside the game instead."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Launch the game and host from Multiplayer -> Host."
+    ],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [],
+    "official_download_url": ""
+  },
+  {
+    "name": "Terraria",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported. Host & Play or official TerrariaServer.exe.",
+    "exe_names": [
+      "Terraria.exe",
+      "TerrariaServer.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Terraria\\Terraria.exe",
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Terraria\\TerrariaServer.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Terraria\\Terraria.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Terraria\\TerrariaServer.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Terraria"
+    ],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "7777"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Terraria normally.",
+      "Use Multiplayer -> Host & Play, or select TerrariaServer.exe manually if hosting with the official server.",
+      "Tell clients the host LAN IP and configured port."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use Multiplayer -> Join via IP.",
+      "Enter HOST_LAN_IP and the configured port, commonly 7777."
+    ],
+    "offline_notes": [
+      "Terraria can host from the game or through the official server executable.",
+      "The default server port is commonly 7777, but it can be changed.",
+      "Use the same game/mod version when mods are involved."
+    ],
+    "troubleshooting": [
+      "Verify the server is running before clients connect.",
+      "Verify the server port matches the firewall rule.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "For Host & Play, launch Terraria.exe.",
+      "For a dedicated local server, select TerrariaServer.exe."
+    ],
+    "server_support": "official_dedicated",
+    "server_notes": [
+      "TerrariaServer.exe is included with many legitimate Terraria installs.",
+      "Select TerrariaServer.exe if it is not detected automatically."
+    ],
+    "server_files": [
+      "TerrariaServer.exe"
+    ],
+    "steamcmd_app_id": "",
+    "server_executable_names": [
+      "TerrariaServer.exe"
+    ],
+    "server_common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Terraria\\TerrariaServer.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Terraria\\TerrariaServer.exe"
+    ],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Install Terraria legally.",
+      "Use the included TerrariaServer.exe or select it manually."
+    ],
+    "server_launch_command_windows": "TerrariaServer.exe",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "TCP",
+        "range": "7777"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Stardew Valley",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported where the installed version exposes LAN/IP co-op.",
+    "exe_names": [
+      "Stardew Valley.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Stardew Valley\\Stardew Valley.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Stardew Valley\\Stardew Valley.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Stardew Valley"
+    ],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "24642"
+      },
+      {
+        "protocol": "UDP",
+        "range": "24642"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Stardew Valley normally.",
+      "Use Co-op -> Host or the supported in-game host flow.",
+      "Start the farm in co-op mode.",
+      "Share the host LAN IP if your installed version supports LAN/IP join."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use the in-game Co-op join flow.",
+      "Use LAN/IP join only if your installed version exposes it."
+    ],
+    "offline_notes": [
+      "Some co-op flows may still use platform invites or online services.",
+      "This helper cannot make invite-code-only flows work offline.",
+      "Mods should match between players when used."
+    ],
+    "troubleshooting": [
+      "Verify the host farm is open for co-op.",
+      "Verify game versions and mods match.",
+      "Temporarily disable mods while testing LAN connectivity."
+    ],
+    "launch_notes": [
+      "Launches Stardew Valley normally. No mod loader or game files are changed."
+    ],
+    "server_support": "in_game_host",
+    "server_notes": [
+      "No separate supported dedicated server tool is configured here. Host from inside the game."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Use the in-game Co-op host flow."
+    ],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "TCP",
+        "range": "24642"
+      },
+      {
+        "protocol": "UDP",
+        "range": "24642"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Valheim",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Local server / host game. Official dedicated server tools exist separately.",
+    "exe_names": [
+      "valheim.exe",
+      "valheim_server.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim\\valheim.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Valheim\\valheim.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Valheim",
+      "Valheim dedicated server"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "2456-2458"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Valheim normally and start a local server from the game, or use official dedicated server tools if installed.",
+      "Add firewall rules for the selected executable and UDP port range.",
+      "Tell clients the host LAN IP and configured port."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use the server browser or direct-connect option if available.",
+      "Connect to HOST_LAN_IP and the configured port."
+    ],
+    "offline_notes": [
+      "Dedicated server setup is separate and must use official tools.",
+      "Ports can change if configured differently.",
+      "This helper does not install or modify Valheim server files."
+    ],
+    "troubleshooting": [
+      "Verify the server is listening on UDP 2456-2458 or your configured port.",
+      "Verify the selected executable matches the hosting method.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "For in-game hosting, launch valheim.exe.",
+      "For an official dedicated server, select valheim_server.exe."
+    ],
+    "server_support": "manual_files",
+    "server_notes": [
+      "Use official Valheim dedicated server files if already installed through Steam tools or SteamCMD.",
+      "This catalog does not include a SteamCMD app ID; select local official server files manually."
+    ],
+    "server_files": [
+      "valheim_server.exe"
+    ],
+    "steamcmd_app_id": "",
+    "server_executable_names": [
+      "valheim_server.exe"
+    ],
+    "server_common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Valheim dedicated server\\valheim_server.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Valheim dedicated server\\valheim_server.exe"
+    ],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Install the official Valheim dedicated server tool through Steam/SteamCMD.",
+      "Select valheim_server.exe in this app."
+    ],
+    "server_launch_command_windows": "valheim_server.exe",
+    "server_launch_command_macos": "",
+    "server_config_files": [
+      "start_headless_server.bat"
+    ],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "2456-2458"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Unturned",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Local server / supported server workflows.",
+    "exe_names": [
+      "Unturned.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Unturned\\Unturned.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Unturned\\Unturned.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Unturned"
+    ],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "27015"
+      },
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Unturned or the official server tool normally.",
+      "Use the game's supported host/server setup.",
+      "Confirm the configured server port.",
+      "Add firewall rules for the executable and port if clients cannot connect."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use the LAN/server browser or direct-connect option.",
+      "Connect to HOST_LAN_IP and the configured server port."
+    ],
+    "offline_notes": [
+      "Ports can vary by server configuration.",
+      "Select the actual server executable manually if hosting with a separate official server tool."
+    ],
+    "troubleshooting": [
+      "Check the server configuration for the actual port.",
+      "Verify the selected executable is the one accepting connections.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "Launches Unturned.exe normally unless you manually select an official server executable."
+    ],
+    "server_support": "manual_files",
+    "server_notes": [
+      "Use official Unturned server tools/files if installed. No SteamCMD app ID is bundled in this catalog."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [
+      "Unturned.exe"
+    ],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Install official server tools/files through supported channels.",
+      "Select the local server executable or folder."
+    ],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "TCP",
+        "range": "27015"
+      },
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Alien Swarm: Reactive Drop",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported through Source-engine local/listen server workflows.",
+    "exe_names": [
+      "reactivedrop.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Alien Swarm Reactive Drop\\reactivedrop.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Alien Swarm Reactive Drop\\reactivedrop.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Alien Swarm Reactive Drop"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the game normally.",
+      "Use the game's host/listen server or LAN server flow.",
+      "Share HOST_LAN_IP if direct connect is needed."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use the server browser/LAN tab if visible.",
+      "Use direct connect to HOST_LAN_IP if the game exposes it."
+    ],
+    "offline_notes": [
+      "Ports can vary by Source server configuration.",
+      "This helper does not modify launch options or game files."
+    ],
+    "troubleshooting": [
+      "Confirm the host server is running and visible on LAN.",
+      "Confirm the configured game port before adding custom rules.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "Launches reactivedrop.exe normally."
+    ],
+    "server_support": "in_game_host",
+    "server_notes": [
+      "Host from inside the game or use local Source server workflows you already have configured."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Host from inside the game."
+    ],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Hedgewars",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported through local network/server workflows.",
+    "exe_names": [
+      "hedgewars.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files\\Hedgewars\\hedgewars.exe",
+      "C:\\Program Files (x86)\\Hedgewars\\hedgewars.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Hedgewars"
+    ],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "46631"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Hedgewars normally.",
+      "Use the local network or server features provided by the game.",
+      "Share HOST_LAN_IP with clients if direct connection is needed."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use the game's network join/server browser feature.",
+      "Connect to HOST_LAN_IP if direct connection is used."
+    ],
+    "offline_notes": [
+      "Ports can vary by custom server setup.",
+      "Select the executable manually if installed outside common paths."
+    ],
+    "troubleshooting": [
+      "Verify the actual server/port used by your Hedgewars setup.",
+      "Verify host and clients are on the same LAN/VPN.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "Launches hedgewars.exe normally."
+    ],
+    "server_support": "in_game_host",
+    "server_notes": [
+      "Use the local network/server features provided by the game."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Host from inside the game."
+    ],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "TCP",
+        "range": "46631"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Soldat",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported through local multiplayer/server workflows.",
+    "exe_names": [
+      "Soldat.exe",
+      "soldat.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Soldat\\Soldat.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Soldat\\Soldat.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Soldat"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "23073"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Soldat or the official server tool normally.",
+      "Create a game/server using supported menus or configuration.",
+      "Confirm the configured server port."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use the server browser or direct-connect option.",
+      "Connect to HOST_LAN_IP and the configured port."
+    ],
+    "offline_notes": [
+      "Default ports can vary by server configuration.",
+      "Select the official server executable manually if needed."
+    ],
+    "troubleshooting": [
+      "Check the server config for the exact game port.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "Launches the selected Soldat executable normally."
+    ],
+    "server_support": "manual_files",
+    "server_notes": [
+      "Select official local Soldat server files if installed."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Install official Soldat server files from supported channels.",
+      "Select the local server executable."
+    ],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "23073"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Minecraft Java Edition",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported. Open to LAN or local dedicated server.",
+    "exe_names": [
+      "MinecraftLauncher.exe",
+      "Minecraft.exe",
+      "javaw.exe",
+      "java.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\XboxGames\\Minecraft Launcher\\Content\\Minecraft.exe",
+      "C:\\Program Files (x86)\\Minecraft Launcher\\MinecraftLauncher.exe",
+      "C:\\Program Files\\Minecraft Launcher\\MinecraftLauncher.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "25565"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Minecraft Java Edition through a legitimate launcher.",
+      "Open a single-player world.",
+      "Press Esc -> Open to LAN.",
+      "Note the port shown in chat."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Open Minecraft Java Edition with the same game version.",
+      "Check Multiplayer for the LAN world.",
+      "If it does not appear, use Direct Connect with HOST_LAN_IP:PORT_SHOWN_IN_HOST_CHAT."
+    ],
+    "offline_notes": [
+      "Open to LAN often uses a random port shown in chat.",
+      "Dedicated servers commonly use TCP 25565 unless configured differently.",
+      "All players need compatible game versions and compatible mods/mod loaders if used."
+    ],
+    "troubleshooting": [
+      "Verify the host world is opened to LAN.",
+      "Use the exact port printed by the host game.",
+      "Verify Java is allowed through Windows Firewall.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "This helper launches the legitimate Minecraft launcher or selected Java executable normally.",
+      "It does not bypass Microsoft/Mojang account checks."
+    ],
+    "server_support": "official_download_page",
+    "server_notes": [
+      "Official Java server jar is available from Mojang/Minecraft download pages.",
+      "Download manually from the official page and select the jar/server file if needed."
+    ],
+    "server_files": [
+      "server.jar"
+    ],
+    "steamcmd_app_id": "",
+    "server_executable_names": [
+      "server.jar"
+    ],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Open the official Minecraft server download page.",
+      "Download the official server jar.",
+      "Run it according to Mojang/Minecraft instructions and accept the EULA only if you agree."
+    ],
+    "server_launch_command_windows": "java -jar server.jar nogui",
+    "server_launch_command_macos": "",
+    "server_config_files": [
+      "server.properties",
+      "eula.txt"
+    ],
+    "server_ports": [
+      {
+        "protocol": "TCP",
+        "range": "25565"
+      }
+    ],
+    "official_download_url": "https://www.minecraft.net/en-us/download/server"
+  },
+  {
+    "name": "Minecraft Bedrock Edition",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported for local network worlds where enabled in-game.",
+    "exe_names": [],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [],
+    "launch_uri": "minecraft:",
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "19132-19133"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Minecraft Bedrock Edition normally.",
+      "Open or create a world.",
+      "Enable Multiplayer and Visible to LAN Players.",
+      "Start the world and keep it open."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Open Minecraft Bedrock Edition.",
+      "Go to Play -> Friends/LAN Games and select the host world if visible.",
+      "If your version supports direct server entry, use HOST_LAN_IP and the configured port."
+    ],
+    "offline_notes": [
+      "Bedrock behavior depends on version and account/platform settings.",
+      "This helper cannot bypass Microsoft account, store, or entitlement checks.",
+      "UDP 19132 is commonly used for Bedrock IPv4 LAN/server traffic."
+    ],
+    "troubleshooting": [
+      "Verify both devices are on the same LAN.",
+      "Verify LAN visibility is enabled in host world settings.",
+      "Verify Windows Firewall allows Minecraft Bedrock incoming local network traffic."
+    ],
+    "launch_notes": [
+      "Uses the safe minecraft: URI when no executable path is available.",
+      "No Microsoft Store or account checks are bypassed."
+    ],
+    "server_support": "official_download_page",
+    "server_notes": [
+      "Official Bedrock Dedicated Server for Windows is available from the official Minecraft download page.",
+      "Download manually from the official page and select the local server executable/folder."
+    ],
+    "server_files": [
+      "bedrock_server.exe"
+    ],
+    "steamcmd_app_id": "",
+    "server_executable_names": [
+      "bedrock_server.exe"
+    ],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Open the official Bedrock server download page.",
+      "Download and extract the official Windows server package.",
+      "Select bedrock_server.exe in this app."
+    ],
+    "server_launch_command_windows": "bedrock_server.exe",
+    "server_launch_command_macos": "",
+    "server_config_files": [
+      "server.properties"
+    ],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "19132-19133"
+      }
+    ],
+    "official_download_url": "https://www.minecraft.net/en-us/download/server/bedrock"
+  },
+  {
+    "name": "Factorio",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported. Multiplayer host or local/headless server.",
+    "exe_names": [
+      "factorio.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Factorio"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "34197"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Factorio normally.",
+      "Use Multiplayer -> Host new game or host a saved game.",
+      "Choose LAN visibility/options as needed.",
+      "Share HOST_LAN_IP with clients if direct connect is needed."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use Multiplayer -> Browse LAN games, or connect to HOST_LAN_IP.",
+      "Use the configured server port if it is not the default."
+    ],
+    "offline_notes": [
+      "Factorio commonly uses UDP 34197.",
+      "All players need compatible versions and mods."
+    ],
+    "troubleshooting": [
+      "Verify mod lists match exactly.",
+      "Verify the server is visible on LAN or direct connect uses the correct IP.",
+      "Verify UDP 34197 or the configured port is allowed."
+    ],
+    "launch_notes": [
+      "Launches factorio.exe normally."
+    ],
+    "server_support": "official_download_page",
+    "server_notes": [
+      "Use official Factorio downloads or local installed files for headless server setup.",
+      "This app opens the official download page but does not download unofficial files."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [
+      "factorio.exe"
+    ],
+    "server_common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe"
+    ],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Open the official Factorio download page.",
+      "Use the official headless/server instructions for your license and platform.",
+      "Select local server files in this app if needed."
+    ],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [
+      "server-settings.json"
+    ],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "34197"
+      }
+    ],
+    "official_download_url": "https://www.factorio.com/download"
+  },
+  {
+    "name": "Project Zomboid",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported. Host game or local dedicated server.",
+    "exe_names": [
+      "ProjectZomboid64.exe",
+      "ProjectZomboid32.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\ProjectZomboid\\ProjectZomboid64.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\ProjectZomboid\\ProjectZomboid64.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "ProjectZomboid"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "16261"
+      },
+      {
+        "protocol": "UDP",
+        "range": "16262-16272"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Project Zomboid normally.",
+      "Use Host from the main menu, or use official local server scripts if configured.",
+      "Start the server/world and wait until it is fully loaded.",
+      "Share HOST_LAN_IP and the server port with clients."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use Join and add a server entry with HOST_LAN_IP.",
+      "Use the configured server port, commonly 16261."
+    ],
+    "offline_notes": [
+      "Project Zomboid server ports can vary with configuration.",
+      "Mods and game versions should match."
+    ],
+    "troubleshooting": [
+      "Verify the server finished loading before clients join.",
+      "Verify UDP 16261 and player ports are allowed.",
+      "Temporarily disable mods while testing."
+    ],
+    "launch_notes": [
+      "Launches Project Zomboid normally. Official server scripts can be selected manually if needed."
+    ],
+    "server_support": "manual_files",
+    "server_notes": [
+      "Use official local server scripts/files from your legitimate install. No SteamCMD app ID is bundled in this catalog."
+    ],
+    "server_files": [
+      "StartServer64.bat"
+    ],
+    "steamcmd_app_id": "",
+    "server_executable_names": [
+      "StartServer64.bat",
+      "ProjectZomboid64.exe"
+    ],
+    "server_common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\ProjectZomboid\\StartServer64.bat",
+      "C:\\Program Files\\Steam\\steamapps\\common\\ProjectZomboid\\StartServer64.bat"
+    ],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Install Project Zomboid legally.",
+      "Use the included official local server scripts or select them manually."
+    ],
+    "server_launch_command_windows": "StartServer64.bat",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "16261"
+      },
+      {
+        "protocol": "UDP",
+        "range": "16262-16272"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Garry's Mod",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported. Local listen server or dedicated Source server.",
+    "exe_names": [
+      "gmod.exe",
+      "srcds.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\GarrysMod\\gmod.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\GarrysMod\\gmod.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "GarrysMod",
+      "Garry's Mod"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      },
+      {
+        "protocol": "TCP",
+        "range": "27015"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Garry's Mod normally.",
+      "Start a new game/server from the menu.",
+      "Use LAN/local server settings where available.",
+      "Share HOST_LAN_IP with clients if direct connect is needed."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use the LAN server browser or direct connect.",
+      "If using console direct connect, connect to HOST_LAN_IP:PORT."
+    ],
+    "offline_notes": [
+      "Source server ports can vary by configuration.",
+      "Addons/content should be compatible between players."
+    ],
+    "troubleshooting": [
+      "Verify the server is running and set for LAN/local use.",
+      "Verify the configured port is allowed.",
+      "Disable conflicting addons while testing."
+    ],
+    "launch_notes": [
+      "Launches gmod.exe normally. srcds.exe can be selected manually if installed."
+    ],
+    "server_support": "manual_files",
+    "server_notes": [
+      "Use official Source dedicated server files if already installed. No SteamCMD app ID is bundled in this catalog."
+    ],
+    "server_files": [
+      "srcds.exe"
+    ],
+    "steamcmd_app_id": "",
+    "server_executable_names": [
+      "srcds.exe"
+    ],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Install official server files through supported channels.",
+      "Select srcds.exe manually."
+    ],
+    "server_launch_command_windows": "srcds.exe",
+    "server_launch_command_macos": "",
+    "server_config_files": [
+      "server.cfg"
+    ],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      },
+      {
+        "protocol": "TCP",
+        "range": "27015"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Left 4 Dead 2",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported through Source local/LAN server workflows.",
+    "exe_names": [
+      "left4dead2.exe",
+      "srcds.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Left 4 Dead 2\\left4dead2.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Left 4 Dead 2\\left4dead2.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Left 4 Dead 2"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      },
+      {
+        "protocol": "TCP",
+        "range": "27015"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Left 4 Dead 2 normally.",
+      "Use supported local/listen server workflows.",
+      "Share HOST_LAN_IP and port with clients."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use the LAN server browser if visible.",
+      "If direct connect is available, connect to HOST_LAN_IP:PORT."
+    ],
+    "offline_notes": [
+      "Source server ports can vary by configuration.",
+      "This helper does not modify game files or launch options."
+    ],
+    "troubleshooting": [
+      "Verify the local server is running before clients connect.",
+      "Verify UDP/TCP 27015 or the configured port is allowed.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "Launches left4dead2.exe normally."
+    ],
+    "server_support": "manual_files",
+    "server_notes": [
+      "Use official Source dedicated server files if already installed. No SteamCMD app ID is bundled in this catalog."
+    ],
+    "server_files": [
+      "srcds.exe"
+    ],
+    "steamcmd_app_id": "",
+    "server_executable_names": [
+      "srcds.exe"
+    ],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Install official server files through supported channels.",
+      "Select srcds.exe manually."
+    ],
+    "server_launch_command_windows": "srcds.exe",
+    "server_launch_command_macos": "",
+    "server_config_files": [
+      "server.cfg"
+    ],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      },
+      {
+        "protocol": "TCP",
+        "range": "27015"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Counter-Strike: Source",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported through Source local/LAN server workflows.",
+    "exe_names": [
+      "hl2.exe",
+      "srcds.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Counter-Strike Source\\hl2.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Counter-Strike Source\\hl2.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Counter-Strike Source"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      },
+      {
+        "protocol": "TCP",
+        "range": "27015"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Counter-Strike: Source normally.",
+      "Create a local server from the game or use official Source dedicated server files if installed.",
+      "Use LAN/local settings for private LAN play.",
+      "Share HOST_LAN_IP and port with clients."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use the LAN server browser or direct connect.",
+      "Connect to HOST_LAN_IP:PORT if direct connect is used."
+    ],
+    "offline_notes": [
+      "This helper only lists confirmed LAN/local options.",
+      "Source server ports can vary by configuration."
+    ],
+    "troubleshooting": [
+      "Verify the server is running and listening on the configured port.",
+      "Verify UDP/TCP 27015 or your configured port is allowed.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "Launches hl2.exe normally. srcds.exe can be selected manually if installed."
+    ],
+    "server_support": "manual_files",
+    "server_notes": [
+      "Use official Source dedicated server files if already installed. No SteamCMD app ID is bundled in this catalog."
+    ],
+    "server_files": [
+      "srcds.exe"
+    ],
+    "steamcmd_app_id": "",
+    "server_executable_names": [
+      "srcds.exe"
+    ],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Install official server files through supported channels.",
+      "Select srcds.exe manually."
+    ],
+    "server_launch_command_windows": "srcds.exe",
+    "server_launch_command_macos": "",
+    "server_config_files": [
+      "server.cfg"
+    ],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      },
+      {
+        "protocol": "TCP",
+        "range": "27015"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "OpenTTD",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported. Local/LAN multiplayer server.",
+    "exe_names": [
+      "openttd.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files\\OpenTTD\\openttd.exe",
+      "C:\\Program Files (x86)\\OpenTTD\\openttd.exe",
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\OpenTTD\\openttd.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\OpenTTD\\openttd.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "OpenTTD"
+    ],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "3979"
+      },
+      {
+        "protocol": "UDP",
+        "range": "3979"
+      }
+    ],
+    "host_tutorial": [
+      "Launch OpenTTD normally.",
+      "Start or load a game and host it for multiplayer/LAN.",
+      "Share HOST_LAN_IP and the configured server port."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use Multiplayer and find the LAN server or enter HOST_LAN_IP.",
+      "Use the configured port if it is not the default."
+    ],
+    "offline_notes": [
+      "Default OpenTTD server port is commonly 3979.",
+      "Game scripts/content should match when required."
+    ],
+    "troubleshooting": [
+      "Verify the game is hosted as a multiplayer server.",
+      "Verify TCP/UDP 3979 or your configured port is allowed.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "Launches openttd.exe normally."
+    ],
+    "server_support": "official_dedicated",
+    "server_notes": [
+      "OpenTTD can run local multiplayer/server workflows from the installed executable."
+    ],
+    "server_files": [
+      "openttd.exe"
+    ],
+    "steamcmd_app_id": "",
+    "server_executable_names": [
+      "openttd.exe"
+    ],
+    "server_common_paths_windows": [
+      "C:\\Program Files\\OpenTTD\\openttd.exe",
+      "C:\\Program Files (x86)\\OpenTTD\\openttd.exe"
+    ],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Install OpenTTD from official or supported sources.",
+      "Select openttd.exe if not detected."
+    ],
+    "server_launch_command_windows": "openttd.exe -D",
+    "server_launch_command_macos": "",
+    "server_config_files": [
+      "openttd.cfg"
+    ],
+    "server_ports": [
+      {
+        "protocol": "TCP",
+        "range": "3979"
+      },
+      {
+        "protocol": "UDP",
+        "range": "3979"
+      }
+    ],
+    "official_download_url": "https://www.openttd.org/downloads/openttd-releases/latest"
+  },
+  {
+    "name": "Teeworlds",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported. Local server / LAN browser.",
+    "exe_names": [
+      "teeworlds.exe",
+      "teeworlds_srv.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Teeworlds\\teeworlds.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Teeworlds\\teeworlds.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Teeworlds"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "8303"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Teeworlds normally or run the official server executable if installed.",
+      "Start a local server.",
+      "Share HOST_LAN_IP and port with clients."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use the LAN server browser or direct connect to HOST_LAN_IP:PORT."
+    ],
+    "offline_notes": [
+      "Default port is commonly UDP 8303.",
+      "Server configuration can change the port."
+    ],
+    "troubleshooting": [
+      "Verify the server executable is running.",
+      "Verify UDP 8303 or the configured port is allowed.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "Launches the selected Teeworlds executable normally."
+    ],
+    "server_support": "manual_files",
+    "server_notes": [
+      "Use official Teeworlds server files if installed locally."
+    ],
+    "server_files": [
+      "teeworlds_srv.exe"
+    ],
+    "steamcmd_app_id": "",
+    "server_executable_names": [
+      "teeworlds_srv.exe"
+    ],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Install official Teeworlds files from supported sources.",
+      "Select teeworlds_srv.exe manually."
+    ],
+    "server_launch_command_windows": "teeworlds_srv.exe",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "8303"
+      }
+    ],
+    "official_download_url": "https://www.teeworlds.com/"
+  },
+  {
+    "name": "Xonotic",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported. Local/LAN server.",
+    "exe_names": [
+      "xonotic.exe",
+      "xonotic-dedicated.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files\\Xonotic\\xonotic.exe",
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Xonotic\\xonotic.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Xonotic\\xonotic.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Xonotic"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "26000"
+      }
+    ],
+    "host_tutorial": [
+      "Launch Xonotic normally or use the official dedicated executable if installed.",
+      "Create a local/LAN server from the game or server config.",
+      "Share HOST_LAN_IP and port with clients."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use the LAN server browser or direct connect to HOST_LAN_IP:PORT."
+    ],
+    "offline_notes": [
+      "Default port is commonly UDP 26000.",
+      "Server configuration can change the port."
+    ],
+    "troubleshooting": [
+      "Verify the server is listening on the configured port.",
+      "Verify UDP 26000 or your configured port is allowed.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "Launches xonotic.exe normally. Dedicated executable can be selected manually."
+    ],
+    "server_support": "manual_files",
+    "server_notes": [
+      "Use official Xonotic local server files if installed."
+    ],
+    "server_files": [
+      "xonotic-dedicated.exe"
+    ],
+    "steamcmd_app_id": "",
+    "server_executable_names": [
+      "xonotic-dedicated.exe"
+    ],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Install official Xonotic files from supported sources.",
+      "Select xonotic-dedicated.exe manually if needed."
+    ],
+    "server_launch_command_windows": "xonotic-dedicated.exe",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "26000"
+      }
+    ],
+    "official_download_url": "https://xonotic.org/download/"
+  },
+  {
+    "name": "0 A.D.",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported. Local network multiplayer.",
+    "exe_names": [
+      "pyrogenesis.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files\\0 A.D. alpha\\binaries\\system\\pyrogenesis.exe",
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\0 A.D.\\binaries\\system\\pyrogenesis.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\0 A.D.\\binaries\\system\\pyrogenesis.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "0 A.D."
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "20595"
+      }
+    ],
+    "host_tutorial": [
+      "Launch 0 A.D. normally.",
+      "Use Multiplayer -> Host Game for a local network game.",
+      "Share HOST_LAN_IP and the configured port with clients."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Use Multiplayer -> Join Game.",
+      "Enter HOST_LAN_IP if the LAN game is not discovered automatically."
+    ],
+    "offline_notes": [
+      "Default multiplayer port is commonly UDP 20595.",
+      "All players should use compatible game versions and mods."
+    ],
+    "troubleshooting": [
+      "Verify the host game is waiting in the lobby.",
+      "Verify UDP 20595 or the configured port is allowed.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "Launches pyrogenesis.exe normally."
+    ],
+    "server_support": "in_game_host",
+    "server_notes": [
+      "No separate supported dedicated server tool is configured. Host from inside the game."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Host from Multiplayer -> Host Game."
+    ],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "20595"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Civilization V",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "Supported. LAN multiplayer from the game menus.",
+    "exe_names": [
+      "CivilizationV.exe",
+      "CivilizationV_DX11.exe"
+    ],
+    "common_paths_windows": [
+      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Sid Meier's Civilization V\\CivilizationV_DX11.exe",
+      "C:\\Program Files\\Steam\\steamapps\\common\\Sid Meier's Civilization V\\CivilizationV_DX11.exe"
+    ],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Sid Meier's Civilization V"
+    ],
+    "ports": [],
+    "host_tutorial": [
+      "Launch Civilization V normally.",
+      "Use Multiplayer -> Local Network/LAN where available.",
+      "Create the game and stay in the lobby until clients join."
+    ],
+    "client_tutorial": [
+      "Join the same LAN or VPN LAN.",
+      "Open Civilization V with the same game version/DLC/mod setup.",
+      "Use Multiplayer -> Local Network/LAN and join the host lobby."
+    ],
+    "offline_notes": [
+      "Civilization V LAN depends on matching game version, DLC, and mods.",
+      "No dedicated server is created by this helper."
+    ],
+    "troubleshooting": [
+      "Verify all players have matching DLC/mod settings.",
+      "Verify the host lobby is open before clients search.",
+      "Verify host and clients can ping each other."
+    ],
+    "launch_notes": [
+      "Launches the selected Civilization V executable normally."
+    ],
+    "server_support": "in_game_host",
+    "server_notes": [
+      "No supported dedicated server tool is configured. Host from inside the game."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [
+      "Use the in-game LAN lobby."
+    ],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [],
+    "official_download_url": ""
+  },
+  {
+    "name": "Don’t Starve Together",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "dontstarve_steam.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Don't Starve Together"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "10999"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "10999"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Core Keeper",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "CoreKeeper.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Core Keeper"
+    ],
+    "ports": [],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "in_game_host",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [],
+    "official_download_url": ""
+  },
+  {
+    "name": "Barotrauma",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "Barotrauma.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Barotrauma"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "The Forest",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "TheForest.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "The Forest"
+    ],
+    "ports": [],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "in_game_host",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [],
+    "official_download_url": ""
+  },
+  {
+    "name": "Sons of the Forest",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "SonsOfTheForest.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Sons Of The Forest"
+    ],
+    "ports": [],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [],
+    "official_download_url": ""
+  },
+  {
+    "name": "Garry’s Mod",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "gmod.exe",
+      "srcds.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "GarrysMod"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Sven Co-op",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "svencoop.exe",
+      "svends.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Sven Co-op"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Team Fortress 2",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "hl2.exe",
+      "srcds.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Team Fortress 2"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Use legitimate private/local server options only. Do not bypass VAC, accounts, or online services."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "27015"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Quake 3 Arena",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "quake3.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Quake 3 Arena"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "27960"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "27960"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "OpenArena",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "openarena.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "OpenArena"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "27960"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "in_game_host",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "27960"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "AssaultCube",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "ac_client.exe",
+      "ac_server.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "AssaultCube"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "28763"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "28763"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Minetest / Luanti",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "luanti.exe",
+      "minetest.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Minetest / Luanti"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "30000"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "30000"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Veloren",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "veloren-voxygen.exe",
+      "veloren-server-cli.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Veloren"
+    ],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "14004"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "TCP",
+        "range": "14004"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Vintage Story",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "Vintagestory.exe",
+      "VintagestoryServer.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Vintage Story"
+    ],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "42420"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "TCP",
+        "range": "42420"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "V Rising",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "VRising.exe",
+      "VRisingServer.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "V Rising"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "9876-9877"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "9876-9877"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Palworld",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "Palworld-Win64-Shipping.exe",
+      "PalServer.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Palworld"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "8211"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "8211"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Satisfactory",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "FactoryGameSteam.exe",
+      "FactoryServer.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Satisfactory"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "7777"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "7777"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Enshrouded",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "enshrouded.exe",
+      "enshrouded_server.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Enshrouded"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "15636-15637"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "15636-15637"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Starbound",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "starbound.exe",
+      "starbound_server.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Starbound"
+    ],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "21025"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "TCP",
+        "range": "21025"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Mindustry",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "Mindustry.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Mindustry"
+    ],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "6567"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "TCP",
+        "range": "6567"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "OpenRCT2",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "openrct2.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "OpenRCT2"
+    ],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "11753"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "in_game_host",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "TCP",
+        "range": "11753"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Warzone 2100",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "warzone2100.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Warzone 2100"
+    ],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "2100"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "in_game_host",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "TCP",
+        "range": "2100"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Armagetron Advanced",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "armagetronad.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Armagetron Advanced"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "4534"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "4534"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Cube 2: Sauerbraten",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "sauerbraten.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Cube 2: Sauerbraten"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "28785"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "28785"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Red Eclipse",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "redeclipse.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Red Eclipse"
+    ],
+    "ports": [
+      {
+        "protocol": "UDP",
+        "range": "28801"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "official",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "UDP",
+        "range": "28801"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "OpenRA",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "OpenRA.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "OpenRA"
+    ],
+    "ports": [
+      {
+        "protocol": "TCP",
+        "range": "1234"
+      }
+    ],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Requires a legitimate installed copy. Some features may need Steam/account login before offline or LAN play."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "in_game_host",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [
+      {
+        "protocol": "TCP",
+        "range": "1234"
+      }
+    ],
+    "official_download_url": ""
+  },
+  {
+    "name": "Zero-K",
+    "platforms": [
+      "Windows"
+    ],
+    "lan_status": "LAN/offline/private hosting supported where the installed game supports it",
+    "exe_names": [
+      "Zero-K.exe"
+    ],
+    "common_paths_windows": [],
+    "common_paths_macos": [],
+    "steam_folders": [
+      "Zero-K"
+    ],
+    "ports": [],
+    "host_tutorial": [
+      "Launch the installed game normally.",
+      "Use the in-game LAN/private host option or an official dedicated server if the game provides one.",
+      "Share the host LAN/VPN IP and configured port with other players."
+    ],
+    "client_tutorial": [
+      "Make sure every player uses the same game version and compatible mods/DLC.",
+      "Join using the in-game LAN browser, direct IP, or private server address when supported."
+    ],
+    "offline_notes": [
+      "Use legitimate local/private hosting where supported. Some modes may require online services."
+    ],
+    "troubleshooting": [
+      "Verify all players are on the same LAN/VPN.",
+      "Allow the game/server through Windows Firewall.",
+      "Use matching game versions and matching mod lists.",
+      "If direct IP fails, confirm the port and host IP are correct."
+    ],
+    "launch_notes": [
+      "This helper launches the selected executable normally. It does not patch or modify game files."
+    ],
+    "server_support": "in_game_host",
+    "server_notes": [
+      "Use only official dedicated server tools or in-game hosting. No bypasses or unofficial server emulators."
+    ],
+    "server_files": [],
+    "steamcmd_app_id": "",
+    "server_executable_names": [],
+    "server_common_paths_windows": [],
+    "server_common_paths_macos": [],
+    "server_install_steps": [],
+    "server_launch_command_windows": "",
+    "server_launch_command_macos": "",
+    "server_config_files": [],
+    "server_ports": [],
+    "official_download_url": ""
+  }
+]
