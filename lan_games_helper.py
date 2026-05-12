@@ -272,7 +272,7 @@ TRANSLATIONS = {
         "privacy": "Privacy",
         "open_privacy": "Open Privacy Policy",
         "about": "About",
-        "author": "Author: The0Cosmo",
+        "author": "Creator: KiwiLiu",
         "license_summary": "Personal, non-commercial use only. See LICENSE for full terms.",
         "default_behavior": "Default Behavior",
         "show_safety_warnings": "Show safety warnings",
@@ -297,6 +297,13 @@ TRANSLATIONS = {
         "troubleshooting": "Troubleshooting",
         "support": "Support",
         "status_ready": "Ready.",
+        "home": "Home",
+        "games": "Games",
+        "firewall": "Firewall",
+        "controller_tools": "Controller Tools",
+        "show_log": "Show Log",
+        "hide_log": "Hide Log",
+        "creator_line": f"Created by KiwiLiu  |  GitHub: The0Cosmo",
         "appearance": "Appearance",
         "ui_scale": "UI scale",
         "compact_mode": "Compact mode",
@@ -389,7 +396,7 @@ TRANSLATIONS = {
         "privacy": "Privacy",
         "open_privacy": "Apri informativa privacy",
         "about": "Informazioni",
-        "author": "Autore: The0Cosmo",
+        "author": "Creatore: KiwiLiu",
         "license_summary": "Solo uso personale e non commerciale. Vedi LICENSE per i termini completi.",
         "default_behavior": "Comportamento predefinito",
         "show_safety_warnings": "Mostra avvisi di sicurezza",
@@ -414,6 +421,13 @@ TRANSLATIONS = {
         "troubleshooting": "Risoluzione problemi",
         "support": "Supporto",
         "status_ready": "Pronto.",
+        "home": "Home",
+        "games": "Giochi",
+        "firewall": "Firewall",
+        "controller_tools": "Strumenti controller",
+        "show_log": "Mostra log",
+        "hide_log": "Nascondi log",
+        "creator_line": f"Creato da KiwiLiu  |  GitHub: The0Cosmo",
         "appearance": "Aspetto",
         "ui_scale": "Scala interfaccia",
         "compact_mode": "Modalita compatta",
@@ -859,9 +873,14 @@ class OfflineLanGamesHelper:
         self.custom_games = [normalize_game(game, custom=True) for game in self.config.get("custom_games", [])]
         self.games: list[dict[str, Any]] = []
         self.filtered_games: list[dict[str, Any]] = []
+        self.games_all: list[dict[str, Any]] = []
+        self.games_visible: list[dict[str, Any]] = []
         self.current_game: dict[str, Any] | None = None
+        self.selected_game_data: dict[str, Any] | None = None
         self.current_path: str | None = None
         self.current_server_path: str | None = None
+        self.game_detail_cache: dict[tuple[str, str], str] = {}
+        self.installed_detection_cache: dict[str, bool] = dict(self.installed_cache)
         self.addresses: list[AddressInfo] = []
         self.main_ip = ""
         self.server_processes: dict[str, subprocess.Popen[Any]] = {}
@@ -885,14 +904,20 @@ class OfflineLanGamesHelper:
         return TRANSLATIONS.get(self.language, TRANSLATIONS["en"]).get(key, TRANSLATIONS["en"].get(key, key))
 
     def load_game_catalog(self) -> list[dict[str, Any]]:
+        fallback_games = [
+            {"name": "Minecraft Java Edition", "platforms": ["Windows"], "lan_status": "In-game host", "exe_names": ["javaw.exe", "MinecraftLauncher.exe"], "host_tutorial": ["Open Multiplayer and host from your installed game/server setup."], "client_tutorial": ["Use Multiplayer -> Direct Connect with HOST_LAN_IP:PORT."], "offline_notes": ["Use same game and mod version for all players."]},
+            {"name": "Terraria", "platforms": ["Windows"], "lan_status": "In-game host / dedicated server", "exe_names": ["Terraria.exe"], "host_tutorial": ["Host and Play or run official server executable if installed."], "client_tutorial": ["Join via IP and port from Multiplayer menu."], "offline_notes": ["Use matching game version."]},
+            {"name": "Stardew Valley", "platforms": ["Windows"], "lan_status": "Co-op host", "exe_names": ["Stardew Valley.exe"], "host_tutorial": ["Open Co-op and host farm from inside the game."], "client_tutorial": ["Join same LAN/VPN and use co-op join flow."], "offline_notes": ["Use matching game and mod setup."]},
+            {"name": "Valheim", "platforms": ["Windows"], "lan_status": "In-game host / official dedicated server", "exe_names": ["valheim.exe"], "host_tutorial": ["Host from game or use official server tools."], "client_tutorial": ["Join via IP:PORT when LAN/server is reachable."], "offline_notes": ["Use matching game version and world setup."]},
+        ]
         try:
             raw_games = load_json_file(GAMES_FILE, [])
         except Exception as exc:
             self.catalog_load_error = f"{self.tr('games_json_error')} {exc}"
-            return []
+            return [normalize_game(game) for game in fallback_games]
         if not isinstance(raw_games, list):
             self.catalog_load_error = self.tr("games_json_error")
-            return []
+            return [normalize_game(game) for game in fallback_games]
         self.catalog_load_error = ""
         return [normalize_game(game) for game in raw_games if isinstance(game, dict)]
 
@@ -934,8 +959,8 @@ class OfflineLanGamesHelper:
         except tk.TclError:
             pass
         self.apply_tk_scaling()
-        base_font = self.scaled_font(10)
-        heading_font = self.scaled_font(12, "bold")
+        base_font = self.scaled_font(11)
+        heading_font = self.scaled_font(13, "bold")
         self.root.option_add("*Font", base_font)
         self.root.option_add("*TCombobox*Listbox.font", base_font)
         self.style.configure(".", font=base_font, background=self.colors["bg"], foreground=self.colors["text"])
@@ -957,8 +982,10 @@ class OfflineLanGamesHelper:
         self.style.configure("TNotebook", background=self.colors["bg"], borderwidth=0)
         self.style.configure("TNotebook.Tab", padding=(12, 7), background=self.colors["panel_alt"], foreground=self.colors["text"])
         self.style.map("TNotebook.Tab", background=[("selected", self.colors["panel"])], foreground=[("selected", self.colors["accent_dark"])])
+        self.style.layout("Hidden.TNotebook.Tab", [])
+        self.style.configure("Hidden.TNotebook", background=self.colors["bg"], borderwidth=0)
         self.style.configure("Treeview", background=self.colors["panel"], fieldbackground=self.colors["panel"], foreground=self.colors["text"], rowheight=max(28, int(28 * self.ui_scale_multiplier())), bordercolor=self.colors["border"])
-        self.style.configure("Treeview.Heading", background=self.colors["panel_alt"], foreground=self.colors["text"], font=self.scaled_font(10, "bold"))
+        self.style.configure("Treeview.Heading", background=self.colors["panel_alt"], foreground=self.colors["text"], font=self.scaled_font(11, "bold"))
 
     def style_text_widget(self, widget: tk.Text, *, height: int | None = None) -> None:
         if height is not None:
@@ -973,7 +1000,7 @@ class OfflineLanGamesHelper:
             bd=1,
             padx=10,
             pady=8,
-            font=self.scaled_font(10),
+            font=self.scaled_font(11),
         )
 
     def localize_widget(self, widget: tk.Widget, key: str) -> tk.Widget:
@@ -985,12 +1012,11 @@ class OfflineLanGamesHelper:
         return widget
 
     def build_ui(self) -> None:
-        self.root.grid_columnconfigure(0, weight=1, minsize=270)
-        self.root.grid_columnconfigure(1, weight=4)
+        self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_rowconfigure(1, weight=1)
 
-        header = ttk.Frame(self.root, padding=(10, 8))
-        header.grid(row=0, column=0, columnspan=2, sticky="ew")
+        header = ttk.Frame(self.root, padding=(12, 10))
+        header.grid(row=0, column=0, sticky="ew")
         header.grid_columnconfigure(1, weight=1)
         title_frame = ttk.Frame(header)
         title_frame.grid(row=0, column=0, sticky="w")
@@ -1002,7 +1028,7 @@ class OfflineLanGamesHelper:
                 self.kiwi_photo = None
         self.title_label = ttk.Label(title_frame, text=self.tr("app_title"), font=self.scaled_font(18, "bold"))
         self.title_label.grid(row=0, column=1, sticky="w")
-        ttk.Label(title_frame, text=f"v{APP_VERSION}  |  The0Cosmo", style="Muted.TLabel").grid(row=1, column=1, sticky="w")
+        ttk.Label(title_frame, text=f"v{APP_VERSION}  |  Created by KiwiLiu", style="Muted.TLabel").grid(row=1, column=1, sticky="w")
         self.settings_header_button = ttk.Button(title_frame, text=self.tr("settings"), command=lambda: self.run_ui_action("Open Settings", self.show_settings))
         self.settings_header_button.grid(row=0, column=2, rowspan=2, sticky="ns", padx=(14, 0))
         self.safety_label = ttk.Label(header, text=self.tr("safety_warning"), style="Warning.TLabel", wraplength=760)
@@ -1035,8 +1061,145 @@ class OfflineLanGamesHelper:
         self.ip_combo.bind("<<ComboboxSelected>>", lambda _event: self.update_all_tabs())
         ttk.Label(network, textvariable=self.network_warning_var, style="Warning.TLabel").grid(row=2, column=0, columnspan=3, sticky="ew", pady=(5, 0))
 
-        left = ttk.Frame(self.root, padding=(10, 0, 6, 8))
-        left.grid(row=1, column=0, sticky="nsew")
+        body = ttk.Frame(self.root, padding=(10, 0, 10, 8))
+        body.grid(row=1, column=0, sticky="nsew")
+        body.grid_columnconfigure(1, weight=1)
+        body.grid_rowconfigure(0, weight=1)
+
+        sidebar = ttk.Frame(body, padding=(0, 0, 10, 0))
+        sidebar.grid(row=0, column=0, sticky="nsw")
+        sidebar.grid_columnconfigure(0, weight=1)
+        self.sidebar_frame = sidebar
+        self.sidebar_buttons: dict[str, ttk.Button] = {}
+        self.sidebar_page_map: dict[str, str] = {}
+        self.current_page = "Home"
+
+        nav_items = [
+            ("home", "Home", "Home"),
+            ("games", "Games", "Games"),
+            ("invite_export", "Invite", "Invite"),
+            ("server_tools", "Server Tools", "Server Tools"),
+            ("lan_test", "LAN Test", "LAN Test"),
+            ("firewall_helper", "Firewall", "Firewall / Permissions"),
+            ("controller_tools", "Controller Tools", "Input Isolation"),
+            ("backup_tools", "Backups", "Backups"),
+            ("troubleshooting", "Troubleshooting", "Troubleshooting"),
+            ("core", "Settings", "Settings"),
+            ("support", "Support", "Support"),
+            ("core", "Privacy", "Privacy"),
+        ]
+        for row, (tool_id, label, page_name) in enumerate(nav_items):
+            button = ttk.Button(sidebar, text=label, command=lambda p=page_name: self.show_page(p))
+            button.grid(row=row, column=0, sticky="ew", pady=2)
+            self.sidebar_buttons[page_name] = button
+            self.sidebar_page_map[page_name] = tool_id
+        self.creator_label = ttk.Label(sidebar, text=self.tr("creator_line"), style="Muted.TLabel")
+        self.creator_label.grid(row=len(nav_items), column=0, sticky="w", pady=(10, 0))
+
+        content = ttk.Frame(body)
+        content.grid(row=0, column=1, sticky="nsew")
+        content.grid_columnconfigure(0, weight=1)
+        content.grid_rowconfigure(0, weight=1)
+
+        self.tabs = ttk.Notebook(content, style="Hidden.TNotebook")
+        self.tabs.grid(row=0, column=0, sticky="nsew")
+        self.add_home_tab()
+        self.add_games_tab()
+        self.tutorial_text = self.add_text_tab("Tutorial")
+        self.network_text = self.add_text_tab("Network / IP")
+        self.firewall_text = self.add_text_tab("Firewall / Permissions")
+        self.path_text = self.add_text_tab("Game Path")
+        self.server_text = self.add_server_tools_tab()
+        self.add_lan_test_tab()
+        self.add_invite_tab()
+        self.add_backup_tab()
+        self.add_mods_tab()
+        self.add_input_isolation_tab()
+        self.add_input_isolation_setup_tab()
+        self.troubleshooting_text = self.add_text_tab("Troubleshooting")
+        self.add_settings_tab()
+        self.add_support_tab()
+        self.privacy_text = self.add_text_tab("Privacy")
+        self.tool_tab_map = {
+            "firewall_helper": ["Firewall / Permissions"],
+            "server_tools": ["Server Tools"],
+            "lan_test": ["LAN Test"],
+            "invite_export": ["Invite"],
+            "backup_tools": ["Backups"],
+            "controller_tools": ["Input Isolation", "Input Isolation Setup"],
+            "input_isolation": ["Input Isolation", "Input Isolation Setup"],
+            "support": ["Support"],
+        }
+        self.server_buttons: dict[str, ttk.Button] = {}
+        self.add_server_button("Open Server Folder", self.open_server_folder, 0)
+        self.add_server_button("Select Server Executable", self.select_server_executable, 1)
+        self.add_server_button("Launch Server", self.launch_server, 2)
+        self.add_server_button("Start Server", self.start_managed_server, 3)
+        self.add_server_button("Stop Server", self.stop_managed_server, 4)
+        self.add_server_button("Open Server Log", self.open_server_log, 5)
+        self.add_server_button("Install with SteamCMD", self.install_with_steamcmd, 6)
+        self.add_server_button("Open Official Download Page", self.open_official_download_page, 7)
+        self.add_server_button("Export Server Guide", self.export_server_guide, 8)
+        self.add_server_button("Select SteamCMD", self.select_steamcmd, 9)
+
+        self.actions_frame = self.game_actions_frame
+        self.add_action_button(self.game_actions_frame, "Refresh IP", self.refresh_network, 0)
+        self.add_action_button(self.game_actions_frame, "Copy Host IP", self.copy_host_ip, 1)
+        self.add_action_button(self.game_actions_frame, "Detect Game Path", self.detect_game_path, 2)
+        self.add_action_button(self.game_actions_frame, "Manual Select Game", self.select_game_exe, 3)
+        self.add_action_button(self.game_actions_frame, "Launch Game", self.launch_game, 4)
+        self.add_action_button(self.game_actions_frame, "Add Firewall Rules", self.add_firewall_rules, 5)
+        self.add_action_button(self.game_actions_frame, "Remove Firewall Rules", self.remove_firewall_rules, 6)
+        self.add_action_button(self.game_actions_frame, "Export Tutorial", self.export_tutorial, 7)
+        self.tool_button_map = {
+            "firewall_helper": [
+                self.action_buttons["Add Firewall Rules"],
+                self.action_buttons["Remove Firewall Rules"],
+            ],
+            "custom_games": [self.add_custom_button],
+        }
+
+        log_frame = ttk.LabelFrame(self.root, text=self.tr("log_status"), padding=6)
+        self.log_frame = log_frame
+        log_frame.grid(row=2, column=0, sticky="ew", padx=10, pady=(0, 10))
+        log_frame.grid_columnconfigure(0, weight=1)
+        header_row = ttk.Frame(log_frame)
+        header_row.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 6))
+        header_row.grid_columnconfigure(0, weight=1)
+        self.log_toggle_button = ttk.Button(header_row, text=self.tr("hide_log"), command=self.toggle_log_visibility)
+        self.log_toggle_button.grid(row=0, column=1, sticky="e")
+        self.log_box = tk.Text(log_frame, height=5, wrap=tk.WORD)
+        self.log_box.grid(row=1, column=0, sticky="ew")
+        self.style_text_widget(self.log_box, height=5)
+        self.log_box.configure(state=tk.DISABLED)
+        self.clear_log_button = ttk.Button(log_frame, text=self.tr("clear_log"), command=self.clear_log)
+        self.clear_log_button.grid(row=1, column=1, sticky="ns", padx=(8, 0))
+        self.log_visible = True
+
+        self.apply_tool_visibility()
+        self.show_page("Home")
+        self.apply_language()
+
+    def add_home_tab(self) -> None:
+        frame = ttk.Frame(self.tabs, padding=12)
+        frame.grid_columnconfigure(0, weight=1)
+        frame.grid_rowconfigure(1, weight=1)
+        ttk.Label(frame, text="Home", font=self.scaled_font(16, "bold")).grid(row=0, column=0, sticky="w")
+        self.home_text = tk.Text(frame, wrap=tk.WORD, height=16)
+        self.home_text.grid(row=1, column=0, sticky="nsew", pady=(8, 0))
+        self.style_text_widget(self.home_text, height=16)
+        self.home_text.configure(state=tk.DISABLED)
+        self.tabs.add(frame, text="Home")
+        self.tab_widgets["Home"] = frame
+
+    def add_games_tab(self) -> None:
+        frame = ttk.Frame(self.tabs, padding=10)
+        frame.grid_columnconfigure(1, weight=1)
+        frame.grid_rowconfigure(2, weight=1)
+        ttk.Label(frame, text="Games", font=self.scaled_font(16, "bold")).grid(row=0, column=0, columnspan=2, sticky="w")
+
+        left = ttk.Frame(frame, padding=(0, 8, 12, 0))
+        left.grid(row=1, column=0, rowspan=2, sticky="nsew")
         left.grid_columnconfigure(0, weight=1)
         left.grid_rowconfigure(5, weight=1)
         self.search_label = ttk.Label(left, text=self.tr("search"))
@@ -1051,10 +1214,22 @@ class OfflineLanGamesHelper:
         self.clear_search_button.grid(row=0, column=1, padx=(6, 0))
         self.filter_label = ttk.Label(left, text=self.tr("default_filter"))
         self.filter_label.grid(row=2, column=0, sticky="w")
-        self.game_filter_var = tk.StringVar(value=self.filter_label_for_key(str(self.config.get("default_game_filter", "all"))))
-        self.game_filter_combo = ttk.Combobox(left, state="readonly", textvariable=self.game_filter_var, values=self.filter_display_values())
-        self.game_filter_combo.grid(row=3, column=0, sticky="ew", pady=(4, 8))
-        self.game_filter_combo.bind("<<ComboboxSelected>>", lambda _event: self.on_filter_changed())
+        self.game_filter_var = tk.StringVar(value=str(self.config.get("default_game_filter", "all")))
+        filter_row = ttk.Frame(left)
+        filter_row.grid(row=3, column=0, sticky="ew", pady=(4, 8))
+        for column in range(5):
+            filter_row.grid_columnconfigure(column, weight=1)
+        self.filter_buttons: dict[str, ttk.Button] = {}
+        quick_filters = ["all", "installed", "favorites", "dedicated_server", "in_game_host"]
+        for column, filter_id in enumerate(quick_filters):
+            button = ttk.Button(
+                filter_row,
+                text=self.filter_label_for_key(filter_id),
+                command=lambda value=filter_id: self.set_game_filter(value),
+            )
+            button.grid(row=0, column=column, sticky="ew", padx=2)
+            self.filter_buttons[filter_id] = button
+        self.update_filter_buttons_visual()
         refresh_row = ttk.Frame(left)
         refresh_row.grid(row=4, column=0, sticky="ew", pady=(0, 8))
         refresh_row.grid_columnconfigure(0, weight=1)
@@ -1079,7 +1254,7 @@ class OfflineLanGamesHelper:
             highlightbackground=self.colors["border"],
             relief=tk.SOLID,
             bd=1,
-            font=self.scaled_font(11),
+            font=self.scaled_font(12),
         )
         self.game_list.grid(row=0, column=0, sticky="nsew")
         game_scroll = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.game_list.yview)
@@ -1089,84 +1264,49 @@ class OfflineLanGamesHelper:
         self.add_custom_button = ttk.Button(left, text=self.tr("add_custom_game"), style="Accent.TButton", command=lambda: self.run_ui_action("Add Custom Game", self.add_custom_game_dialog))
         self.add_custom_button.grid(row=6, column=0, sticky="ew", pady=(8, 0))
         self.game_status_var = tk.StringVar(value="")
-        self.game_status_label = ttk.Label(left, textvariable=self.game_status_var, style="Muted.TLabel", wraplength=250)
+        self.game_status_label = ttk.Label(left, textvariable=self.game_status_var, style="Muted.TLabel", wraplength=290)
         self.game_status_label.grid(row=7, column=0, sticky="ew", pady=(6, 0))
 
-        right = ttk.Frame(self.root, padding=(6, 0, 10, 8))
-        right.grid(row=1, column=1, sticky="nsew")
+        right = ttk.Frame(frame, padding=(8, 8, 0, 0))
+        right.grid(row=1, column=1, rowspan=2, sticky="nsew")
         right.grid_columnconfigure(0, weight=1)
-        right.grid_rowconfigure(0, weight=1)
-        self.tabs = ttk.Notebook(right)
-        self.tabs.grid(row=0, column=0, sticky="nsew")
-        self.tutorial_text = self.add_text_tab("Tutorial")
-        self.network_text = self.add_text_tab("Network / IP")
-        self.firewall_text = self.add_text_tab("Firewall / Permissions")
-        self.path_text = self.add_text_tab("Game Path")
-        self.server_text = self.add_server_tools_tab()
-        self.add_lan_test_tab()
-        self.add_invite_tab()
-        self.add_backup_tab()
-        self.add_mods_tab()
-        self.add_input_isolation_tab()
-        self.add_input_isolation_setup_tab()
-        self.troubleshooting_text = self.add_text_tab("Troubleshooting")
-        self.add_settings_tab()
-        self.add_support_tab()
-        self.privacy_text = self.add_text_tab("Privacy")
-        self.tool_tab_map = {
-            "firewall_helper": ["Firewall / Permissions"],
-            "server_tools": ["Server Tools"],
-            "lan_test": ["LAN Test"],
-            "invite_export": ["Invite"],
-            "backup_tools": ["Backups"],
-            "input_isolation": ["Input Isolation", "Input Isolation Setup"],
-            "support": ["Support"],
-        }
-        self.server_buttons: dict[str, ttk.Button] = {}
-        self.add_server_button("Open Server Folder", self.open_server_folder, 0)
-        self.add_server_button("Select Server Executable", self.select_server_executable, 1)
-        self.add_server_button("Launch Server", self.launch_server, 2)
-        self.add_server_button("Start Server", self.start_managed_server, 3)
-        self.add_server_button("Stop Server", self.stop_managed_server, 4)
-        self.add_server_button("Open Server Log", self.open_server_log, 5)
-        self.add_server_button("Install with SteamCMD", self.install_with_steamcmd, 6)
-        self.add_server_button("Open Official Download Page", self.open_official_download_page, 7)
-        self.add_server_button("Export Server Guide", self.export_server_guide, 8)
-        self.add_server_button("Select SteamCMD", self.select_steamcmd, 9)
-
-        actions = ttk.LabelFrame(self.root, text=self.tr("actions"), padding=8)
-        self.actions_frame = actions
-        actions.grid(row=2, column=0, columnspan=2, sticky="ew", padx=10, pady=(0, 6))
+        right.grid_rowconfigure(2, weight=1)
+        self.games_page_title = ttk.Label(right, text="Selected game details", font=self.scaled_font(14, "bold"))
+        self.games_page_title.grid(row=0, column=0, sticky="w")
+        self.game_actions_frame = ttk.LabelFrame(right, text=self.tr("actions"), padding=6)
+        self.game_actions_frame.grid(row=1, column=0, sticky="ew", pady=(8, 8))
         for column in range(8):
-            actions.grid_columnconfigure(column, weight=1, uniform="actions")
-        self.add_action_button(actions, "Refresh IP", self.refresh_network, 0)
-        self.add_action_button(actions, "Copy Host IP", self.copy_host_ip, 1)
-        self.add_action_button(actions, "Detect Game Path", self.detect_game_path, 2)
-        self.add_action_button(actions, "Manual Select Game", self.select_game_exe, 3)
-        self.add_action_button(actions, "Launch Game", self.launch_game, 4)
-        self.add_action_button(actions, "Add Firewall Rules", self.add_firewall_rules, 5)
-        self.add_action_button(actions, "Remove Firewall Rules", self.remove_firewall_rules, 6)
-        self.add_action_button(actions, "Export Tutorial", self.export_tutorial, 7)
-        self.tool_button_map = {
-            "firewall_helper": [
-                self.action_buttons["Add Firewall Rules"],
-                self.action_buttons["Remove Firewall Rules"],
-            ],
-            "custom_games": [self.add_custom_button],
-        }
-        self.apply_tool_visibility()
+            self.game_actions_frame.grid_columnconfigure(column, weight=1, uniform="actions")
+        self.games_detail_text = tk.Text(right, wrap=tk.WORD)
+        self.games_detail_text.grid(row=2, column=0, sticky="nsew")
+        self.style_text_widget(self.games_detail_text, height=24)
+        self.games_detail_text.configure(state=tk.DISABLED)
 
-        log_frame = ttk.LabelFrame(self.root, text=self.tr("log_status"), padding=6)
-        self.log_frame = log_frame
-        log_frame.grid(row=3, column=0, columnspan=2, sticky="ew", padx=10, pady=(0, 10))
-        log_frame.grid_columnconfigure(0, weight=1)
-        self.log_box = tk.Text(log_frame, height=5, wrap=tk.WORD)
-        self.log_box.grid(row=0, column=0, sticky="ew")
-        self.style_text_widget(self.log_box, height=5)
-        self.log_box.configure(state=tk.DISABLED)
-        self.clear_log_button = ttk.Button(log_frame, text=self.tr("clear_log"), command=self.clear_log)
-        self.clear_log_button.grid(row=0, column=1, sticky="ns", padx=(8, 0))
-        self.apply_language()
+        self.tabs.add(frame, text="Games")
+        self.tab_widgets["Games"] = frame
+
+    def show_page(self, page_name: str) -> None:
+        frame = self.tab_widgets.get(page_name)
+        if frame is None:
+            return
+        self.tabs.select(frame)
+        self.current_page = page_name
+        for name, button in self.sidebar_buttons.items():
+            if name == page_name:
+                button.configure(style="Accent.TButton")
+            else:
+                button.configure(style="TButton")
+
+    def toggle_log_visibility(self) -> None:
+        self.log_visible = not self.log_visible
+        if self.log_visible:
+            self.log_box.grid()
+            self.clear_log_button.grid()
+            self.log_toggle_button.configure(text=self.tr("hide_log"))
+        else:
+            self.log_box.grid_remove()
+            self.clear_log_button.grid_remove()
+            self.log_toggle_button.configure(text=self.tr("show_log"))
 
     def add_text_tab(self, title: str) -> tk.Text:
         frame = ttk.Frame(self.tabs, padding=8)
@@ -1772,9 +1912,7 @@ class OfflineLanGamesHelper:
         self.server_buttons[text] = button
 
     def show_settings(self) -> None:
-        frame = self.tab_widgets.get("Settings")
-        if frame is not None:
-            self.tabs.select(frame)
+        self.show_page("Settings")
 
     def filter_display_values(self) -> list[str]:
         return [self.filter_label_for_key(filter_id) for filter_id in GAME_FILTER_IDS]
@@ -1794,7 +1932,24 @@ class OfflineLanGamesHelper:
         return lookup.get(label, "all")
 
     def current_filter_key(self) -> str:
-        return self.filter_key_from_label(getattr(self, "game_filter_var", tk.StringVar(value="")).get())
+        value = getattr(self, "game_filter_var", tk.StringVar(value="all")).get()
+        if value in GAME_FILTER_IDS:
+            return value
+        return self.filter_key_from_label(value)
+
+    def set_game_filter(self, filter_key: str) -> None:
+        if filter_key not in GAME_FILTER_IDS:
+            filter_key = "all"
+        self.game_filter_var.set(filter_key)
+        self.config["default_game_filter"] = filter_key
+        save_json_file(CONFIG_FILE, self.config)
+        self.update_filter_buttons_visual()
+        self.apply_filter()
+
+    def update_filter_buttons_visual(self) -> None:
+        current = self.current_filter_key()
+        for filter_id, button in getattr(self, "filter_buttons", {}).items():
+            button.configure(style="Accent.TButton" if filter_id == current else "TButton")
 
     def invite_mode_display_values(self) -> list[str]:
         return [self.invite_mode_label_for_key(mode_id) for mode_id in INVITE_MODE_IDS]
@@ -1813,10 +1968,7 @@ class OfflineLanGamesHelper:
         return lookup.get(label, "short")
 
     def on_filter_changed(self) -> None:
-        filter_key = self.current_filter_key()
-        self.config["default_game_filter"] = filter_key
-        save_json_file(CONFIG_FILE, self.config)
-        self.apply_filter()
+        self.set_game_filter(self.current_filter_key())
 
     def refresh_games(self) -> None:
         if hasattr(self, "game_status_var"):
@@ -1837,7 +1989,7 @@ class OfflineLanGamesHelper:
         if hasattr(self, "refresh_detection_button"):
             self.refresh_detection_button.configure(state=tk.DISABLED)
         if hasattr(self, "game_status_var"):
-            self.game_status_var.set("Detecting installed games...")
+            self.game_status_var.set("Checking installed games...")
 
         def worker() -> None:
             detected: dict[str, bool] = {}
@@ -1852,6 +2004,7 @@ class OfflineLanGamesHelper:
 
     def finish_installed_detection(self, detected: dict[str, bool]) -> None:
         self.installed_cache = detected
+        self.installed_detection_cache = dict(detected)
         self.config["installed_cache"] = detected
         self.config["detection_cache_updated"] = time.strftime("%Y-%m-%d %H:%M:%S")
         save_json_file(CONFIG_FILE, self.config)
@@ -1887,6 +2040,22 @@ class OfflineLanGamesHelper:
                         widget.grid_remove()
                 except tk.TclError:
                     pass
+        for page_name, tool_id in getattr(self, "sidebar_page_map", {}).items():
+            button = getattr(self, "sidebar_buttons", {}).get(page_name)
+            if button is None:
+                continue
+            page_visible = True
+            if tool_id != "core":
+                page_visible = self.is_tool_visible(tool_id)
+            try:
+                if page_visible:
+                    button.grid()
+                else:
+                    button.grid_remove()
+                    if self.current_page == page_name:
+                        self.show_page("Home")
+            except tk.TclError:
+                pass
         if hasattr(self, "tool_tree"):
             self.populate_tool_tree()
 
@@ -1983,15 +2152,24 @@ class OfflineLanGamesHelper:
         self.config["ui_scale"] = self.ui_scale
         save_json_file(CONFIG_FILE, self.config)
         self.configure_style()
+        self.refresh_scaled_fonts()
         self.apply_theme_to_widgets()
+        self.apply_language()
         self.log(f"UI scale changed to {self.ui_scale}.")
+
+    def refresh_scaled_fonts(self) -> None:
+        if hasattr(self, "title_label"):
+            self.title_label.configure(font=self.scaled_font(18, "bold"))
+        if hasattr(self, "games_page_title"):
+            self.games_page_title.configure(font=self.scaled_font(14, "bold"))
+        if hasattr(self, "settings_title_label"):
+            self.settings_title_label.configure(font=self.scaled_font(16, "bold"))
+        if hasattr(self, "tool_manager_label"):
+            self.tool_manager_label.configure(font=self.scaled_font(13, "bold"))
 
     def change_default_filter_setting(self) -> None:
         filter_key = self.filter_key_from_label(self.settings_filter_var.get())
-        self.config["default_game_filter"] = filter_key
-        self.game_filter_var.set(self.filter_label_for_key(filter_key))
-        save_json_file(CONFIG_FILE, self.config)
-        self.apply_filter()
+        self.set_game_filter(filter_key)
 
     def change_default_invite_mode(self) -> None:
         mode_key = self.invite_mode_key_from_label(self.default_invite_var.get())
@@ -2088,10 +2266,10 @@ class OfflineLanGamesHelper:
             self.clear_search_button.configure(text=self.tr("clear_search"))
         if hasattr(self, "filter_label"):
             self.filter_label.configure(text=self.tr("default_filter"))
-        if hasattr(self, "game_filter_combo"):
-            current_filter = str(self.config.get("default_game_filter", "all"))
-            self.game_filter_combo.configure(values=self.filter_display_values())
-            self.game_filter_var.set(self.filter_label_for_key(current_filter))
+        if hasattr(self, "filter_buttons"):
+            for filter_id, button in self.filter_buttons.items():
+                button.configure(text=self.filter_label_for_key(filter_id))
+            self.update_filter_buttons_visual()
         if hasattr(self, "refresh_games_button"):
             self.refresh_games_button.configure(text=self.tr("refresh_games"))
         if hasattr(self, "refresh_detection_button"):
@@ -2101,11 +2279,18 @@ class OfflineLanGamesHelper:
         if hasattr(self, "host_network_frame"):
             self.host_network_frame.configure(text=self.tr("host_network"))
         if hasattr(self, "actions_frame"):
-            self.actions_frame.configure(text=self.tr("actions"))
+            try:
+                self.actions_frame.configure(text=self.tr("actions"))
+            except tk.TclError:
+                pass
         if hasattr(self, "log_frame"):
             self.log_frame.configure(text=self.tr("log_status"))
         if hasattr(self, "clear_log_button"):
             self.clear_log_button.configure(text=self.tr("clear_log"))
+        if hasattr(self, "creator_label"):
+            self.creator_label.configure(text=self.tr("creator_line"))
+        if hasattr(self, "log_toggle_button"):
+            self.log_toggle_button.configure(text=self.tr("hide_log") if getattr(self, "log_visible", True) else self.tr("show_log"))
 
         button_keys = {
             "Refresh IP": "refresh_ip",
@@ -2121,7 +2306,26 @@ class OfflineLanGamesHelper:
             if english in self.action_buttons:
                 self.action_buttons[english].configure(text=self.tr(key))
 
+        sidebar_label_map = {
+            "Home": self.tr("home"),
+            "Games": self.tr("games"),
+            "Invite": self.tr("invite"),
+            "Server Tools": self.tr("server_tools"),
+            "LAN Test": self.tr("lan_test"),
+            "Firewall / Permissions": self.tr("firewall"),
+            "Input Isolation": self.tr("controller_tools"),
+            "Backups": self.tr("backups"),
+            "Troubleshooting": self.tr("troubleshooting"),
+            "Settings": self.tr("settings"),
+            "Support": self.tr("support"),
+            "Privacy": self.tr("privacy"),
+        }
+        for page_name, button in getattr(self, "sidebar_buttons", {}).items():
+            button.configure(text=sidebar_label_map.get(page_name, page_name))
+
         tab_keys = {
+            "Home": "home",
+            "Games": "games",
             "Tutorial": "tutorial",
             "Network / IP": "network",
             "Firewall / Permissions": "firewall_permissions",
@@ -2210,6 +2414,7 @@ class OfflineLanGamesHelper:
                     selectforeground="#ffffff",
                     highlightcolor=self.colors["accent"],
                     highlightbackground=self.colors["border"],
+                    font=self.scaled_font(12),
                 )
             for child in widget.winfo_children():
                 walk(child)
@@ -2302,7 +2507,8 @@ class OfflineLanGamesHelper:
 
     def reload_games(self) -> None:
         self.custom_games = [normalize_game(game, custom=True) for game in self.config.get("custom_games", [])]
-        self.games = self.builtin_games + self.custom_games
+        self.games_all = self.builtin_games + self.custom_games
+        self.games = self.games_all
         if self.catalog_load_error and hasattr(self, "game_status_var"):
             self.game_status_var.set(self.catalog_load_error)
         elif not self.games and hasattr(self, "game_status_var"):
@@ -2312,6 +2518,7 @@ class OfflineLanGamesHelper:
     def apply_filter(self, select_first: bool = False) -> None:
         query = self.search_var.get().strip().lower()
         filter_key = self.current_filter_key() if hasattr(self, "game_filter_var") else "all"
+        self.update_filter_buttons_visual()
         previous = self.current_game["name"] if self.current_game else ""
         games = list(self.games)
         if not bool(self.config.get("show_hidden_games", False)):
@@ -2331,6 +2538,7 @@ class OfflineLanGamesHelper:
         elif filter_key == "in_game_host":
             games = [game for game in games if str(game.get("server_support", "none")) == "in_game_host"]
         self.filtered_games = games
+        self.games_visible = games
         self.game_list.delete(0, tk.END)
         for game in self.filtered_games:
             suffix = " (custom)" if game.get("custom") else ""
@@ -2364,7 +2572,10 @@ class OfflineLanGamesHelper:
         game = self.selected_game()
         if not game:
             return
+        if self.current_game and self.current_game.get("name") == game.get("name"):
+            return
         self.current_game = game
+        self.selected_game_data = game
         if self.config.get("remember_last_selected_game", True):
             self.config["last_selected_game"] = game["name"]
             save_json_file(CONFIG_FILE, self.config)
@@ -2403,6 +2614,7 @@ class OfflineLanGamesHelper:
         self.log("Network/IP refreshed.")
 
     def update_all_tabs(self) -> None:
+        self.update_home_tab()
         self.update_tutorial_tab()
         self.update_network_tab()
         self.update_firewall_tab()
@@ -2416,6 +2628,71 @@ class OfflineLanGamesHelper:
         self.update_input_setup_tab()
         self.update_troubleshooting_tab()
         self.update_privacy_tab()
+        self.render_games_page_details()
+
+    def update_home_tab(self) -> None:
+        lines = [
+            "Offline LAN Games Helper",
+            "Created by KiwiLiu",
+            "",
+            f"Selected game: {self.current_game['name'] if self.current_game else 'none'}",
+            f"Primary LAN IPv4: {self.main_ip or 'not detected'}",
+            "",
+            "Quick actions:",
+            "- Use Games to choose a title and launch details.",
+            "- Use Invite for short connection info only.",
+            "- Use Refresh Installed Detection when needed.",
+            "",
+            "Safety:",
+            "- No DRM bypass, launcher bypass, authentication bypass, anti-cheat bypass, or online-service bypass.",
+            "- No game file modification.",
+        ]
+        self.set_text(self.home_text, "\n".join(lines))
+
+    def render_games_page_details(self) -> None:
+        if not getattr(self, "games_detail_text", None):
+            return
+        game = self.current_game
+        if not game:
+            self.set_text(self.games_detail_text, "No game selected.")
+            return
+        cache_key = (game["name"], "static")
+        cached = self.game_detail_cache.get(cache_key)
+        if cached is None:
+            lines = [
+                f"Game: {game['name']}",
+                f"LAN/offline status: {game['lan_status']}",
+                "",
+                "Tutorial:",
+                self.format_list(game["host_tutorial"]),
+                "",
+                "Client join:",
+                self.format_list(game["client_tutorial"]),
+                "",
+                "Server info:",
+                f"- Server support: {game.get('server_support', 'none')}",
+                self.format_ports(game.get("server_ports", [])),
+                "",
+                "Mods:",
+                "- Use Mod List Export to compare files between players.",
+                "",
+                "Troubleshooting:",
+                self.format_list(game["troubleshooting"]),
+                "",
+                "Safety notes:",
+                "- This helper does not transform online-only games into LAN games.",
+                "- No DRM/anti-cheat/authentication bypass.",
+            ]
+            cached = "\n".join(lines)
+            self.game_detail_cache[cache_key] = cached
+        dynamic_lines = [
+            f"Network/IP: {self.selected_ip() or 'HOST_LAN_IP'}",
+            f"Executable path: {self.current_path or 'not selected'}",
+            "Note: Same LAN/VPN and matching version/mod state required.",
+            "",
+        ]
+        self.games_page_title.configure(text=f"{game['name']} details")
+        self.set_text(self.games_detail_text, "\n".join(dynamic_lines) + cached)
 
     def update_tutorial_tab(self) -> None:
         game = self.current_game

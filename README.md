@@ -2,6 +2,12 @@
 
 Offline LAN Games Helper is a safe Windows GUI utility for LAN/offline multiplayer games that you legally own. It helps with LAN IP discovery, Windows Firewall rules, normal game launching, game-specific tutorials, exported guides, and official dedicated server tools where a real supported server option exists.
 
+Created by **KiwiLiu**.
+
+Support the project:
+- PayPal: https://paypal.me/The0Cosmo
+- GitHub Sponsors: https://github.com/sponsors/The0Cosmo
+
 The current UI uses a cleaner kiwi-green light theme, readable high-contrast text, larger buttons, scrollable tutorial panels, and an original kiwi LAN logo.
 
 This project is not affiliated with Steam, Valve, Paradox, Epic Games, Rockstar, Riot Games, Mojang, Microsoft, Apple, or any game publisher.
@@ -91,7 +97,13 @@ Optional tools that can be hidden or disabled include Firewall Helper, Server To
 
 Settings, About, Privacy, and Tool Manager are core pages and cannot be hidden.
 
-## Performance and Game Loading
+## Optimized UI
+
+The app uses a cleaner sidebar layout. Game tools are separated from core pages, and `Settings`, `Support`, and `Privacy` are not mixed into game-detail tabs.
+
+The compact log panel is now separated at the bottom with `Show Log / Hide Log` and `Clear Log`.
+
+## Fast Game Loading
 
 The app loads `games.json` once at startup and keeps the parsed game catalog in memory.
 
@@ -102,6 +114,12 @@ Use `Refresh Games` to reload the catalog manually after editing `games.json`.
 ## Responsive UI
 
 The interface uses a minimal kiwi-inspired light/dark palette, scrollable long-text panels, a minimum window size, and a UI scale setting. It is designed to stay readable on resized windows and high-DPI displays.
+
+## Always Visible Settings
+
+`Settings` is a core sidebar page and always remains visible.
+
+`Settings`, `About`, `Privacy`, and `Tool Manager` are core pages and cannot be hidden by Tool Manager.
 
 ## Kiwi Logo
 

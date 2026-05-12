@@ -53,13 +53,15 @@ Invite text is copied or exported only when the user clicks the related button.
 
 The app does not upload invite text.
 
-## Local Detection and Cache
+## Local Cache and Performance
 
 The app may cache local game detection results and UI preferences to improve performance.
 
 This data stays on your device and is not uploaded.
 
 The app does not scan the entire disk aggressively.
+
+Cached items may include the supported game catalog state, selected game, installed detection results, hidden/disabled tools, default filters, and UI preferences.
 
 ## Internet Access
 
@@ -102,4 +104,4 @@ This project is not affiliated with Steam, Valve, Paradox, Epic Games, Rockstar,
 ## Contact
 
 For privacy questions, contact:
-The0Cosmo via GitHub.
+KiwiLiu (GitHub: The0Cosmo).
